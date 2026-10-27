@@ -1,3 +1,4 @@
+import type { InterestChoice } from "../../lib/interestCategories";
 import { useState } from "react";
 import {
   ChevronUp,
@@ -17,6 +18,7 @@ export default function IssueDetails({
   issue,
   followed,
   interests,
+  trackingReady,
   onTrack,
   onUntrack,
   onCreateInterest,
@@ -27,9 +29,10 @@ export default function IssueDetails({
   issue: Issue;
   followed: boolean;
   interests: Interest[];
+  trackingReady: boolean;
   onTrack: (interestId?: string) => void;
   onUntrack: () => void;
-  onCreateInterest: (name: string) => void;
+  onCreateInterest: (choice: InterestChoice) => void;
   onClose: () => void;
   onContribute: () => void;
   onAsk: () => void;
@@ -70,6 +73,7 @@ export default function IssueDetails({
         <span className={styles.date}>{freshness(issue.source)}</span>
         <div className={styles.actions}>
           <TrackingButton
+            disabled={!trackingReady}
             issueId={issue.id}
             followed={followed}
             interests={interests}

@@ -1,3 +1,4 @@
+import type { InterestChoice } from "../../lib/interestCategories";
 import { useEffect, useRef, useState } from "react";
 import {
   House,
@@ -26,6 +27,7 @@ export default function Sidebar({
   onClose,
   issues,
   interests,
+  trackingReady,
   following,
   activeInterestId,
   onInterest,
@@ -43,10 +45,11 @@ export default function Sidebar({
   onClose: () => void;
   issues: Issue[];
   interests: Interest[];
+  trackingReady: boolean;
   following: string[];
   activeInterestId?: string;
   onInterest: (id: string) => void;
-  onCreateInterest: (name: string) => void;
+  onCreateInterest: (choice: InterestChoice) => void;
   selected?: string;
   onSelect: (issue: Issue) => void;
   query: string;
@@ -175,6 +178,7 @@ export default function Sidebar({
                     </button>
                   ))}
                   <InterestList
+                    disabled={!trackingReady}
                     interests={interests}
                     following={following}
                     issues={issues}

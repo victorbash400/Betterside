@@ -1,0 +1,44 @@
+.row {
+  display: flex;
+  align-items: stretch;
+  min-height: 42px;
+  border-radius: 9px;
+}
+.row:hover {
+  background: var(--hover);
+}
+.row button {
+  display: flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+}
+.choose {
+  flex: 1;
+  min-width: 0;
+  gap: 10px;
+  padding: 10px;
+  text-align: left;
+}
+.choose > span {
+  flex: 1;
+}
+.choose small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 3px;
+}
+.choose:disabled {
+  color: var(--muted);
+}
+.browse {
+  justify-content: center;
+  width: 40px;
+  border-radius: 9px;
+}
+.browse:hover {
+  background: var(--selection);
+}

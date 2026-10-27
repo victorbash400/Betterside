@@ -1,3 +1,7 @@
+import {
+  interestOrder,
+  type InterestChoice,
+} from "../../lib/interestCategories";
 import { useState } from "react";
 import { Plus, FileText } from "lucide-react";
 import IconButton from "../controls/IconButton";
@@ -8,6 +12,7 @@ import type { Issue } from "../../lib/types";
 import styles from "./InterestList.module.css";
 export default function InterestList({
   interests,
+  disabled,
   following,
   issues,
   selected,
@@ -17,13 +22,14 @@ export default function InterestList({
   onCreate,
 }: {
   interests: Interest[];
+  disabled?: boolean;
   following: string[];
   issues: Issue[];
   selected?: string;
   activeId?: string;
   onSelect: (issue: Issue) => void;
   onOpen: (id: string) => void;
-  onCreate: (name: string) => void;
+  onCreate: (choice: InterestChoice) => void;
 }) {
   const [creating, setCreating] = useState(false);
   const grouped = new Set(interests.flatMap((interest) => interest.issueIds));
@@ -32,6 +38,7 @@ export default function InterestList({
       <div className={styles.header}>
         <span>Interests</span>
         <IconButton
+          disabled={disabled}
           label="New interest"
           title="New interest"
           onClick={() => setCreating(true)}
@@ -39,7 +46,7 @@ export default function InterestList({
           <Plus />
         </IconButton>
       </div>
-      {interests.map((interest) => (
+      {interests.toSorted(interestOrder).map((interest) => (
         <InterestFolder
           key={interest.id}
           interest={interest}
@@ -71,6 +78,7 @@ export default function InterestList({
         ))}
       {creating && (
         <NewInterestDialog
+          interests={interests}
           onClose={() => setCreating(false)}
           onCreate={(name) => {
             onCreate(name);

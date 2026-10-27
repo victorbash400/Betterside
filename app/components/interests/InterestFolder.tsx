@@ -1,3 +1,4 @@
+import { categoryPath } from "../../lib/interestCategories";
 import { useState } from "react";
 import { Folder, FolderOpen, FileText, ChevronRight } from "lucide-react";
 import type { Issue } from "../../lib/types";
@@ -35,6 +36,7 @@ export default function InterestFolder({
         </button>
         <button
           className={styles.name}
+          title={categoryPath(interest.categoryId) || interest.name}
           onClick={() => {
             setExpanded(true);
             onOpen();

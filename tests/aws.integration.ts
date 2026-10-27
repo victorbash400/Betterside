@@ -77,3 +77,41 @@ test("isolated AWS fixture captures once, refunds once, and preserves isolation"
     );
   }
 });
+
+test("interests persist per visitor and reject conflicting revisions", async () => {
+  const { loadTracking, saveTracking } =
+    await import("../app/server/tracking.ts");
+  const donor = `qa-tracking-${randomUUID()}`;
+  const snapshot = {
+    version: 1 as const,
+    following: ["somalia-water"],
+    interests: [
+      {
+        id: "water-test",
+        name: "Safe drinking water",
+        categoryId: "drinking-water",
+        issueIds: ["somalia-water"],
+      },
+    ],
+  };
+  try {
+    assert.deepEqual(await loadTracking(donor), {
+      snapshot: null,
+      revision: 0,
+    });
+    assert.equal((await saveTracking(donor, snapshot, 0)).revision, 1);
+    assert.deepEqual((await loadTracking(donor)).snapshot, snapshot);
+    assert.equal((await loadTracking(`${donor}-other`)).snapshot, null);
+    await assert.rejects(() =>
+      saveTracking(donor, { ...snapshot, following: [], interests: [] }, 0),
+    );
+    assert.deepEqual((await loadTracking(donor)).snapshot, snapshot);
+  } finally {
+    await database.send(
+      new DeleteCommand({
+        TableName: requireTable(),
+        Key: { pk: `DONOR#${donor}`, sk: "TRACKING" },
+      }),
+    );
+  }
+});

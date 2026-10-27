@@ -106,6 +106,7 @@ export function useWorkspace() {
     setSelectedId,
     following,
     interests: tracking.interests,
+    trackingReady: tracking.ready && !tracking.error,
     track: tracking.track,
     untrack: tracking.untrack,
     createInterest: tracking.create,

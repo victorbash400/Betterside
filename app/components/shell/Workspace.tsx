@@ -56,6 +56,7 @@ export default function Workspace() {
         onClose={() => state.setNavigationOpen(false)}
         issues={state.sidebarIssues}
         interests={state.interests}
+        trackingReady={state.trackingReady}
         following={state.following}
         activeInterestId={
           state.view === "Following" ? state.selectedInterestId : undefined
@@ -67,7 +68,7 @@ export default function Workspace() {
           state.setSettingsOpen(false);
         }}
         onCreateInterest={(name) => {
-          state.createInterest(name);
+          state.createInterest(name.name, undefined, name.categoryId);
         }}
         selected={state.selected?.id}
         onSelect={(issue) => {
@@ -176,12 +177,17 @@ export default function Workspace() {
                         issue={state.selected}
                         followed={state.following.includes(state.selected.id)}
                         interests={state.interests}
+                        trackingReady={state.trackingReady}
                         onTrack={(interestId) =>
                           state.track(state.selected!.id, interestId)
                         }
                         onUntrack={() => state.untrack(state.selected!.id)}
                         onCreateInterest={(name) => {
-                          state.createInterest(name, state.selected!.id);
+                          state.createInterest(
+                            name.name,
+                            state.selected!.id,
+                            name.categoryId,
+                          );
                         }}
                         onClose={() => state.setSelectedId(undefined)}
                         onContribute={() => state.setCheckout(state.selected)}

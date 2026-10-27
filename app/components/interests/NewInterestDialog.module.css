@@ -1,32 +1,72 @@
-.form {
+.picker {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
+}
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 8px 12px;
+  color: var(--muted);
+}
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 13px;
+}
+.search:focus-within {
+  border-color: var(--icon);
+}
+.list {
+  max-height: min(360px, 50dvh);
+  overflow-y: auto;
+}
+.specific {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+}
+.specific:hover {
+  background: var(--hover);
+}
+.form {
+  display: flex;
+  gap: 8px;
 }
 .form input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
-  padding: 10px 12px;
   font-size: 13px;
 }
-.form > div {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
 .form button {
-  border: 1px solid var(--border);
-  border-radius: 18px;
   padding: 8px 16px;
-  background: transparent;
-  font-size: 12px;
-}
-.form button:last-child {
+  border: 0;
+  border-radius: 18px;
   background: var(--ink);
   color: var(--surface);
-  border-color: var(--ink);
+  font-size: 12px;
 }
 .form button:disabled {
   opacity: 0.5;

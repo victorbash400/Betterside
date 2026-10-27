@@ -1,3 +1,4 @@
+import type { InterestChoice } from "../../lib/interestCategories";
 import { useState } from "react";
 import { Bookmark, Check, FolderPlus, X } from "lucide-react";
 import ContextMenu from "../controls/ContextMenu";
@@ -5,6 +6,7 @@ import NewInterestDialog from "./NewInterestDialog";
 import type { Interest } from "../../state/useTracking";
 export default function TrackingButton({
   issueId,
+  disabled,
   followed,
   interests,
   onTrack,
@@ -12,11 +14,12 @@ export default function TrackingButton({
   onCreate,
 }: {
   issueId: string;
+  disabled?: boolean;
   followed: boolean;
   interests: Interest[];
   onTrack: (interestId?: string) => void;
   onUntrack: () => void;
-  onCreate: (name: string) => void;
+  onCreate: (choice: InterestChoice) => void;
 }) {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null),
     [creating, setCreating] = useState(false);
@@ -26,6 +29,7 @@ export default function TrackingButton({
   return (
     <>
       <button
+        disabled={disabled}
         aria-pressed={followed}
         aria-haspopup="menu"
         aria-expanded={Boolean(menu)}
@@ -66,6 +70,7 @@ export default function TrackingButton({
       )}
       {creating && (
         <NewInterestDialog
+          interests={interests}
           onClose={() => setCreating(false)}
           onCreate={(name) => {
             onCreate(name);
