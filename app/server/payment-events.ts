@@ -16,6 +16,19 @@ export async function recordRefund(
           Put: {
             TableName,
             Item: {
+              pk: `REFUND#${refundId}`,
+              sk: "META",
+              eventId,
+              orderId: record.id,
+              cents,
+            },
+            ConditionExpression: "attribute_not_exists(pk)",
+          },
+        },
+        {
+          Put: {
+            TableName,
+            Item: {
               pk: `EVENT#${eventId}`,
               sk: "META",
               refundId,

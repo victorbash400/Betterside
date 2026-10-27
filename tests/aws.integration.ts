@@ -38,6 +38,7 @@ test("isolated AWS fixture captures once, refunds once, and preserves isolation"
     { pk: `DONOR#${donor}`, sk: `PAYMENT#${createdAt}#${id}` },
     { pk: `PROJECT#${projectId}`, sk: "FUNDING" },
     { pk: `EVENT#${eventId}`, sk: "META" },
+    { pk: `REFUND#qa-refund-${suffix}`, sk: "META" },
   ];
   try {
     await recordPayment(record);
@@ -56,6 +57,9 @@ test("isolated AWS fixture captures once, refunds once, and preserves isolation"
     await recordRefund(captured, eventId, `qa-refund-${suffix}`, 100);
     await assert.rejects(() =>
       recordRefund(captured, eventId, `qa-refund-${suffix}`, 100),
+    );
+    await assert.rejects(() =>
+      recordRefund(captured, `another-${eventId}`, `qa-refund-${suffix}`, 100),
     );
     assert.equal((await funding()).Item?.receivedCents, 0);
     assert.equal((await payment(id))?.status, "REFUNDED");

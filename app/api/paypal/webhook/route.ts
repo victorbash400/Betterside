@@ -113,7 +113,7 @@ export async function POST(request: Request) {
         const duplicate = await database.send(
           new GetCommand({
             TableName: requireTable(),
-            Key: { pk: `EVENT#${event.id}`, sk: "META" },
+            Key: { pk: `REFUND#${event.resource.id}`, sk: "META" },
             ConsistentRead: true,
           }),
         );
