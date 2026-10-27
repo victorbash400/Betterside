@@ -1,90 +1,105 @@
 "use client";
-import { MessageCircle, SquarePen, X } from "lucide-react";
-import IconButton from "../controls/IconButton";
-import MessageList from "./MessageList";
-import ChatComposer from "./ChatComposer";
+import { useState } from "react";
+import { useChatSessions } from "../../state/useChatSessions";
+import ChatHeader from "./ChatHeader";
+import ChatHistory from "./ChatHistory";
+import ChatRenameDialog from "./ChatRenameDialog";
+import ChatThread from "./ChatThread";
 import type { Analysis } from "../../lib/analysis";
 import type { Issue } from "../../lib/types";
-import { useConversation } from "../../state/useConversation";
 import styles from "./ChatDrawer.module.css";
 export default function ChatDrawer({
   selected,
-  onClose,
+  issues,
   model,
   onAnalysis,
+  onSelect,
+  onClose,
 }: {
   selected?: Issue;
-  onClose: () => void;
+  issues: Issue[];
   model: "fast" | "reasoning";
   onAnalysis: (analysis: Analysis) => void;
+  onSelect: (issue: Issue) => void;
+  onClose: () => void;
 }) {
-  const {
-    draft,
-    setDraft,
-    messages,
-    sendMessage,
-    stop,
-    error,
-    regenerate,
-    setMessages,
-    storageError,
-    busy,
-  } = useConversation({ areaId: selected?.id, model, onAnalysis });
+  const sessions = useChatSessions(),
+    [history, setHistory] = useState(false),
+    [renaming, setRenaming] = useState(false);
+  function newChat() {
+    sessions.create();
+    setHistory(false);
+  }
   return (
-    <aside className={styles.drawer} aria-label="BetterSide chat">
-      <header>
-        <MessageCircle size={16} />
-        <span>Ask BetterSide</span>
-        <IconButton
-          label="New conversation"
-          onClick={() => {
-            void stop();
-            setMessages([]);
-            setDraft("");
-          }}
-        >
-          <SquarePen />
-        </IconButton>
-        <IconButton label="Close chat" onClick={onClose}>
-          <X />
-        </IconButton>
-      </header>
-      {messages.length === 0 ? (
-        <div className={styles.starters}>
-          {[
-            "Which water projects need funding?",
-            "Compare the available projects",
-            "What do we know about Sudan?",
-          ].map((text) => (
-            <button
-              key={text}
-              disabled={busy}
-              onClick={() => void sendMessage({ text })}
-            >
-              {text}
-            </button>
-          ))}
-        </div>
-      ) : null}
-      <MessageList messages={messages} busy={busy} />
-      {(error || storageError) && (
-        <div className={styles.error} role="alert">
-          <span>{storageError || error?.message || "Chat failed."}</span>
-          {error && <button onClick={() => void regenerate()}>Retry</button>}
-        </div>
-      )}
-      <ChatComposer
-        draft={draft}
-        onDraft={setDraft}
-        busy={busy}
-        location={selected?.location}
-        onStop={() => void stop()}
-        onSend={() => {
-          if (!draft.trim()) return;
-          void sendMessage({ text: draft.trim() });
-          setDraft("");
-        }}
+    <aside
+      className={styles.drawer}
+      aria-label="Chat"
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && !event.defaultPrevented) {
+          if (history) setHistory(false);
+          else onClose();
+        }
+      }}
+    >
+      <ChatHeader
+        historyOpen={history}
+        onHistory={() => setHistory((value) => !value)}
+        onNew={newChat}
+        onClose={onClose}
+        onRename={() => setRenaming(true)}
+        onDelete={() => sessions.remove(sessions.activeId)}
       />
+      <div className={styles.body}>
+        {sessions.ready && (
+          <ChatThread
+            key={sessions.activeId}
+            conversationId={sessions.activeId}
+            selected={selected}
+            issues={issues}
+            model={model}
+            onAnalysis={onAnalysis}
+            onSelect={onSelect}
+            onTitle={(title) => sessions.rename(sessions.activeId, title)}
+          />
+        )}
+        {sessions.error && (
+          <p className={styles.error} role="alert">
+            {sessions.error}
+          </p>
+        )}
+        {history && (
+          <>
+            <button
+              className={styles.scrim}
+              aria-label="Close chats"
+              onClick={() => setHistory(false)}
+            />
+            <ChatHistory
+              items={sessions.items}
+              activeId={sessions.activeId}
+              onNew={newChat}
+              onSelect={(id) => {
+                sessions.select(id);
+                setHistory(false);
+              }}
+              onDelete={sessions.remove}
+            />
+          </>
+        )}
+      </div>
+      {renaming && (
+        <ChatRenameDialog
+          title={
+            sessions.items.find((item) => item.id === sessions.activeId)
+              ?.title ?? ""
+          }
+          onSubmit={(title) => {
+            sessions.rename(sessions.activeId, title);
+            setRenaming(false);
+          }}
+          onClose={() => setRenaming(false)}
+        />
+      )}
     </aside>
   );
 }

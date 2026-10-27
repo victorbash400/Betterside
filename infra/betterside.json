@@ -131,9 +131,43 @@
                   "Resource": {
                     "Fn::Sub": "${Files.Arn}/*"
                   }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "bedrock-mantle:CreateInference",
+                    "bedrock-mantle:GetProject",
+                    "bedrock-mantle:ListTagsForResource"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": ["AgentProject", "Arn"]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": ["bedrock-mantle:CallWithBearerToken"],
+                  "Resource": "*"
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    "AgentProject": {
+      "Type": "AWS::BedrockMantle::Project",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "Name": "BetterSide-Development",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": "betterside"
+          },
+          {
+            "Key": "Environment",
+            "Value": "development"
           }
         ]
       }
@@ -148,6 +182,16 @@
     "BucketName": {
       "Value": {
         "Ref": "Files"
+      }
+    },
+    "BedrockProjectId": {
+      "Value": {
+        "Fn::GetAtt": ["AgentProject", "Id"]
+      }
+    },
+    "BedrockProjectArn": {
+      "Value": {
+        "Fn::GetAtt": ["AgentProject", "Arn"]
       }
     }
   }

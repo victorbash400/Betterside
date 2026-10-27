@@ -1,4 +1,7 @@
 "use client";
+import { useState } from "react";
+import MapTools from "../map/MapTools";
+import MapWindow from "../map/MapWindow";
 import dynamic from "next/dynamic";
 import Sidebar from "./Sidebar";
 import WorkspaceHeader from "./WorkspaceHeader";
@@ -16,54 +19,135 @@ const StudioDashboard = dynamic(() => import("../dashboard/StudioDashboard"), {
 const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), { ssr: false });
 export default function Workspace() {
   const state = useWorkspace();
+  const [fundingOpen, setFundingOpen] = useState(false),
+    [projectsOpen, setProjectsOpen] = useState(false),
+    [markers, setMarkers] = useState(true),
+    [focusRequest, setFocusRequest] = useState(0);
+  const [openedWindows, setOpenedWindows] = useState({
+    funding: false,
+    projects: false,
+  });
+  function toggleFunding() {
+    setOpenedWindows((value) => ({ ...value, funding: true }));
+    setFundingOpen((value) => !value);
+  }
+  function toggleProjects() {
+    setOpenedWindows((value) => ({ ...value, projects: true }));
+    setProjectsOpen((value) => !value);
+  }
+  function home() {
+    state.setView("Explore");
+    state.setSelectedId(undefined);
+    state.setSettingsOpen(false);
+  }
   return (
-    <main className={styles.shell}>
+    <div className={styles.shell}>
       <Sidebar
         view={state.view}
-        onView={state.setView}
-        onChat={() => state.setChatOpen(true)}
+        onView={(view) => {
+          state.setView(view);
+          state.setSettingsOpen(false);
+          if (view === "Explore") state.setSelectedId(undefined);
+        }}
         onSettings={() => state.setSettingsOpen(true)}
         open={state.navigationOpen}
         onClose={() => state.setNavigationOpen(false)}
+        issues={state.records}
+        selected={state.selected?.id}
+        onSelect={(issue) => {
+          state.setSelectedId(issue.id);
+          state.setView("Explore");
+          state.setSettingsOpen(false);
+        }}
+        query={state.filters.query}
+        onQuery={(query) => state.setFilters({ ...state.filters, query })}
+        settings={state.settingsOpen}
       />
-      <div className={styles.main}>
-        <WorkspaceHeader
-          view={state.view}
-          onMenu={() => state.setNavigationOpen(true)}
-          chatOpen={state.chatOpen}
-          onChat={() => state.setChatOpen((value) => !value)}
-          onSettings={() => state.setSettingsOpen(true)}
+      {state.settingsOpen ? (
+        <SettingsDialog
+          projection={state.projection}
+          onProjection={state.setProjection}
+          model={state.model}
+          onModel={state.setModel}
+          onClose={() => state.setSettingsOpen(false)}
+          onNavigation={() => state.setNavigationOpen(true)}
         />
-        <div className={styles.workspace}>
-          <div className={styles.surface}>
-            {state.view === "Contributions" ? (
-              <ContributionHistory onExplore={() => state.setView("Explore")} />
-            ) : (
-              <>
-                <IssueFilters
-                  filters={state.filters}
-                  onChange={state.setFilters}
-                  count={state.records.length}
-                />
-                {state.view === "Dashboard" ? (
-                  <StudioDashboard
-                    issues={state.records}
-                    analysis={state.analysis}
-                    onSelect={issue=>{state.setSelectedId(issue.id);state.setView("Explore");}}
+      ) : (
+        <main className={styles.main}>
+          <WorkspaceHeader
+            view={state.view}
+            onMenu={() => state.setNavigationOpen(true)}
+            onChat={() => state.setChatOpen((value) => !value)}
+            chatOpen={state.chatOpen}
+            onHome={home}
+          />
+          <div className={styles.workspace}>
+            <div className={styles.surface}>
+              {state.view === "Contributions" ? (
+                <ContributionHistory onExplore={home} />
+              ) : (
+                <>
+                  <IssueFilters
+                    filters={state.filters}
+                    onChange={state.setFilters}
+                    count={state.records.length}
                   />
-                ) : (
                   <div className={styles.mapWorkspace}>
                     <GlobeCanvas
-                      issues={state.records}
+                      issues={markers ? state.records : []}
+                      focusRequest={focusRequest}
                       selected={state.selected}
                       onSelect={(issue) => state.setSelectedId(issue.id)}
                       metric={state.filters.metric}
-                      onMetric={(metric) =>
-                        state.setFilters({ ...state.filters, metric })
-                      }
                       projection={state.projection}
                       onProjection={state.setProjection}
                     />
+                    <MapTools
+                      funding={fundingOpen}
+                      projects={projectsOpen}
+                      markers={markers}
+                      metric={state.filters.metric}
+                      onFunding={toggleFunding}
+                      onProjects={toggleProjects}
+                      onMarkers={() => setMarkers((value) => !value)}
+                      onMetric={(metric) =>
+                        state.setFilters({ ...state.filters, metric })
+                      }
+                      canFocus={Boolean(state.selected)}
+                      onFocus={() => setFocusRequest((value) => value + 1)}
+                    />
+                    {openedWindows.funding && (
+                      <MapWindow
+                        title="Funding"
+                        hidden={!fundingOpen}
+                        onClose={() => setFundingOpen(false)}
+                      >
+                        <StudioDashboard
+                          issues={state.records}
+                          analysis={
+                            state.analysis?.kind === "project-comparison"
+                              ? undefined
+                              : state.analysis
+                          }
+                          widget="funding"
+                          onSelect={(issue) => state.setSelectedId(issue.id)}
+                        />
+                      </MapWindow>
+                    )}
+                    {openedWindows.projects && (
+                      <MapWindow
+                        title="Projects"
+                        hidden={!projectsOpen}
+                        offset={50}
+                        onClose={() => setProjectsOpen(false)}
+                      >
+                        <StudioDashboard
+                          issues={state.records}
+                          widget="projects"
+                          onSelect={(issue) => state.setSelectedId(issue.id)}
+                        />
+                      </MapWindow>
+                    )}
                     {state.selected && (
                       <IssueDetails
                         issue={state.selected}
@@ -75,31 +159,36 @@ export default function Workspace() {
                       />
                     )}
                   </div>
-                )}
-              </>
+                </>
+              )}
+            </div>
+            {state.chatOpen && (
+              <ChatDrawer
+                selected={state.selected}
+                issues={state.records}
+                model={state.model}
+                onAnalysis={(analysis) => {
+                  state.setAnalysis(analysis);
+                  state.setView("Explore");
+                  setOpenedWindows((value) => ({
+                    ...value,
+                    [analysis.kind === "project-comparison"
+                      ? "projects"
+                      : "funding"]: true,
+                  }));
+                  if (analysis.kind === "project-comparison")
+                    setProjectsOpen(true);
+                  else setFundingOpen(true);
+                }}
+                onSelect={(issue) => {
+                  state.setSelectedId(issue.id);
+                  state.setView("Explore");
+                }}
+                onClose={() => state.setChatOpen(false)}
+              />
             )}
           </div>
-          {state.chatOpen && (
-            <ChatDrawer
-              selected={state.selected}
-              model={state.model}
-              onAnalysis={(analysis) => {
-                state.setAnalysis(analysis);
-                state.setView("Dashboard");
-              }}
-              onClose={() => state.setChatOpen(false)}
-            />
-          )}
-        </div>
-      </div>
-      {state.settingsOpen && (
-        <SettingsDialog
-          projection={state.projection}
-          onProjection={state.setProjection}
-          model={state.model}
-          onModel={state.setModel}
-          onClose={() => state.setSettingsOpen(false)}
-        />
+        </main>
       )}
       {state.checkout && (
         <ContributionDialog
@@ -114,6 +203,6 @@ export default function Workspace() {
           <button onClick={() => state.setError("")}>Dismiss</button>
         </div>
       )}
-    </main>
+    </div>
   );
 }

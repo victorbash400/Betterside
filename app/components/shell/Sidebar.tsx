@@ -1,90 +1,210 @@
+import { useEffect, useRef, useState } from "react";
 import {
-  Globe2,
-  ChartNoAxesCombined,
+  House,
+  PanelLeftClose,
+  Folder,
   Heart,
   Bookmark,
-  MessageCircle,
-  Settings2,
+  CircleUserRound,
+  Settings,
+  Search,
   X,
-  ArrowUpRight,
 } from "lucide-react";
-import { useNarrowLayout } from "../../state/useNarrowLayout";
 import IconButton from "../controls/IconButton";
-import type { View } from "../../lib/types";
+import AppIcon from "../controls/AppIcon";
+import ContextMenu from "../controls/ContextMenu";
+import { useNarrowLayout } from "../../state/useNarrowLayout";
+import type { Issue, View } from "../../lib/types";
 import styles from "./Sidebar.module.css";
-const destinations = [
-  { name: "Explore", icon: Globe2 },
-  { name: "Dashboard", icon: ChartNoAxesCombined },
-  { name: "Contributions", icon: Heart },
-  { name: "Following", icon: Bookmark },
-] as const;
+import searchStyles from "./SidebarSearch.module.css";
 export default function Sidebar({
   view,
   onView,
-  onChat,
   onSettings,
   open,
   onClose,
+  issues,
+  selected,
+  onSelect,
+  query,
+  onQuery,
+  settings,
 }: {
   view: View;
   onView: (view: View) => void;
-  onChat: () => void;
   onSettings: () => void;
   open: boolean;
   onClose: () => void;
+  issues: Issue[];
+  selected?: string;
+  onSelect: (issue: Issue) => void;
+  query: string;
+  onQuery: (query: string) => void;
+  settings: boolean;
 }) {
-  const narrow = useNarrowLayout();
+  const narrow = useNarrowLayout(),
+    sidebar = useRef<HTMLElement>(null);
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    if (!narrow || !open) return;
+    const previous = document.activeElement;
+    sidebar.current?.querySelector("button")?.focus();
+    return () => {
+      if (previous instanceof HTMLElement) previous.focus();
+    };
+  }, [narrow, open]);
   return (
     <>
-      <aside
-        className={`${styles.sidebar} ${open ? styles.open : ""}`}
-        aria-label="Main navigation"
-        inert={narrow && !open}
-      >
-        <div className={styles.brand}>
-          <Globe2 size={22} />
-          <span>BetterSide</span>
-          <IconButton
-            label="Close navigation"
-            className={styles.close}
-            onClick={onClose}
-          >
-            <X />
-          </IconButton>
-        </div>
-        <nav className={styles.nav}>
-          {destinations.map(({ name, icon: Icon }) => (
-            <button
-              key={name}
-              aria-current={view === name ? "page" : undefined}
-              onClick={() => {
-                onView(name);
-                onClose();
-              }}
-            >
-              <Icon size={17} />
-              {name}
-            </button>
-          ))}
-        </nav>
-        <div className={styles.secondary}>
-          <button onClick={onChat}>
-            <MessageCircle size={17} />
-            Ask BetterSide
-            <ArrowUpRight size={14} />
-          </button>
-          <button onClick={onSettings}>
-            <Settings2 size={17} />
-            Settings
-          </button>
-        </div>
-        <span className={styles.sandbox}>Sandbox</span>
-      </aside>
       {open && (
         <button
           className={styles.backdrop}
           aria-label="Close navigation"
           onClick={onClose}
+        />
+      )}
+      <aside
+        ref={sidebar}
+        inert={narrow && !open}
+        className={`${styles.sidebar} ${open ? styles.open : ""}`}
+        aria-label="Navigation"
+        onKeyDown={(event) => {
+          if (!narrow || !open) return;
+          if (event.key === "Escape") {
+            event.preventDefault();
+            onClose();
+          }
+          if (event.key === "Tab") {
+            const controls = Array.from(
+              sidebar.current?.querySelectorAll<HTMLElement>(
+                "button:not(:disabled), input:not(:disabled)",
+              ) ?? [],
+            );
+            const first = controls[0],
+              last = controls.at(-1);
+            if (event.shiftKey && document.activeElement === first) {
+              event.preventDefault();
+              last?.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+              event.preventDefault();
+              first?.focus();
+            }
+          }
+        }}
+      >
+        <div className={styles.brand}>
+          <AppIcon />
+          <span>BetterSide</span>
+          <div className={styles.close}>
+            <IconButton label="Close navigation" onClick={onClose}>
+              <PanelLeftClose />
+            </IconButton>
+          </div>
+        </div>
+        <div className={styles.panel}>
+          <button
+            className={`${styles.home} ${styles.homeRow} ${!settings && view === "Explore" && !selected ? styles.selected : ""}`}
+            onClick={() => {
+              onView("Explore");
+              onClose();
+            }}
+          >
+            <House size={24} strokeWidth={1.8} />
+            Home
+          </button>
+          <label className={searchStyles.search}>
+            <Search size={18} />
+            <input
+              type="search"
+              aria-label="Search locations, issues and projects"
+              placeholder="Search"
+              value={query}
+              onChange={(event) => onQuery(event.target.value)}
+            />
+            {query && (
+              <button
+                className={searchStyles.clear}
+                aria-label="Clear search"
+                onClick={() => onQuery("")}
+              >
+                <X size={14} />
+              </button>
+            )}
+          </label>
+          <nav className={styles.navigation}>
+            <div className={styles.entries}>
+              {settings ? (
+                <button
+                  className={`${styles.home} ${styles.selected}`}
+                  onClick={onSettings}
+                >
+                  <Settings size={24} />
+                  Settings
+                </button>
+              ) : (
+                <>
+                  <div className={styles.section}>
+                    <span>Areas</span>
+                  </div>
+                  {issues.map((issue) => (
+                    <button
+                      key={issue.id}
+                      className={`${styles.home} ${selected === issue.id ? styles.selected : ""}`}
+                      onClick={() => {
+                        onSelect(issue);
+                        onClose();
+                      }}
+                    >
+                      <Folder size={24} strokeWidth={1.8} />
+                      {issue.location}
+                    </button>
+                  ))}
+                  <div className={styles.section}>
+                    <span>Workspace</span>
+                  </div>
+                  {(
+                    [
+                      { name: "Contributions", icon: Heart },
+                      { name: "Following", icon: Bookmark },
+                    ] as const
+                  ).map(({ name, icon: Icon }) => (
+                    <button
+                      key={name}
+                      className={`${styles.home} ${view === name ? styles.selected : ""}`}
+                      onClick={() => {
+                        onView(name);
+                        onClose();
+                      }}
+                    >
+                      <Icon size={24} strokeWidth={1.8} />
+                      {name}
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          </nav>
+          <footer className={styles.footer}>
+            <button
+              className={styles.avatar}
+              aria-label="Account menu"
+              aria-haspopup="menu"
+              aria-expanded={Boolean(menu)}
+              onClick={(event) => {
+                const rect = event.currentTarget.getBoundingClientRect();
+                setMenu(menu ? null : { x: rect.left, y: rect.top - 58 });
+              }}
+            >
+              <CircleUserRound size={24} strokeWidth={1.8} />
+            </button>
+          </footer>
+        </div>
+      </aside>
+      {menu && (
+        <ContextMenu
+          {...menu}
+          label="Account"
+          entries={[{ label: "Settings", icon: Settings, action: onSettings }]}
+          onClose={() => setMenu(null)}
         />
       )}
     </>

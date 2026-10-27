@@ -1,99 +1,36 @@
-.filters {
+.header {
   position: relative;
   z-index: 3;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 12px 16px;
-  background: var(--surface);
-  border-radius: 14px 14px 0 0;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 10px 12px 12px;
+  background: var(--panel);
 }
-.search {
+.searchRow {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--panel);
-  padding: 0 10px;
-  height: 34px;
-  min-width: 240px;
-  flex: 1;
-  max-width: 340px;
-  border-radius: 8px;
-  color: var(--icon);
+  min-width: 0;
 }
-.search input {
-  border: 0;
-  outline: 0;
-  background: transparent;
-  width: 100%;
-  font-size: 12px;
-}
-.search button {
-  display: flex;
-  border: 0;
-  background: transparent;
-  padding: 2px;
-}
-.categories {
-  display: flex;
-  gap: 4px;
-  overflow: auto;
-}
-.categories button {
+.control {
   display: flex;
   align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  font-size: 11px;
-  height: 30px;
-  padding: 0 8px;
-  border: 0;
-  border-radius: 7px;
+  gap: 7px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
   background: transparent;
   color: var(--icon);
+  font-size: 12px;
 }
-.categories button:hover {
+.control:hover {
   background: var(--hover);
-}
-.categories button[aria-pressed="true"] {
-  background: var(--selection);
-  color: var(--ink);
-}
-.categories i {
-  height: 6px;
-  width: 6px;
-  border-radius: 50%;
 }
 .count {
   margin-left: auto;
   color: var(--muted);
   font-size: 11px;
-  white-space: nowrap;
-}
-@media (max-width: 1000px) {
-  .search {
-    max-width: none;
-  }
-  .categories {
-    order: 2;
-    width: 100%;
-  }
-  .filters {
-    gap: 8px;
-  }
-}
-@media (max-width: 760px) {
-  .filters {
-    padding: 10px 12px;
-  }
-  .search {
-    min-width: 0;
-  }
-  .categories {
-    gap: 2px;
-  }
-  .categories button {
-    padding: 0 7px;
-  }
 }

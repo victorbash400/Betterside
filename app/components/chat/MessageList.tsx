@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { UIMessage } from "ai";
+import ChatLoadingIndicator from "./ChatLoadingIndicator";
 import MessageText from "./MessageText";
 import styles from "./MessageList.module.css";
 export default function MessageList({
@@ -37,19 +38,11 @@ export default function MessageList({
           {message.parts.map((part, index) =>
             part.type === "text" ? (
               <MessageText key={index} text={part.text} />
-            ) : part.type.startsWith("tool-") ? (
-              <span key={index} className={styles.tool}>
-                Analysis
-              </span>
             ) : null,
           )}
         </article>
       ))}
-      {busy && (
-        <span className={styles.activity} role="status">
-          Thinking
-        </span>
-      )}
+      {busy && <ChatLoadingIndicator />}
     </div>
   );
 }

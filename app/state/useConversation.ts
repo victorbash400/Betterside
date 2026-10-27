@@ -9,10 +9,12 @@ const storedConversation = z.object({
   messages: z.array(z.unknown()),
 });
 export function useConversation({
+  conversationId,
   areaId,
   model,
   onAnalysis,
 }: {
+  conversationId: string;
   areaId?: string;
   model: "fast" | "reasoning";
   onAnalysis: (analysis: Analysis) => void;
@@ -36,7 +38,7 @@ export function useConversation({
       }),
     [areaId, model],
   );
-  const chat = useChat({ transport });
+  const chat = useChat({ id: conversationId, transport });
   const seen = useRef(new Set<string>()),
     applyAnalysis = useEffectEvent(onAnalysis);
   useEffect(() => {
@@ -62,16 +64,21 @@ export function useConversation({
   useEffect(() => {
     let active = true;
     async function restore() {
+      setStorageError("");
       try {
-        const saved = localStorage.getItem("betterside-chat");
+        const saved =
+          localStorage.getItem(`betterside-chat:${conversationId}`) ??
+          (conversationId === "default"
+            ? localStorage.getItem("betterside-chat")
+            : null);
         if (saved) {
           const raw = JSON.parse(saved);
           const snapshot = Array.isArray(raw)
             ? { version: 1, messages: raw }
             : storedConversation.parse(raw);
-          const messages = await validateUIMessages({
-            messages: snapshot.messages,
-          });
+          const messages = snapshot.messages.length
+            ? await validateUIMessages({ messages: snapshot.messages })
+            : [];
           if (!active) return;
           for (const message of messages)
             for (const part of message.parts) {
@@ -82,7 +89,14 @@ export function useConversation({
             }
           setMessages(messages);
         }
-        if (active) setDraft(localStorage.getItem("betterside-draft") ?? "");
+        if (active)
+          setDraft(
+            localStorage.getItem(`betterside-draft:${conversationId}`) ??
+              (conversationId === "default"
+                ? localStorage.getItem("betterside-draft")
+                : null) ??
+              "",
+          );
       } catch {
         if (active) setStorageError("Could not restore conversation.");
       } finally {
@@ -93,20 +107,49 @@ export function useConversation({
     return () => {
       active = false;
     };
-  }, [setMessages]);
+  }, [setMessages, conversationId]);
   useEffect(() => {
-    if (!hydrated || chat.status === "streaming" || chat.status === "submitted")
-      return;
+    if (storageError || !hydrated || chat.status === "streaming") return;
     try {
       localStorage.setItem(
-        "betterside-chat",
+        `betterside-chat:${conversationId}`,
         JSON.stringify({ version: 1, messages: chat.messages }),
       );
-      localStorage.setItem("betterside-draft", draft);
+      localStorage.setItem(`betterside-draft:${conversationId}`, draft);
     } catch {
       setStorageError("Could not save conversation.");
     }
-  }, [draft, chat.messages, hydrated, chat.status]);
+  }, [
+    draft,
+    chat.messages,
+    hydrated,
+    chat.status,
+    conversationId,
+    storageError,
+  ]);
+  const latest = useRef({
+    messages: chat.messages,
+    draft,
+    hydrated,
+    storageError,
+  });
+  latest.current = { messages: chat.messages, draft, hydrated, storageError };
+  useEffect(
+    () => () => {
+      const saved = latest.current;
+      if (!saved.hydrated || saved.storageError) return;
+      try {
+        localStorage.setItem(
+          `betterside-chat:${conversationId}`,
+          JSON.stringify({ version: 1, messages: saved.messages }),
+        );
+        localStorage.setItem(`betterside-draft:${conversationId}`, saved.draft);
+      } catch {
+        console.error("Could not save chat before closing.");
+      }
+    },
+    [conversationId],
+  );
   return {
     ...chat,
     draft,

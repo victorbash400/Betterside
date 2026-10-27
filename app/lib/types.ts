@@ -1,6 +1,6 @@
 export type IssueKind =
   "Water" | "Hunger" | "Displacement" | "Disaster response";
-export type View = "Explore" | "Dashboard" | "Contributions" | "Following";
+export type View = "Explore" | "Contributions" | "Following";
 export interface Source {
   label: string;
   url: string;

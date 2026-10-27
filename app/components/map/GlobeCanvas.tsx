@@ -3,11 +3,9 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Map, setWorkerUrl, type GeoJSONSource } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
-import { issueColors } from "../../lib/catalogue";
 import type { Issue, Filters } from "../../lib/types";
 import MapControls from "./MapControls";
-import MapLegend from "./MapLegend";
-import AreaIndex from "../issues/AreaIndex";
+
 import { cleanMapStyle } from "./mapStyle";
 import styles from "./GlobeCanvas.module.css";
 setWorkerUrl(
@@ -18,17 +16,17 @@ setWorkerUrl(
 );
 export default function GlobeCanvas({
   issues,
+  focusRequest,
   selected,
   metric,
-  onMetric,
   onSelect,
   projection,
   onProjection,
 }: {
   issues: Issue[];
+  focusRequest: number;
   selected?: Issue;
   metric: Filters["metric"];
-  onMetric: (metric: Filters["metric"]) => void;
   onSelect: (issue: Issue) => void;
   projection: "globe" | "mercator";
   onProjection: (projection: "globe" | "mercator") => void;
@@ -42,6 +40,15 @@ export default function GlobeCanvas({
   const pick = useEffectEvent((id: string) => {
     const issue = issues.find((item) => item.id === id);
     if (issue) onSelect(issue);
+  });
+  const resizeFrame = useEffectEvent((instance: Map, ratio: number) => {
+    if (
+      !selected &&
+      projection === "globe" &&
+      Number.isFinite(ratio) &&
+      ratio > 0
+    )
+      instance.setZoom(instance.getZoom() + Math.log2(ratio));
   });
   useEffect(() => {
     if (!container.current) return;
@@ -117,7 +124,7 @@ export default function GlobeCanvas({
         source: "issues",
         filter: ["has", "point_count"],
         paint: {
-          "circle-color": "#626f62",
+          "circle-color": "#5a5a58",
           "circle-radius": 16,
           "circle-stroke-color": "#fafaf8",
           "circle-stroke-width": 2,
@@ -172,7 +179,21 @@ export default function GlobeCanvas({
       else if (event.error?.message?.includes("issues"))
         setError("Issue layer could not load.");
     });
-    const observer = new ResizeObserver(() => instance.resize());
+    let previousSize = Math.min(
+      container.current.clientWidth,
+      container.current.clientHeight,
+    );
+    const observer = new ResizeObserver(() => {
+      if (!container.current) return;
+      const size = Math.min(
+        container.current.clientWidth,
+        container.current.clientHeight,
+      );
+      instance.resize();
+      if (previousSize > 0 && size > 0 && size !== previousSize)
+        resizeFrame(instance, size / previousSize);
+      previousSize = size;
+    });
     observer.observe(container.current);
     return () => {
       observer.disconnect();
@@ -190,7 +211,7 @@ export default function GlobeCanvas({
         geometry: { type: "Point", coordinates: issue.coordinates },
         properties: {
           id: issue.id,
-          color: issueColors[issue.kind],
+          color: "#5a5a58",
           severity: issue.severity,
           freshness: !issue.source.published
             ? "Unknown"
@@ -211,33 +232,11 @@ export default function GlobeCanvas({
       "circle-radius",
       metric === "Funding gap"
         ? ["interpolate", ["linear"], ["get", "gap"], 0, 4, 150000, 11]
-        : 5,
-    );
-    instance.setPaintProperty(
-      "issue-point",
-      "circle-color",
-      metric === "Funding gap"
-        ? ["get", "color"]
         : metric === "Severity"
-          ? [
-              "match",
-              ["get", "severity"],
-              "Critical",
-              "#c85a46",
-              "High",
-              "#d09538",
-              "#fafaf8",
-            ]
-          : [
-              "match",
-              ["get", "freshness"],
-              "Recent",
-              "#54734c",
-              "Outdated",
-              "#d09538",
-              "#fafaf8",
-            ],
+          ? ["match", ["get", "severity"], "Critical", 9, "High", 7, 5]
+          : ["match", ["get", "freshness"], "Recent", 8, "Outdated", 6, 4],
     );
+    instance.setPaintProperty("issue-point", "circle-color", "#fafaf8");
   }, [ready, projection, metric]);
   useEffect(() => {
     if (!ready || !selected || !map.current) return;
@@ -254,7 +253,7 @@ export default function GlobeCanvas({
         ? 0
         : 900,
     });
-  }, [ready, selected, narrow]);
+  }, [ready, selected, narrow, focusRequest]);
   return (
     <div className={styles.canvas}>
       <div
@@ -276,11 +275,6 @@ export default function GlobeCanvas({
           </button>
         </div>
       )}
-      <AreaIndex
-        issues={issues}
-        selectedId={selected?.id}
-        onSelect={onSelect}
-      />
       <MapControls
         globe={projection === "globe"}
         onProjection={() =>
@@ -308,7 +302,6 @@ export default function GlobeCanvas({
           })
         }
       />
-      <MapLegend metric={metric} onMetric={onMetric} />
       <div className={styles.attribution}>
         <a href="https://openfreemap.org" target="_blank" rel="noreferrer">
           OpenFreeMap

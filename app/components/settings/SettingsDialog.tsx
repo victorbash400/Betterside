@@ -1,4 +1,8 @@
-import Dialog from "../controls/Dialog";
+import { ArrowLeft, PanelLeftOpen } from "lucide-react";
+import IconButton from "../controls/IconButton";
+import SettingsGroup from "./SettingsGroup";
+import SettingsRow from "./SettingsRow";
+import SettingsPicker from "./SettingsPicker";
 import styles from "./SettingsDialog.module.css";
 export default function SettingsDialog({
   projection,
@@ -6,68 +10,64 @@ export default function SettingsDialog({
   model,
   onModel,
   onClose,
+  onNavigation,
 }: {
   projection: "globe" | "mercator";
   onProjection: (value: "globe" | "mercator") => void;
   model: "fast" | "reasoning";
   onModel: (value: "fast" | "reasoning") => void;
   onClose: () => void;
+  onNavigation: () => void;
 }) {
   return (
-    <Dialog title="Settings" onClose={onClose}>
-      <div className={styles.group}>
-        <div className={styles.row}>
-          <span>Appearance</span>
-          <span>Light</span>
-        </div>
-        <div className={styles.row}>
-          <span>Map projection</span>
-          <div
-            className={styles.segment}
-            role="group"
-            aria-label="Map projection"
-          >
-            {(["globe", "mercator"] as const).map((value) => (
-              <button
-                key={value}
-                aria-pressed={projection === value}
-                onClick={() => onProjection(value)}
-              >
-                {value === "globe" ? "Globe" : "Flat"}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className={styles.group}>
-        <div className={styles.row}>
-          <span>Chat model</span>
-          <div className={styles.segment} role="group" aria-label="Chat model">
-            {(["fast", "reasoning"] as const).map((value) => (
-              <button
-                key={value}
-                aria-pressed={model === value}
-                onClick={() => onModel(value)}
-              >
-                {value === "fast" ? "Flash" : "Pro"}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className={styles.row}>
-          <span>
-            {model === "fast"
-              ? "Gemini 3.0 Flash Preview"
-              : "Gemini 3.1 Pro Preview"}
+    <main className={styles.main} aria-label="Settings">
+      <div className={styles.content}>
+        <header>
+          <span className={styles.mobile}>
+            <IconButton label="Open navigation" onClick={onNavigation}>
+              <PanelLeftOpen />
+            </IconButton>
           </span>
+          <IconButton label="Back to map" onClick={onClose}>
+            <ArrowLeft />
+          </IconButton>
+          <h1>Settings</h1>
+        </header>
+        <div className={styles.surface}>
+          <SettingsGroup>
+            <SettingsRow label="Appearance">
+              <span>Light</span>
+            </SettingsRow>
+            <SettingsRow label="Map projection">
+              <SettingsPicker
+                label="Map projection"
+                value={projection}
+                options={[
+                  { value: "globe", label: "Globe" },
+                  { value: "mercator", label: "Flat" },
+                ]}
+                onChange={(value) =>
+                  onProjection(value as "globe" | "mercator")
+                }
+              />
+            </SettingsRow>
+            <SettingsRow label="Chat model">
+              <SettingsPicker
+                label="Chat model"
+                value={model}
+                options={[
+                  { value: "fast", label: "GLM 4.7 Flash" },
+                  { value: "reasoning", label: "GLM 5" },
+                ]}
+                onChange={(value) => onModel(value as "fast" | "reasoning")}
+              />
+            </SettingsRow>
+            <SettingsRow label="Payments">
+              <span>PayPal Sandbox</span>
+            </SettingsRow>
+          </SettingsGroup>
         </div>
       </div>
-      <div className={styles.group}>
-        <div className={styles.row}>
-          <span>Payments</span>
-          <span>PayPal Sandbox</span>
-        </div>
-      </div>
-    </Dialog>
+    </main>
   );
 }

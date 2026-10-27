@@ -1,26 +1,138 @@
-.header {
-  height: 58px;
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 56px;
+  padding: 6px 14px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.navigation {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 18px;
-  flex-shrink: 0;
-  font-weight: 500;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
 }
 .actions {
-  margin-left: auto;
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  justify-self: end;
 }
-.menu {
-  display: none !important;
+.group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+}
+.group > button:first-child {
+  border-top-left-radius: 17px;
+  border-bottom-left-radius: 17px;
+}
+.group > button:last-child {
+  border-top-right-radius: 17px;
+  border-bottom-right-radius: 17px;
+}
+.mobile {
+  display: none;
+}
+@container workspace (max-width: 439px) {
+  .navigation {
+    grid-column: 1 / -1;
+    min-height: 44px;
+  }
+  .actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: end;
+  }
 }
 @media (max-width: 760px) {
-  .header {
-    height: 52px;
-    padding: 0 12px;
+  .mobile {
+    display: block;
   }
-  .menu {
-    display: inline-flex !important;
+  .toolbar {
+    padding: 8px 12px;
+  }
+  .navigation {
+    gap: 5px;
+  }
+}
+
+.back {
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.back svg {
+  width: 16px;
+  height: 16px;
+}
+
+.actionGroup > button[aria-pressed="true"] {
+  background: transparent;
+  color: var(--accent);
+}
+
+@container workspace (max-width: 850px) {
+  .navigation {
+    grid-column: 1 / -1;
+  }
+  .actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 12px;
+}
+.breadcrumb > button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--ink);
+}
+.breadcrumb > svg {
+  color: var(--muted);
+}
+.breadcrumb > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat {
+  width: auto;
+  padding: 0 8px;
+  gap: 6px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 400;
+}
+@container workspace (max-width:850px) {
+  .navigation {
+    grid-column: auto;
+  }
+  .actions {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+@media (max-width: 760px) {
+  .back {
+    display: none;
   }
 }

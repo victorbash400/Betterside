@@ -1,0 +1,79 @@
+.window {
+  position: absolute;
+  z-index: 6;
+  width: min(540px, calc(100% - 74px));
+  height: min(410px, calc(100% - 86px));
+  min-width: 260px;
+  min-height: 220px;
+  max-width: calc(100% - 60px);
+  max-height: calc(100% - 28px);
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  outline: none;
+  box-shadow: 0 4px 20px #00000008;
+}
+.window:focus-within {
+  z-index: 8;
+}
+.header {
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px 4px 14px;
+}
+.handle {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12px;
+  cursor: move;
+  touch-action: none;
+}
+.content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+.focused {
+  inset: 12px 60px 12px 12px;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  resize: none;
+}
+@media (max-width: 760px) {
+  .window {
+    height: 56% !important;
+    width: calc(100% - 64px) !important;
+    left: 8px !important;
+    top: 8px !important;
+    max-width: none;
+    resize: none;
+    min-width: 0;
+  }
+  .focused {
+    bottom: 70px;
+    height: auto !important;
+    right: 56px;
+  }
+  .handle {
+    cursor: default;
+  }
+}
+
+.window[hidden] {
+  display: none;
+}

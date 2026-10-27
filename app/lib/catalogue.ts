@@ -6,12 +6,6 @@ export const issueKinds = [
   "Displacement",
   "Disaster response",
 ] as const;
-export const issueColors = {
-  Water: "#398b9a",
-  Hunger: "#d09538",
-  Displacement: "#a56d8b",
-  "Disaster response": "#c85a46",
-};
 export const issues: Issue[] = [
   {
     id: "somalia-water",

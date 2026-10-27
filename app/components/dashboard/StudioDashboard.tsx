@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { AgStudio } from "ag-studio-react";
 import {
   AgStudioLicenseManager,
@@ -7,7 +7,6 @@ import {
   type AgReportState,
 } from "ag-studio";
 import { dashboardRows, dashboardState } from "../../lib/dashboard";
-import { useNarrowLayout } from "../../state/useNarrowLayout";
 import type { Analysis } from "../../lib/analysis";
 import type { Issue } from "../../lib/types";
 import { projectCellRenderer } from "./projectCellRenderer";
@@ -17,32 +16,43 @@ if (license) AgStudioLicenseManager.setLicenseKey(license);
 const theme = studioTheme.withParams({
   fontFamily: "Geist, sans-serif",
   fontSize: 12,
-  accentColor: "#54734c",
-  backgroundColor: "#fafaf8",
-  foregroundColor: "#292b28",
-  borderColor: "#ddded7",
+  accentColor: "#cc7d5e",
+  backgroundColor: "#f9f9f8",
+  foregroundColor: "#30302e",
+  borderColor: "#e2e1de",
   studioWidgetBorder: false,
-  studioWidgetBorderRadius: 10,
-  studioWidgetBackgroundColor: "#f3f3f0",
+  studioWidgetBorderRadius: 0,
+  studioWidgetBackgroundColor: "#f9f9f8",
   studioWidgetTitleFontSize: 12,
   studioCanvasBorder: false,
   studioCanvasShadow: false,
-  studioCanvasBackgroundColor: "#fafaf8",
-  chartPaletteFills1Color: "#54734c",
-  chartPaletteFills2Color: "#b8c4af",
-  chartPaletteStrokes1Color: "#54734c",
-  chartPaletteStrokes2Color: "#b8c4af",
+  studioCanvasBackgroundColor: "#f9f9f8",
+  chartPaletteFills1Color: "#cc7d5e",
+  chartPaletteFills2Color: "#d9d8d5",
+  chartPaletteStrokes1Color: "#cc7d5e",
+  chartPaletteStrokes2Color: "#d9d8d5",
 });
 export default function StudioDashboard({
   issues,
+  widget,
   analysis,
   onSelect,
 }: {
   issues: Issue[];
+  widget: "funding" | "projects";
   analysis?: Analysis;
-  onSelect:(issue:Issue)=>void;
+  onSelect: (issue: Issue) => void;
 }) {
-  const narrow = useNarrowLayout();
+  const container = useRef<HTMLElement>(null);
+  const [narrow, setNarrow] = useState(true);
+  useEffect(() => {
+    if (!container.current) return;
+    const observer = new ResizeObserver((entries) =>
+      setNarrow(entries[0].contentRect.width < 700),
+    );
+    observer.observe(container.current);
+    return () => observer.disconnect();
+  }, []);
   const [editing, setEditing] = useState(false),
     [error, setError] = useState(""),
     [savedStates, setSavedStates] = useState<
@@ -54,14 +64,24 @@ export default function StudioDashboard({
         ? dashboardState
         : (savedStates[narrow ? "mobile" : "desktop"] ?? dashboardState),
     );
+    for (const page of next.pages) {
+      page.layout = {
+        ...page.layout,
+        pagePadding: 0,
+        widgetPadding: 0,
+        widgetBorderRadius: 0,
+        backgroundColor: "#f9f9f8",
+        widgetBackgroundColor: "#f9f9f8",
+      };
+    }
     if (narrow) {
       for (const page of next.pages) {
         page.layout = {
           ...page.layout,
           minWidth: 0,
           columns: 1,
-          pagePadding: 10,
-          widgetPadding: 10,
+          pagePadding: 0,
+          widgetPadding: 0,
         };
         if (page.widgetLayout)
           for (const layout of Object.values(page.widgetLayout)) {
@@ -109,6 +129,18 @@ export default function StudioDashboard({
             ...page.widgets.funding,
             type: "bar-chart-stacked",
           };
+    for (const page of next.pages) {
+      for (const id of Object.keys(page.widgets ?? {}))
+        if (id !== widget) delete page.widgets?.[id];
+      page.widgetLayout = {
+        [widget]: {
+          xTrack: 0,
+          yTrack: 0,
+          xSpan: narrow ? 1 : 12,
+          ySpan: widget === "projects" ? 9 : 8,
+        },
+      };
+    }
     if (!analysis) return next;
     const page = next.pages[0];
     if (
@@ -158,7 +190,7 @@ export default function StudioDashboard({
         type: "bar-chart-stacked",
       };
     return next;
-  }, [analysis, savedStates, narrow]);
+  }, [analysis, savedStates, narrow, widget]);
   const data = useMemo(
     () => ({
       sources: [
@@ -171,9 +203,28 @@ export default function StudioDashboard({
     }),
     [issues],
   );
-  const widgets=useMemo(()=>({overrides:[{id:"grid" as const,options:{createCellRenderer:(field:{fieldId:string})=>field.fieldId==="projects.location"?projectCellRenderer(issues,onSelect):undefined}}]}),[issues,onSelect]);
+  const widgets = useMemo(
+    () => ({
+      overrides: [
+        {
+          id: "grid" as const,
+          options: {
+            createCellRenderer: (field: { fieldId: string }) =>
+              field.fieldId === "projects.location"
+                ? projectCellRenderer(issues, onSelect)
+                : undefined,
+          },
+        },
+      ],
+    }),
+    [issues, onSelect],
+  );
   return (
-    <section className={styles.dashboard} aria-label="Project analytics">
+    <section
+      ref={container}
+      className={styles.dashboard}
+      aria-label="Project analytics"
+    >
       <div className={styles.toolbar}>
         <span>Demonstration data · USD</span>
         <button
@@ -197,7 +248,14 @@ export default function StudioDashboard({
               [narrow ? "mobile" : "desktop"]: event.api.getState(),
             }))
           }
-          widgets={config=>({...config,widgets:config.widgets.map(widget=>widget.id==="grid"?{...widget,options:widgets.overrides[0].options}:widget)})}
+          widgets={(config) => ({
+            ...config,
+            widgets: config.widgets.map((widget) =>
+              widget.id === "grid"
+                ? { ...widget, options: widgets.overrides[0].options }
+                : widget,
+            ),
+          })}
           panels={{
             view: { left: [], right: [] },
             edit: { left: [], right: ["edit", "data", "filters"] },

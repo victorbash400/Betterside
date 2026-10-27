@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import IconButton from "../controls/IconButton";
 import ProjectFunding from "./ProjectFunding";
-import { issueColors, freshness } from "../../lib/catalogue";
+import { freshness } from "../../lib/catalogue";
 import type { Issue } from "../../lib/types";
 import styles from "./IssueDetails.module.css";
 export default function IssueDetails({
@@ -42,7 +42,7 @@ export default function IssueDetails({
         {expanded ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
       </button>
       <div className={styles.header}>
-        <span style={{ color: issueColors[issue.kind] }}>{issue.kind}</span>
+        <span>{issue.kind}</span>
         <IconButton label="Close area details" onClick={onClose}>
           <X />
         </IconButton>
