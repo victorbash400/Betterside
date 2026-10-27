@@ -27,13 +27,17 @@ export async function POST(request: Request) {
     const existing = await paypalRequest(
       `/v2/checkout/orders/${encodeURIComponent(orderId)}`,
     );
+    if (existing.status !== "COMPLETED")
+      await paypalRequest(
+        `/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`,
+        {},
+        `capture-${orderId}`,
+      );
     const raw =
       existing.status === "COMPLETED"
         ? existing
         : await paypalRequest(
-            `/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`,
-            {},
-            `capture-${orderId}`,
+            `/v2/checkout/orders/${encodeURIComponent(orderId)}`,
           );
     const order = z
       .object({
