@@ -2,7 +2,6 @@ import ContextMenu from "../controls/ContextMenu";
 import InterestContextMenu from "../interests/InterestContextMenu";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import CollectionToolbar from "./CollectionToolbar";
 import CollectionItemRow from "./CollectionItemRow";
 import type { Interest } from "../../lib/tracking";
 import type { MapItem } from "../../lib/types";
@@ -28,13 +27,7 @@ export default function InterestContents({
   canEdit: boolean;
 }) {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
-  const [sort, setSort] = useState<"name" | "date">("name");
-  const sorted = items.toSorted((a, b) =>
-    sort === "name"
-      ? a.location.localeCompare(b.location)
-      : (Date.parse(b.source.published ?? "") || 0) -
-        (Date.parse(a.source.published ?? "") || 0),
-  );
+  const sorted = items.toSorted((a, b) => a.location.localeCompare(b.location));
 
   return (
     <section
@@ -47,7 +40,7 @@ export default function InterestContents({
             : "Following contents"
       }
       onContextMenu={(event) => {
-        if (event.defaultPrevented) return;
+        if (event.defaultPrevented || !canEdit) return;
         if (
           event.target instanceof Element &&
           event.target.closest("button,a,input")
@@ -57,13 +50,6 @@ export default function InterestContents({
         setMenu({ x: event.clientX, y: event.clientY });
       }}
     >
-      <CollectionToolbar
-        count={items.length}
-        onAdd={onAdd}
-        sort={sort}
-        onSort={() => setSort((value) => (value === "name" ? "date" : "name"))}
-        canEdit={canEdit}
-      />
       <div className={styles.scroll}>
         <div className={styles.header}>
           <span>Name</span>

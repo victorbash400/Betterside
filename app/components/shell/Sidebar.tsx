@@ -6,7 +6,6 @@ import {
   House,
   PanelLeftClose,
   Heart,
-  Bookmark,
   CircleUserRound,
   Settings,
   Search,
@@ -172,24 +171,16 @@ export default function Sidebar({
                   <div className={styles.section}>
                     <span>Workspace</span>
                   </div>
-                  {(
-                    [
-                      { name: "Contributions", icon: Heart },
-                      { name: "Following", icon: Bookmark },
-                    ] as const
-                  ).map(({ name, icon: Icon }) => (
-                    <button
-                      key={name}
-                      className={`${styles.home} ${view === name && !activeInterestId ? styles.selected : ""}`}
-                      onClick={() => {
-                        onView(name);
-                        onClose();
-                      }}
-                    >
-                      <Icon size={24} strokeWidth={1.8} />
-                      {name}
-                    </button>
-                  ))}
+                  <button
+                    className={`${styles.home} ${view === "Contributions" ? styles.selected : ""}`}
+                    onClick={() => {
+                      onView("Contributions");
+                      onClose();
+                    }}
+                  >
+                    <Heart size={24} strokeWidth={1.8} />
+                    Contributions
+                  </button>
                   <InterestList
                     onAction={onInterestAction}
                     onTrack={onTrack}
