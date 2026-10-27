@@ -1,1 +1,39 @@
-.row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 8px;text-align:left;border:0;border-radius:8px;background:transparent}.row:hover{background:var(--hover)}.row[aria-pressed=true]{background:var(--selection)}.row>i{width:7px;height:7px;border-radius:50%;flex-shrink:0}.row>span{display:grid;gap:3px}.row strong{font-size:12px;font-weight:500}.row small{font-size:10px;color:var(--muted)}.row>svg{margin-left:auto;color:var(--muted)}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 8px;
+  text-align: left;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+.row:hover {
+  background: var(--hover);
+}
+.row[aria-pressed="true"] {
+  background: var(--selection);
+}
+.row > i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.row > span {
+  display: grid;
+  gap: 3px;
+}
+.row strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.row small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.row > svg {
+  margin-left: auto;
+  color: var(--muted);
+}

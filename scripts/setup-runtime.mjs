@@ -1,11 +1,55 @@
-import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
-const user='betterside-dev-runtime';
-const list=JSON.parse(execFileSync('aws',['iam','list-access-keys','--user-name',user,'--region','us-east-1','--output','json'],{encoding:'utf8'}));
-if(list.AccessKeyMetadata.length)throw new Error('Runtime credentials already exist. Use the existing local credentials.');
-const {AccessKey}=JSON.parse(execFileSync('aws',['iam','create-access-key','--user-name',user,'--region','us-east-1','--output','json'],{encoding:'utf8'}));
-const file=new URL('../.env.local',import.meta.url);
-const existing=readFileSync(file,'utf8').split('\n').filter(line=>!line.startsWith('AWS_ACCESS_KEY_ID=')&&!line.startsWith('AWS_SECRET_ACCESS_KEY=')&&!line.startsWith('AWS_SESSION_TOKEN='));
-existing.push(`AWS_ACCESS_KEY_ID=${AccessKey.AccessKeyId}`,`AWS_SECRET_ACCESS_KEY=${AccessKey.SecretAccessKey}`,'');
-writeFileSync(file,existing.join('\n'),{mode:0o600});
-console.log('Scoped BetterSide runtime credentials saved locally.');
+import { execFileSync } from "node:child_process";
+import { readFileSync, writeFileSync } from "node:fs";
+const user = "betterside-dev-runtime";
+const list = JSON.parse(
+  execFileSync(
+    "aws",
+    [
+      "iam",
+      "list-access-keys",
+      "--user-name",
+      user,
+      "--region",
+      "us-east-1",
+      "--output",
+      "json",
+    ],
+    { encoding: "utf8" },
+  ),
+);
+if (list.AccessKeyMetadata.length)
+  throw new Error(
+    "Runtime credentials already exist. Use the existing local credentials.",
+  );
+const { AccessKey } = JSON.parse(
+  execFileSync(
+    "aws",
+    [
+      "iam",
+      "create-access-key",
+      "--user-name",
+      user,
+      "--region",
+      "us-east-1",
+      "--output",
+      "json",
+    ],
+    { encoding: "utf8" },
+  ),
+);
+const file = new URL("../.env.local", import.meta.url);
+const existing = readFileSync(file, "utf8")
+  .split("\n")
+  .filter(
+    (line) =>
+      !line.startsWith("AWS_ACCESS_KEY_ID=") &&
+      !line.startsWith("AWS_SECRET_ACCESS_KEY=") &&
+      !line.startsWith("AWS_SESSION_TOKEN="),
+  );
+existing.push(
+  `AWS_ACCESS_KEY_ID=${AccessKey.AccessKeyId}`,
+  `AWS_SECRET_ACCESS_KEY=${AccessKey.SecretAccessKey}`,
+  "",
+);
+writeFileSync(file, existing.join("\n"), { mode: 0o600 });
+console.log("Scoped BetterSide runtime credentials saved locally.");

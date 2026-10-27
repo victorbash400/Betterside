@@ -1,1 +1,25 @@
-.dialog{width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 40px);padding:20px;border:1px solid var(--border);border-radius:18px;background:var(--surface);color:var(--ink);box-shadow:0 16px 80px #1a241a18}.dialog::backdrop{background:#20251f33;backdrop-filter:blur(3px)}.dialog>header{display:flex;align-items:center;justify-content:space-between;font-weight:500;font-size:14px;margin:-4px -4px 18px 0}.dialog:focus{outline:none}
+.dialog {
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 16px 80px #1a241a18;
+}
+.dialog::backdrop {
+  background: #20251f33;
+  backdrop-filter: blur(3px);
+}
+.dialog > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  font-size: 14px;
+  margin: -4px -4px 18px 0;
+}
+.dialog:focus {
+  outline: none;
+}

@@ -1,9 +1,89 @@
-import { useState } from 'react';
-import Dialog from '../controls/Dialog';
-import type { Issue } from '../../lib/types';
-import styles from './ContributionDialog.module.css';
-export default function ContributionDialog({issue,onClose}:{issue:Issue;onClose:()=>void}) {
- const [amount,setAmount]=useState('25'),[busy,setBusy]=useState(false),[error,setError]=useState('');
- async function checkout(){setBusy(true);setError('');try{const response=await fetch('/api/paypal/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({projectId:issue.project.id,amount})});const data=await response.json();if(!response.ok)throw new Error(data.error??'Checkout failed.');if(typeof data.approvalUrl!=='string')throw new Error('PayPal approval link missing.');window.location.assign(data.approvalUrl);}catch(error){setError(error instanceof Error?error.message:'Checkout failed.');setBusy(false);}}
- return <Dialog title="Contribute" onClose={onClose}><div className={styles.project}><strong>{issue.project.name}</strong><span>{issue.project.organisation} · Sandbox</span></div><form className={styles.form} onSubmit={event=>{event.preventDefault();void checkout();}}><div className={styles.amounts} role="group" aria-label="Contribution amount">{['10','25','50','100'].map(value=><button type="button" key={value} aria-pressed={amount===value} onClick={()=>setAmount(value)}>${value}</button>)}</div><label className={styles.custom}><span>USD</span><input type="number" inputMode="decimal" min="1" max="10000" step="0.01" required aria-label="Custom contribution amount" value={amount} onChange={event=>setAmount(event.target.value)}/></label><span className={styles.test}>Test transaction · No real money</span>{error&&<div className={styles.error} role="alert">{error}</div>}<button className={styles.checkout} disabled={busy}>{busy?'Opening PayPal':'Continue to PayPal'}</button></form></Dialog>;
+import { useState } from "react";
+import Dialog from "../controls/Dialog";
+import type { Issue } from "../../lib/types";
+import styles from "./ContributionDialog.module.css";
+export default function ContributionDialog({
+  issue,
+  onClose,
+}: {
+  issue: Issue;
+  onClose: () => void;
+}) {
+  const [amount, setAmount] = useState("25"),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  async function checkout() {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/paypal/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: issue.project.id, amount }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Checkout failed.");
+      if (typeof data.approvalUrl !== "string")
+        throw new Error("PayPal approval link missing.");
+      window.location.assign(data.approvalUrl);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Checkout failed.");
+      setBusy(false);
+    }
+  }
+  return (
+    <Dialog title="Contribute" onClose={onClose}>
+      <div className={styles.project}>
+        <strong>{issue.project.name}</strong>
+        <span>{issue.project.organisation} · Sandbox</span>
+      </div>
+      <form
+        className={styles.form}
+        onSubmit={(event) => {
+          event.preventDefault();
+          void checkout();
+        }}
+      >
+        <div
+          className={styles.amounts}
+          role="group"
+          aria-label="Contribution amount"
+        >
+          {["10", "25", "50", "100"].map((value) => (
+            <button
+              type="button"
+              key={value}
+              aria-pressed={amount === value}
+              onClick={() => setAmount(value)}
+            >
+              ${value}
+            </button>
+          ))}
+        </div>
+        <label className={styles.custom}>
+          <span>USD</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min="1"
+            max="10000"
+            step="0.01"
+            required
+            aria-label="Custom contribution amount"
+            value={amount}
+            onChange={(event) => setAmount(event.target.value)}
+          />
+        </label>
+        <span className={styles.test}>Test transaction · No real money</span>
+        {error && (
+          <div className={styles.error} role="alert">
+            {error}
+          </div>
+        )}
+        <button className={styles.checkout} disabled={busy}>
+          {busy ? "Opening PayPal" : "Continue to PayPal"}
+        </button>
+      </form>
+    </Dialog>
+  );
 }

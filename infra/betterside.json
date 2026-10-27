@@ -115,31 +115,19 @@
                     "dynamodb:ConditionCheckItem"
                   ],
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Data",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Data", "Arn"]
                   }
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "s3:ListBucket"
-                  ],
+                  "Action": ["s3:ListBucket"],
                   "Resource": {
-                    "Fn::GetAtt": [
-                      "Files",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["Files", "Arn"]
                   }
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject",
-                    "s3:DeleteObject"
-                  ],
+                  "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
                   "Resource": {
                     "Fn::Sub": "${Files.Arn}/*"
                   }

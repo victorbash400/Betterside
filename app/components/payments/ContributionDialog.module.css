@@ -1,1 +1,73 @@
-.project{display:grid;gap:7px;margin-bottom:24px}.project strong{font-size:16px;font-weight:500}.project span,.test{font-size:11px;color:var(--muted)}.form{display:grid;gap:14px}.amounts{display:flex;gap:8px}.amounts button{flex:1;padding:10px;background:var(--panel);border:0;border-radius:8px}.amounts button[aria-pressed=true]{background:var(--selection);color:var(--accent)}.custom{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:9px}.custom span{font-size:11px;color:var(--muted)}.custom input{width:100%;border:0;outline:0;background:transparent;font-size:18px;appearance:textfield}.custom input::-webkit-inner-spin-button{appearance:none}.test{margin-bottom:10px}.checkout{background:var(--ink);color:var(--surface);border:0;border-radius:9px;padding:12px}.checkout:disabled{opacity:.5}.error{color:var(--danger);font-size:12px}
+.project {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 24px;
+}
+.project strong {
+  font-size: 16px;
+  font-weight: 500;
+}
+.project span,
+.test {
+  font-size: 11px;
+  color: var(--muted);
+}
+.form {
+  display: grid;
+  gap: 14px;
+}
+.amounts {
+  display: flex;
+  gap: 8px;
+}
+.amounts button {
+  flex: 1;
+  padding: 10px;
+  background: var(--panel);
+  border: 0;
+  border-radius: 8px;
+}
+.amounts button[aria-pressed="true"] {
+  background: var(--selection);
+  color: var(--accent);
+}
+.custom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+}
+.custom span {
+  font-size: 11px;
+  color: var(--muted);
+}
+.custom input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 18px;
+  appearance: textfield;
+}
+.custom input::-webkit-inner-spin-button {
+  appearance: none;
+}
+.test {
+  margin-bottom: 10px;
+}
+.checkout {
+  background: var(--ink);
+  color: var(--surface);
+  border: 0;
+  border-radius: 9px;
+  padding: 12px;
+}
+.checkout:disabled {
+  opacity: 0.5;
+}
+.error {
+  color: var(--danger);
+  font-size: 12px;
+}

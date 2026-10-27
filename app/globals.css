@@ -1,4 +1,97 @@
-@font-face{font-family:Geist;src:url('/fonts/Geist-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
-@font-face{font-family:Geist;src:url('/fonts/Geist-Medium.ttf') format('truetype');font-weight:500 700;font-display:swap}
-:root{color-scheme:light;--surface:#fafaf8;--panel:#f3f3f0;--ink:#292b28;--muted:#858780;--icon:#62665f;--border:#ddded7;--hover:#e9eae4;--selection:#e4eadd;--accent:#54734c;--danger:#bd503d;--disabled:#c8cac3;--water:#b9cdd3;background:var(--surface);color:var(--ink);font-family:Geist,sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
-*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#bfc3b8 transparent}body{margin:0;overflow:hidden}button,input,textarea{font:inherit;color:inherit}button{cursor:pointer}button:disabled{cursor:default}button,a,input,textarea{-webkit-tap-highlight-color:transparent}button{touch-action:manipulation}a{color:inherit}input,textarea{min-width:0}button svg{flex-shrink:0;stroke-width:1.8}::selection{background:var(--selection)}:focus-visible{outline:2px solid var(--accent);outline-offset:3px}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:#bfc3b8;border-radius:6px}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@font-face {
+  font-family: Geist;
+  src: url("/fonts/Geist-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: Geist;
+  src: url("/fonts/Geist-Medium.ttf") format("truetype");
+  font-weight: 500 700;
+  font-display: swap;
+}
+:root {
+  color-scheme: light;
+  --surface: #fafaf8;
+  --panel: #f3f3f0;
+  --ink: #292b28;
+  --muted: #858780;
+  --icon: #62665f;
+  --border: #ddded7;
+  --hover: #e9eae4;
+  --selection: #e4eadd;
+  --accent: #54734c;
+  --danger: #bd503d;
+  --disabled: #c8cac3;
+  --water: #b9cdd3;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: Geist, sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #bfc3b8 transparent;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+}
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+button,
+a,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  touch-action: manipulation;
+}
+a {
+  color: inherit;
+}
+input,
+textarea {
+  min-width: 0;
+}
+button svg {
+  flex-shrink: 0;
+  stroke-width: 1.8;
+}
+::selection {
+  background: var(--selection);
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #bfc3b8;
+  border-radius: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
