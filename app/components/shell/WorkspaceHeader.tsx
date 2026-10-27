@@ -10,12 +10,14 @@ import type { View } from "../../lib/types";
 import styles from "./WorkspaceHeader.module.css";
 export default function WorkspaceHeader({
   view,
+  interestName,
   onMenu,
   onChat,
   chatOpen,
   onHome,
 }: {
   view: View;
+  interestName?: string;
   onMenu: () => void;
   onChat: () => void;
   chatOpen: boolean;
@@ -35,7 +37,7 @@ export default function WorkspaceHeader({
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
           <button onClick={onHome}>Home</button>
           <ChevronRight size={12} />
-          <span>{view === "Explore" ? "Map" : view}</span>
+          <span>{view === "Explore" ? "Map" : (interestName ?? view)}</span>
         </nav>
       </div>
       <div className={styles.actions}>

@@ -1,0 +1,65 @@
+.folder {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  margin: 2px 0;
+  border-radius: 10px;
+}
+.folder:hover,
+.file:hover {
+  background: var(--hover);
+}
+.folder.selected,
+.file.selected {
+  background: var(--selection);
+}
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0;
+}
+.name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px 0 0;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+}
+.name svg,
+.file svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+.name span,
+.file span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 34px;
+  margin: 2px 0;
+  padding: 0 12px 0 46px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}

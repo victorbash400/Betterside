@@ -33,7 +33,9 @@ export default function IssueFilters({
           </span>
           <ChevronDown size={13} />
         </button>
-        <span className={styles.count}>{count} areas</span>
+        <span className={styles.count}>
+          {count} {count === 1 ? "issue" : "issues"}
+        </span>
       </div>
       {menu && (
         <ContextMenu

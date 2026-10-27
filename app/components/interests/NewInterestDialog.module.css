@@ -1,0 +1,33 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.form input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.form > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.form button {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 8px 16px;
+  background: transparent;
+  font-size: 12px;
+}
+.form button:last-child {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+.form button:disabled {
+  opacity: 0.5;
+}

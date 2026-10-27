@@ -3,10 +3,11 @@ import {
   ChevronUp,
   ChevronDown,
   ArrowUpRight,
-  Bookmark,
   X,
   MessageCircle,
 } from "lucide-react";
+import TrackingButton from "../interests/TrackingButton";
+import type { Interest } from "../../state/useTracking";
 import IconButton from "../controls/IconButton";
 import ProjectFunding from "./ProjectFunding";
 import { freshness } from "../../lib/catalogue";
@@ -15,14 +16,20 @@ import styles from "./IssueDetails.module.css";
 export default function IssueDetails({
   issue,
   followed,
-  onFollow,
+  interests,
+  onTrack,
+  onUntrack,
+  onCreateInterest,
   onClose,
   onContribute,
   onAsk,
 }: {
   issue: Issue;
   followed: boolean;
-  onFollow: () => void;
+  interests: Interest[];
+  onTrack: (interestId?: string) => void;
+  onUntrack: () => void;
+  onCreateInterest: (name: string) => void;
   onClose: () => void;
   onContribute: () => void;
   onAsk: () => void;
@@ -62,10 +69,14 @@ export default function IssueDetails({
         </a>
         <span className={styles.date}>{freshness(issue.source)}</span>
         <div className={styles.actions}>
-          <button aria-pressed={followed} onClick={onFollow}>
-            <Bookmark size={14} fill={followed ? "currentColor" : "none"} />
-            {followed ? "Following" : "Follow"}
-          </button>
+          <TrackingButton
+            issueId={issue.id}
+            followed={followed}
+            interests={interests}
+            onTrack={onTrack}
+            onUntrack={onUntrack}
+            onCreate={onCreateInterest}
+          />
           <button onClick={onAsk}>
             <MessageCircle size={14} />
             Ask about this area

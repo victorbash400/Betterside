@@ -38,6 +38,7 @@ export default function Workspace() {
   function home() {
     state.setView("Explore");
     state.setSelectedId(undefined);
+    state.setSelectedInterestId(undefined);
     state.setSettingsOpen(false);
   }
   return (
@@ -46,17 +47,32 @@ export default function Workspace() {
         view={state.view}
         onView={(view) => {
           state.setView(view);
+          state.setSelectedInterestId(undefined);
           state.setSettingsOpen(false);
           if (view === "Explore") state.setSelectedId(undefined);
         }}
         onSettings={() => state.setSettingsOpen(true)}
         open={state.navigationOpen}
         onClose={() => state.setNavigationOpen(false)}
-        issues={state.records}
+        issues={state.sidebarIssues}
+        interests={state.interests}
+        following={state.following}
+        activeInterestId={
+          state.view === "Following" ? state.selectedInterestId : undefined
+        }
+        onInterest={(id) => {
+          state.setSelectedInterestId(id);
+          state.setSelectedId(undefined);
+          state.setView("Following");
+          state.setSettingsOpen(false);
+        }}
+        onCreateInterest={(name) => {
+          state.createInterest(name);
+        }}
         selected={state.selected?.id}
         onSelect={(issue) => {
           state.setSelectedId(issue.id);
-          state.setView("Explore");
+          if (state.view !== "Following") state.setView("Explore");
           state.setSettingsOpen(false);
         }}
         query={state.filters.query}
@@ -76,6 +92,13 @@ export default function Workspace() {
         <main className={styles.main}>
           <WorkspaceHeader
             view={state.view}
+            interestName={
+              state.view === "Following"
+                ? state.interests.find(
+                    (interest) => interest.id === state.selectedInterestId,
+                  )?.name
+                : undefined
+            }
             onMenu={() => state.setNavigationOpen(true)}
             onChat={() => state.setChatOpen((value) => !value)}
             chatOpen={state.chatOpen}
@@ -152,7 +175,14 @@ export default function Workspace() {
                       <IssueDetails
                         issue={state.selected}
                         followed={state.following.includes(state.selected.id)}
-                        onFollow={() => state.follow(state.selected!.id)}
+                        interests={state.interests}
+                        onTrack={(interestId) =>
+                          state.track(state.selected!.id, interestId)
+                        }
+                        onUntrack={() => state.untrack(state.selected!.id)}
+                        onCreateInterest={(name) => {
+                          state.createInterest(name, state.selected!.id);
+                        }}
                         onClose={() => state.setSelectedId(undefined)}
                         onContribute={() => state.setCheckout(state.selected)}
                         onAsk={() => state.setChatOpen(true)}
@@ -200,7 +230,9 @@ export default function Workspace() {
         <div className={styles.error} role="alert">
           {state.error}
           <button onClick={state.retryCatalogue}>Retry</button>
-          <button onClick={() => state.setError("")}>Dismiss</button>
+          {state.errorDismissible && (
+            <button onClick={() => state.setError("")}>Dismiss</button>
+          )}
         </div>
       )}
     </div>

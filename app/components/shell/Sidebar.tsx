@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   House,
   PanelLeftClose,
-  Folder,
   Heart,
   Bookmark,
   CircleUserRound,
@@ -10,6 +9,8 @@ import {
   Search,
   X,
 } from "lucide-react";
+import InterestList from "../interests/InterestList";
+import type { Interest } from "../../state/useTracking";
 import IconButton from "../controls/IconButton";
 import AppIcon from "../controls/AppIcon";
 import ContextMenu from "../controls/ContextMenu";
@@ -24,6 +25,11 @@ export default function Sidebar({
   open,
   onClose,
   issues,
+  interests,
+  following,
+  activeInterestId,
+  onInterest,
+  onCreateInterest,
   selected,
   onSelect,
   query,
@@ -36,6 +42,11 @@ export default function Sidebar({
   open: boolean;
   onClose: () => void;
   issues: Issue[];
+  interests: Interest[];
+  following: string[];
+  activeInterestId?: string;
+  onInterest: (id: string) => void;
+  onCreateInterest: (name: string) => void;
   selected?: string;
   onSelect: (issue: Issue) => void;
   query: string;
@@ -143,22 +154,6 @@ export default function Sidebar({
               ) : (
                 <>
                   <div className={styles.section}>
-                    <span>Areas</span>
-                  </div>
-                  {issues.map((issue) => (
-                    <button
-                      key={issue.id}
-                      className={`${styles.home} ${selected === issue.id ? styles.selected : ""}`}
-                      onClick={() => {
-                        onSelect(issue);
-                        onClose();
-                      }}
-                    >
-                      <Folder size={24} strokeWidth={1.8} />
-                      {issue.location}
-                    </button>
-                  ))}
-                  <div className={styles.section}>
                     <span>Workspace</span>
                   </div>
                   {(
@@ -169,7 +164,7 @@ export default function Sidebar({
                   ).map(({ name, icon: Icon }) => (
                     <button
                       key={name}
-                      className={`${styles.home} ${view === name ? styles.selected : ""}`}
+                      className={`${styles.home} ${view === name && !activeInterestId ? styles.selected : ""}`}
                       onClick={() => {
                         onView(name);
                         onClose();
@@ -179,6 +174,22 @@ export default function Sidebar({
                       {name}
                     </button>
                   ))}
+                  <InterestList
+                    interests={interests}
+                    following={following}
+                    issues={issues}
+                    selected={selected}
+                    activeId={activeInterestId}
+                    onSelect={(issue) => {
+                      onSelect(issue);
+                      onClose();
+                    }}
+                    onOpen={(id) => {
+                      onInterest(id);
+                      onClose();
+                    }}
+                    onCreate={onCreateInterest}
+                  />
                 </>
               )}
             </div>

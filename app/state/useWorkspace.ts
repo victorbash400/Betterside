@@ -1,9 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useTracking } from "./useTracking";
 import { filterIssues } from "../lib/catalogue";
 import type { Analysis } from "../lib/analysis";
 import type { Filters, Issue, View } from "../lib/types";
 export function useWorkspace() {
+  const tracking = useTracking();
+  const following = tracking.following;
+  const [selectedInterestId, setSelectedInterestId] = useState<string>();
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [analysis, setAnalysis] = useState<Analysis>();
   const [catalogue, setCatalogue] = useState<Issue[]>([]);
@@ -14,7 +18,6 @@ export function useWorkspace() {
       metric: "Severity",
     }),
     [selectedId, setSelectedId] = useState<string>(),
-    [following, setFollowing] = useState<string[]>([]),
     [projection, setProjection] = useState<"globe" | "mercator">("globe"),
     [model, setModel] = useState<"fast" | "reasoning">("fast");
   const [chatOpen, setChatOpen] = useState(false),
@@ -44,16 +47,6 @@ export function useWorkspace() {
   }, [loadAttempt]);
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("betterside-following");
-      if (raw) {
-        const value: unknown = JSON.parse(raw);
-        if (
-          !Array.isArray(value) ||
-          !value.every((item) => typeof item === "string")
-        )
-          throw new Error();
-        setFollowing(value);
-      }
       const savedModel = localStorage.getItem("betterside-model");
       if (savedModel === "fast" || savedModel === "reasoning")
         setModel(savedModel);
@@ -65,32 +58,41 @@ export function useWorkspace() {
   useEffect(() => {
     if (!loaded) return;
     try {
-      localStorage.setItem("betterside-following", JSON.stringify(following));
       localStorage.setItem("betterside-model", model);
     } catch {
       setError("Could not save preferences.");
     }
-  }, [following, model, loaded]);
+  }, [model, loaded]);
   const records = useMemo(
     () =>
       filterIssues(
         view === "Following"
-          ? catalogue.filter((issue) => following.includes(issue.id))
+          ? catalogue.filter((issue) =>
+              selectedInterestId
+                ? tracking.interests
+                    .find((interest) => interest.id === selectedInterestId)
+                    ?.issueIds.includes(issue.id)
+                : following.includes(issue.id),
+            )
           : catalogue,
         filters,
       ),
-    [catalogue, filters, following, view],
+    [
+      catalogue,
+      filters,
+      following,
+      view,
+      selectedInterestId,
+      tracking.interests,
+    ],
   );
   const selected = catalogue.find((issue) => issue.id === selectedId);
-  function follow(id: string) {
-    setFollowing((previous) =>
-      previous.includes(id)
-        ? previous.filter((value) => value !== id)
-        : [...previous, id],
-    );
-  }
   return {
     retryCatalogue: () => {
+      if (tracking.error) {
+        tracking.retry();
+        return;
+      }
       setError("");
       setLoadAttempt((value) => value + 1);
     },
@@ -103,7 +105,13 @@ export function useWorkspace() {
     selected,
     setSelectedId,
     following,
-    follow,
+    interests: tracking.interests,
+    track: tracking.track,
+    untrack: tracking.untrack,
+    createInterest: tracking.create,
+    selectedInterestId,
+    setSelectedInterestId,
+    sidebarIssues: filterIssues(catalogue, filters),
     projection,
     setProjection,
     model,
@@ -116,7 +124,8 @@ export function useWorkspace() {
     setNavigationOpen,
     checkout,
     setCheckout,
-    error,
+    error: error || tracking.error,
+    errorDismissible: !tracking.error,
     setError,
     records,
   };
