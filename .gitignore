@@ -8,3 +8,6 @@ look and feel/
 .qa/
 *.tsbuildinfo
 .DS_Store
+
+.vercel/
+.vercel

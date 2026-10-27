@@ -1,0 +1,11 @@
+.git/
+.vercel/
+.next/
+node_modules/
+.env*
+*.md
+*.MD
+look and feel/
+.qa/
+*.tsbuildinfo
+.DS_Store
