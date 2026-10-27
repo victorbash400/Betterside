@@ -10,6 +10,7 @@ import {
 } from "ai";
 import { z } from "zod";
 import { loadCatalogue } from "../../server/catalogue";
+import { modelError } from "../../lib/modelError";
 import { sameOrigin, apiError } from "../../server/http";
 export const maxDuration = 60;
 export async function POST(request: Request) {
@@ -65,8 +66,7 @@ export async function POST(request: Request) {
     return createUIMessageStreamResponse({
       stream: toUIMessageStream({
         stream: result.stream,
-        onError: () =>
-          "The model request failed. Retry or select another model.",
+        onError: modelError,
       }),
     });
   } catch (error) {
