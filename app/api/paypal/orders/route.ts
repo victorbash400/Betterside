@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { issues } from '../../../lib/catalogue';
+import { loadCatalogue } from '../../../server/catalogue';
 import { amountInCents, decimalAmount } from '../../../lib/payment';
 import { paypalRequest } from '../../../server/paypal';
 import { donorSession } from '../../../server/donor';
@@ -9,6 +9,7 @@ import { sameOrigin, apiError } from '../../../server/http';
 export async function POST(request:Request){try{
  sameOrigin(request);
  const input=z.object({projectId:z.string(),amount:z.string()}).strict().parse(await request.json());
+ const issues=await loadCatalogue();
  const issue=issues.find(issue=>issue.project.id===input.projectId);if(!issue)throw new Error('Project not found.');
  const donor=await donorSession(true);if(!donor)throw new Error('Could not create donor session.');
  const cents=amountInCents(input.amount),amount=decimalAmount(cents),origin=new URL(request.url).origin;
