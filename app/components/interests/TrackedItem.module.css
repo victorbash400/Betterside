@@ -1,0 +1,53 @@
+.row {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  border-radius: 10px;
+  margin-top: 1px;
+}
+.row:hover {
+  background: var(--hover);
+}
+.row.selected {
+  background: var(--selection);
+}
+.label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 4px 0 22px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}
+.label svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+.label span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row > button:last-child:not(.label) {
+  width: 24px;
+  height: 28px;
+  opacity: 0;
+}
+.row > button:last-child svg {
+  width: 14px;
+  height: 14px;
+}
+.row:hover > button:last-child,
+.row:focus-within > button:last-child {
+  opacity: 1;
+}
+@media (hover: none) {
+  .row > button:last-child:not(.label) {
+    opacity: 1;
+  }
+}

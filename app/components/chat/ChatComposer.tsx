@@ -5,7 +5,7 @@ import ComposerLocation from "./ComposerLocation";
 import ReferencePicker from "./ReferencePicker";
 import useVoiceDraft from "./useVoiceDraft";
 import VoiceRecording from "./VoiceRecording";
-import type { Issue } from "../../lib/types";
+import type { MapItem as Issue } from "../../lib/types";
 import styles from "./ChatComposer.module.css";
 export default function ChatComposer({
   draft,

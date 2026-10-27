@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Folder } from "lucide-react";
 import Dialog from "../controls/Dialog";
-import type { Issue } from "../../lib/types";
+import type { MapItem as Issue } from "../../lib/types";
 import styles from "./ReferencePicker.module.css";
 export default function ReferencePicker({
   issues,
@@ -28,8 +28,8 @@ export default function ReferencePicker({
       <div className={styles.items}>
         {issues
           .filter((issue) =>
-            [issue.location, issue.project.name].some((value) =>
-              value.toLowerCase().includes(query.toLowerCase()),
+            [issue.location, issue.project?.name ?? issue.source.label].some(
+              (value) => value.toLowerCase().includes(query.toLowerCase()),
             ),
           )
           .map((issue) => (
@@ -37,7 +37,7 @@ export default function ReferencePicker({
               <Folder size={18} />
               <span>
                 {issue.location}
-                <small>{issue.project.name}</small>
+                <small>{issue.project?.name ?? issue.source.label}</small>
               </span>
             </button>
           ))}

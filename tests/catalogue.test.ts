@@ -1,6 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { issues, filterIssues } from "../app/lib/catalogue.ts";
+test("issue checkboxes include exactly the selected categories", () => {
+  assert.equal(
+    filterIssues(issues, { query: "", kinds: [], metric: "Severity" }).length,
+    0,
+  );
+  assert.equal(
+    filterIssues(issues, {
+      query: "",
+      kinds: ["Water", "Hunger", "Displacement", "Disaster response"],
+      metric: "Severity",
+    }).length,
+    issues.length,
+  );
+});
 test("shared filters combine location search and issue categories", () => {
   assert.equal(
     filterIssues(issues, {

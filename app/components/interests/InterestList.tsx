@@ -1,14 +1,17 @@
+import { interestPath } from "../../lib/interestTree";
+import type { InterestAction } from "../../lib/interestActions";
+import TrackedItem from "./TrackedItem";
 import {
   interestOrder,
   type InterestChoice,
 } from "../../lib/interestCategories";
 import { useState } from "react";
-import { Plus, FileText } from "lucide-react";
+import { Plus } from "lucide-react";
 import IconButton from "../controls/IconButton";
 import InterestFolder from "./InterestFolder";
 import NewInterestDialog from "./NewInterestDialog";
 import type { Interest } from "../../state/useTracking";
-import type { Issue } from "../../lib/types";
+import type { MapItem as Issue } from "../../lib/types";
 import styles from "./InterestList.module.css";
 export default function InterestList({
   interests,
@@ -20,6 +23,8 @@ export default function InterestList({
   onSelect,
   onOpen,
   onCreate,
+  onAction,
+  onTrack,
 }: {
   interests: Interest[];
   disabled?: boolean;
@@ -30,9 +35,35 @@ export default function InterestList({
   onSelect: (issue: Issue) => void;
   onOpen: (id: string) => void;
   onCreate: (choice: InterestChoice) => void;
+  onAction: (action: InterestAction) => void;
+  onTrack: (id: string, interestId?: string) => void;
 }) {
   const [creating, setCreating] = useState(false);
   const grouped = new Set(interests.flatMap((interest) => interest.issueIds));
+  function renderFolder(interest: Interest, depth: number): React.ReactNode {
+    return (
+      <InterestFolder
+        key={interest.id}
+        interest={interest}
+        issues={issues.filter((issue) => interest.issueIds.includes(issue.id))}
+        selected={selected}
+        active={activeId === interest.id}
+        reveal={interestPath(interests, activeId).some(
+          (item) => item.id === interest.id,
+        )}
+        onSelect={onSelect}
+        onOpen={() => onOpen(interest.id)}
+        onAction={onAction}
+        onDropItem={(id) => onTrack(id, interest.id)}
+        depth={depth}
+      >
+        {interests
+          .filter((child) => child.parentId === interest.id)
+          .toSorted(interestOrder)
+          .map((child) => renderFolder(child, depth + 1))}
+      </InterestFolder>
+    );
+  }
   return (
     <>
       <div className={styles.header}>
@@ -46,35 +77,23 @@ export default function InterestList({
           <Plus />
         </IconButton>
       </div>
-      {interests.toSorted(interestOrder).map((interest) => (
-        <InterestFolder
-          key={interest.id}
-          interest={interest}
-          issues={issues.filter((issue) =>
-            interest.issueIds.includes(issue.id),
-          )}
-          selected={selected}
-          active={activeId === interest.id}
-          onSelect={onSelect}
-          onOpen={() => onOpen(interest.id)}
-        />
-      ))}
+      {interests
+        .filter((interest) => !interest.parentId)
+        .toSorted(interestOrder)
+        .map((interest) => renderFolder(interest, 0))}
       {issues
         .filter(
           (issue) => following.includes(issue.id) && !grouped.has(issue.id),
         )
         .map((issue) => (
-          <button
+          <TrackedItem
             key={issue.id}
-            className={`${styles.file} ${selected === issue.id ? styles.selected : ""}`}
-            onClick={() => onSelect(issue)}
-            title={`${issue.location} · ${issue.kind}`}
-          >
-            <FileText size={24} strokeWidth={1.8} />
-            <span>
-              {issue.location} · {issue.kind}
-            </span>
-          </button>
+            item={issue}
+            selected={selected === issue.id}
+            onSelect={() => onSelect(issue)}
+            onAction={onAction}
+            depth={0}
+          />
         ))}
       {creating && (
         <NewInterestDialog

@@ -6,7 +6,7 @@ import ChatHistory from "./ChatHistory";
 import ChatRenameDialog from "./ChatRenameDialog";
 import ChatThread from "./ChatThread";
 import type { Analysis } from "../../lib/analysis";
-import type { Issue } from "../../lib/types";
+import type { MapItem as Issue } from "../../lib/types";
 import styles from "./ChatDrawer.module.css";
 export default function ChatDrawer({
   selected,

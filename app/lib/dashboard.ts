@@ -1,18 +1,24 @@
 import type { AgReportState } from "ag-studio";
-import type { Issue } from "./types";
+import type { MapItem as Issue } from "./types";
 export function dashboardRows(issues: Issue[]) {
-  return issues.map((issue) => ({
-    location: issue.location,
-    issue: issue.kind,
-    project: issue.project.name,
-    target: issue.project.target,
-    received: issue.project.raised,
-    gap: Math.max(0, issue.project.target - issue.project.raised),
-    severity: issue.severity,
-    source: issue.source.label,
-    publication: issue.source.published,
-    demonstration: true,
-  }));
+  return issues.flatMap((issue) =>
+    issue.project
+      ? [
+          {
+            location: issue.location,
+            issue: issue.kind,
+            project: issue.project.name,
+            target: issue.project.target,
+            received: issue.project.raised,
+            gap: Math.max(0, issue.project.target - issue.project.raised),
+            severity: issue.severity,
+            source: issue.source.label,
+            publication: issue.source.published,
+            demonstration: true,
+          },
+        ]
+      : [],
+  );
 }
 export const dashboardState: AgReportState = {
   selectedPageId: "overview",

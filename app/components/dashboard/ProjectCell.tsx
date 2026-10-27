@@ -1,5 +1,5 @@
 import type { ICellRendererParams } from "ag-grid-enterprise";
-import type { Issue } from "../../lib/types";
+import type { MapItem as Issue } from "../../lib/types";
 import styles from "./ProjectCell.module.css";
 export default function ProjectCell({
   value,

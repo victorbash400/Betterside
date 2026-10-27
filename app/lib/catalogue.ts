@@ -1,4 +1,6 @@
-import type { Issue, Filters } from "./types";
+import { categoryPath } from "./interestCategories.ts";
+import { formatDate } from "./dates.ts";
+import type { Issue, MapItem, Filters } from "./types";
 const reviewed = "2026-10-27";
 export const issueKinds = [
   "Water",
@@ -133,15 +135,20 @@ export const issues: Issue[] = [
     },
   },
 ];
-export function filterIssues(records: Issue[], filters: Filters) {
+export function filterIssues(records: MapItem[], filters: Filters) {
   const query = filters.query.trim().toLocaleLowerCase();
   return records.filter(
     (issue) =>
-      (!filters.kinds.length || filters.kinds.includes(issue.kind)) &&
+      filters.kinds.includes(issue.kind) &&
       (!query ||
-        [issue.location, issue.country, issue.kind, issue.project.name].some(
-          (value) => value.toLocaleLowerCase().includes(query),
-        )),
+        [
+          issue.location,
+          issue.country,
+          issue.kind,
+          issue.project?.name ?? "",
+          issue.source.label,
+          ...(issue.categoryIds ?? []).map(categoryPath),
+        ].some((value) => value.toLocaleLowerCase().includes(query))),
   );
 }
 export function money(amount: number) {
@@ -153,7 +160,5 @@ export function money(amount: number) {
 }
 export function freshness(source: Issue["source"]) {
   if (!source.published) return "Publication date unavailable";
-  return new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(
-    new Date(source.published),
-  );
+  return formatDate(source.published);
 }

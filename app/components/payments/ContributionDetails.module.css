@@ -1,0 +1,30 @@
+.details {
+  font-size: 13px;
+}
+.details strong {
+  font-weight: 500;
+}
+.details dl {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 14px 20px;
+  margin: 24px 0;
+}
+.details dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.details button {
+  display: block;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: transparent;
+  font-size: 12px;
+  padding: 8px 14px;
+}

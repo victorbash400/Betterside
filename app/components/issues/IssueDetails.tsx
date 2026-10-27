@@ -12,7 +12,7 @@ import type { Interest } from "../../state/useTracking";
 import IconButton from "../controls/IconButton";
 import ProjectFunding from "./ProjectFunding";
 import { freshness } from "../../lib/catalogue";
-import type { Issue } from "../../lib/types";
+import type { MapItem as Issue } from "../../lib/types";
 import styles from "./IssueDetails.module.css";
 export default function IssueDetails({
   issue,
@@ -52,7 +52,10 @@ export default function IssueDetails({
         {expanded ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
       </button>
       <div className={styles.header}>
-        <span>{issue.kind}</span>
+        <span>
+          {issue.kind}
+          {issue.eventStatus ? ` · ${issue.eventStatus}` : ""}
+        </span>
         <IconButton label="Close area details" onClick={onClose}>
           <X />
         </IconButton>
@@ -60,7 +63,7 @@ export default function IssueDetails({
       <div className={styles.content}>
         <h2>{issue.location}</h2>
         <div className={styles.status}>{issue.severity}</div>
-        <p className={styles.summary}>{issue.summary}</p>
+        {issue.summary && <p className={styles.summary}>{issue.summary}</p>}
         <a
           className={styles.source}
           href={issue.source.url}
@@ -86,7 +89,9 @@ export default function IssueDetails({
             Ask about this area
           </button>
         </div>
-        <ProjectFunding project={issue.project} onContribute={onContribute} />
+        {issue.project && (
+          <ProjectFunding project={issue.project} onContribute={onContribute} />
+        )}
       </div>
     </aside>
   );

@@ -9,6 +9,8 @@ import {
   completePayment,
   payment,
 } from "../app/server/contributions.ts";
+import { trackingSchema } from "../app/lib/tracking.ts";
+import { contributions } from "../app/server/contributions.ts";
 import { recordRefund } from "../app/server/payment-events.ts";
 test("isolated AWS fixture captures once, refunds once, and preserves isolation", async () => {
   assert.equal(requireTable(), "BetterSide-dev");
@@ -82,7 +84,7 @@ test("interests persist per visitor and reject conflicting revisions", async () 
   const { loadTracking, saveTracking } =
     await import("../app/server/tracking.ts");
   const donor = `qa-tracking-${randomUUID()}`;
-  const snapshot = {
+  const snapshot = trackingSchema.parse({
     version: 1 as const,
     following: ["somalia-water"],
     interests: [
@@ -93,13 +95,14 @@ test("interests persist per visitor and reject conflicting revisions", async () 
         issueIds: ["somalia-water"],
       },
     ],
-  };
+  });
   try {
     assert.deepEqual(await loadTracking(donor), {
       snapshot: null,
       revision: 0,
     });
     assert.equal((await saveTracking(donor, snapshot, 0)).revision, 1);
+    assert.deepEqual(await contributions(donor), []);
     assert.deepEqual((await loadTracking(donor)).snapshot, snapshot);
     assert.equal((await loadTracking(`${donor}-other`)).snapshot, null);
     await assert.rejects(() =>

@@ -1,0 +1,67 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 52px;
+  padding: 4px 12px;
+  border-radius: 10px;
+}
+.row:hover {
+  background: var(--hover);
+}
+.name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: var(--ink);
+  font-size: 13px;
+  padding: 6px;
+}
+.name svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+.name > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.name small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.date {
+  font-size: 11px;
+  color: var(--muted);
+  width: 120px;
+  flex-shrink: 0;
+}
+.kind {
+  font-size: 11px;
+  color: var(--muted);
+  width: 125px;
+  flex-shrink: 0;
+}
+.row > button:last-child {
+  width: 28px;
+}
+@container collection (max-width:650px) {
+  .kind {
+    display: none;
+  }
+}
+@container collection (max-width:460px) {
+  .date {
+    display: none;
+  }
+  .row {
+    gap: 4px;
+  }
+}

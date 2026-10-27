@@ -1,20 +1,35 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useDiscoveryData } from "./useDiscoveryData";
 import { useTracking } from "./useTracking";
-import { filterIssues } from "../lib/catalogue";
+import { filterIssues, issueKinds } from "../lib/catalogue";
 import type { Analysis } from "../lib/analysis";
-import type { Filters, Issue, View } from "../lib/types";
+import type { Filters, MapItem as Issue, View } from "../lib/types";
 export function useWorkspace() {
   const tracking = useTracking();
   const following = tracking.following;
   const [selectedInterestId, setSelectedInterestId] = useState<string>();
-  const [loadAttempt, setLoadAttempt] = useState(0);
+  const discovery = useDiscoveryData();
+  const [datasets, setDatasets] = useState({ catalogue: true, eonet: true });
+  const [collectionMode, setCollectionMode] = useState<"list" | "map">("map");
   const [analysis, setAnalysis] = useState<Analysis>();
-  const [catalogue, setCatalogue] = useState<Issue[]>([]);
+  const catalogue = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          [
+            ...tracking.savedItems,
+            ...discovery.catalogue,
+            ...discovery.events,
+          ].map((item) => [item.id, item]),
+        ).values(),
+      ),
+    [tracking.savedItems, discovery.catalogue, discovery.events],
+  );
   const [view, setView] = useState<View>("Explore"),
     [filters, setFilters] = useState<Filters>({
       query: "",
-      kinds: [],
+      kinds: [...issueKinds],
       metric: "Severity",
     }),
     [selectedId, setSelectedId] = useState<string>(),
@@ -26,25 +41,6 @@ export function useWorkspace() {
     [checkout, setCheckout] = useState<Issue>(),
     [error, setError] = useState(""),
     [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    const controller = new AbortController();
-    async function load() {
-      try {
-        const response = await fetch("/api/catalogue", {
-          signal: controller.signal,
-        });
-        const data = await response.json();
-        if (!response.ok)
-          throw new Error(data.error ?? "Could not load funding records.");
-        setCatalogue(data.issues);
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") return;
-        setError("Could not load funding records.");
-      }
-    }
-    void load();
-    return () => controller.abort();
-  }, [loadAttempt]);
   useEffect(() => {
     try {
       const savedModel = localStorage.getItem("betterside-model");
@@ -63,6 +59,9 @@ export function useWorkspace() {
       setError("Could not save preferences.");
     }
   }, [model, loaded]);
+  const activeInterest = tracking.interests.find(
+    (item) => item.id === selectedInterestId,
+  );
   const records = useMemo(
     () =>
       filterIssues(
@@ -74,8 +73,18 @@ export function useWorkspace() {
                     ?.issueIds.includes(issue.id)
                 : following.includes(issue.id),
             )
-          : catalogue,
-        filters,
+          : catalogue.filter((item) =>
+              item.dataset === "eonet" ? datasets.eonet : datasets.catalogue,
+            ),
+        {
+          ...filters,
+          kinds:
+            view === "Following" && activeInterest
+              ? issueKinds.filter(
+                  (kind) => !activeInterest.hiddenKinds.includes(kind),
+                )
+              : filters.kinds,
+        },
       ),
     [
       catalogue,
@@ -84,6 +93,8 @@ export function useWorkspace() {
       view,
       selectedInterestId,
       tracking.interests,
+      activeInterest,
+      datasets,
     ],
   );
   const selected = catalogue.find((issue) => issue.id === selectedId);
@@ -94,9 +105,18 @@ export function useWorkspace() {
         return;
       }
       setError("");
-      setLoadAttempt((value) => value + 1);
+      discovery.refresh();
     },
     analysis,
+    activeInterest,
+    collectionMode,
+    setCollectionMode,
+    datasets,
+    setDatasets,
+    dataBusy: discovery.busy,
+    dataError: discovery.eventError,
+    refreshData: discovery.refresh,
+    allRecords: catalogue,
     setAnalysis,
     view,
     setView,
@@ -105,14 +125,23 @@ export function useWorkspace() {
     selected,
     setSelectedId,
     following,
-    interests: tracking.interests,
+    interests: tracking.interests.filter((item) => !item.archived),
     trackingReady: tracking.ready && !tracking.error,
-    track: tracking.track,
+    track: (id: string, interestId?: string) =>
+      tracking.track(
+        id,
+        interestId,
+        catalogue.find((item) => item.id === id),
+      ),
+    addItems: tracking.addMany,
+    renameInterest: tracking.rename,
+    moveInterest: tracking.moveFolder,
+    archiveInterest: tracking.archive,
+    filterInterest: tracking.filter,
     untrack: tracking.untrack,
     createInterest: tracking.create,
     selectedInterestId,
     setSelectedInterestId,
-    sidebarIssues: filterIssues(catalogue, filters),
     projection,
     setProjection,
     model,
@@ -125,8 +154,13 @@ export function useWorkspace() {
     setNavigationOpen,
     checkout,
     setCheckout,
-    error: error || tracking.error,
-    errorDismissible: !tracking.error,
+    error:
+      error ||
+      tracking.error ||
+      discovery.error ||
+      (collectionMode === "list" ? discovery.eventError : ""),
+    errorDismissible:
+      !tracking.error && !discovery.error && !discovery.eventError,
     setError,
     records,
   };

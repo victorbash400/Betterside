@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useConversation } from "../../state/useConversation";
 import ChatComposer from "./ChatComposer";
 import MessageList from "./MessageList";
 import type { Analysis } from "../../lib/analysis";
-import type { Issue } from "../../lib/types";
+import type { MapItem as Issue } from "../../lib/types";
 import styles from "./ChatDrawer.module.css";
 export default function ChatThread({
   conversationId,
@@ -22,8 +22,10 @@ export default function ChatThread({
   onSelect: (issue: Issue) => void;
   onTitle: (title: string) => void;
 }) {
+  const recordIds = useMemo(() => issues.map((item) => item.id), [issues]);
   const chat = useConversation({
       conversationId,
+      recordIds,
       areaId: selected?.id,
       model,
       onAnalysis,

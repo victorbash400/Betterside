@@ -8,7 +8,7 @@ import {
 } from "ag-studio";
 import { dashboardRows, dashboardState } from "../../lib/dashboard";
 import type { Analysis } from "../../lib/analysis";
-import type { Issue } from "../../lib/types";
+import type { MapItem as Issue } from "../../lib/types";
 import { projectCellRenderer } from "./projectCellRenderer";
 import styles from "./StudioDashboard.module.css";
 const license = process.env.NEXT_PUBLIC_AG_STUDIO_LICENSE_KEY;

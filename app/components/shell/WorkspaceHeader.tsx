@@ -1,27 +1,47 @@
 import {
   PanelLeft,
   ArrowLeft,
-  House,
-  ChevronRight,
-  UsersRound,
+  MessageCircle,
+  Map,
+  List,
+  FolderPlus,
+  RefreshCw,
 } from "lucide-react";
 import IconButton from "../controls/IconButton";
+import WorkspaceBreadcrumbs from "./WorkspaceBreadcrumbs";
 import type { View } from "../../lib/types";
+import type { Interest } from "../../lib/tracking";
 import styles from "./WorkspaceHeader.module.css";
 export default function WorkspaceHeader({
   view,
-  interestName,
+  path,
   onMenu,
   onChat,
   chatOpen,
   onHome,
+  onBack,
+  onFollowing,
+  onInterest,
+  mode,
+  onMode,
+  onCreate,
+  onRefresh,
+  busy,
 }: {
   view: View;
-  interestName?: string;
+  path: Interest[];
   onMenu: () => void;
   onChat: () => void;
   chatOpen: boolean;
   onHome: () => void;
+  onBack: () => void;
+  onFollowing: () => void;
+  onInterest: (id: string) => void;
+  mode: "map" | "list";
+  onMode: (mode: "map" | "list") => void;
+  onCreate: () => void;
+  onRefresh: () => void;
+  busy: boolean;
 }) {
   return (
     <header className={styles.toolbar}>
@@ -31,25 +51,67 @@ export default function WorkspaceHeader({
             <PanelLeft />
           </IconButton>
         </div>
-        <IconButton className={styles.back} label="Home" onClick={onHome}>
+        <IconButton
+          className={styles.back}
+          label={path.length ? "Parent folder" : "Home"}
+          onClick={onBack}
+        >
           <ArrowLeft />
         </IconButton>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <button onClick={onHome}>Home</button>
-          <ChevronRight size={12} />
-          <span>{view === "Explore" ? "Map" : (interestName ?? view)}</span>
-        </nav>
+        <WorkspaceBreadcrumbs
+          view={view}
+          path={path}
+          onHome={onHome}
+          onFollowing={onFollowing}
+          onInterest={onInterest}
+        />
       </div>
       <div className={styles.actions}>
-        <div className={styles.group}>
+        <div className={styles.group} role="group" aria-label="Chat">
           <IconButton
-            className={styles.chat}
             label="Chat"
+            title="Chat"
             selected={chatOpen}
             onClick={onChat}
           >
-            <UsersRound />
-            <span>Chat</span>
+            <MessageCircle />
+          </IconButton>
+        </div>
+        {view !== "Contributions" && (
+          <div className={styles.group} role="group" aria-label="View">
+            <IconButton
+              label="Map view"
+              title="Map view"
+              selected={mode === "map"}
+              onClick={() => onMode("map")}
+            >
+              <Map />
+            </IconButton>
+            <IconButton
+              label="List view"
+              title="List view"
+              selected={mode === "list"}
+              onClick={() => onMode("list")}
+            >
+              <List />
+            </IconButton>
+          </div>
+        )}
+        <div className={styles.group}>
+          <IconButton
+            label="New interest"
+            title="New interest"
+            onClick={onCreate}
+          >
+            <FolderPlus />
+          </IconButton>
+          <IconButton
+            label="Refresh data"
+            title="Refresh data"
+            onClick={onRefresh}
+            disabled={busy}
+          >
+            <RefreshCw />
           </IconButton>
         </div>
       </div>

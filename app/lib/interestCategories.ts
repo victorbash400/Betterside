@@ -78,6 +78,24 @@ export const interestCategories: InterestCategory[] = [
     issueKind: "Disaster response",
   },
   {
+    id: "wildfire-response",
+    name: "Wildfires",
+    parentId: "disaster-response",
+    issueKind: "Disaster response",
+  },
+  {
+    id: "storm-response",
+    name: "Storms",
+    parentId: "disaster-response",
+    issueKind: "Disaster response",
+  },
+  {
+    id: "volcano-response",
+    name: "Volcanoes",
+    parentId: "disaster-response",
+    issueKind: "Disaster response",
+  },
+  {
     id: "emergency-supplies",
     name: "Emergency supplies",
     parentId: "disaster-response",

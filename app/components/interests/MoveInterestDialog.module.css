@@ -1,0 +1,43 @@
+.list {
+  max-height: 50dvh;
+  overflow: auto;
+}
+.list button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}
+.list button span {
+  flex: 1;
+}
+.list button:hover {
+  background: var(--hover);
+}
+.list button[aria-checked="true"] {
+  background: var(--selection);
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+.actions button {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: transparent;
+  padding: 8px 14px;
+  font-size: 12px;
+}
+.actions button:last-child {
+  background: var(--ink);
+  color: var(--surface);
+}

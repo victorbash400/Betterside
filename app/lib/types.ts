@@ -26,6 +26,12 @@ export interface Issue {
     demonstration: true;
   };
 }
+export type MapItem = Omit<Issue, "project"> & {
+  project?: Issue["project"];
+  dataset?: "catalogue" | "eonet";
+  categoryIds?: string[];
+  eventStatus?: "Open" | "Closed";
+};
 export interface Contribution {
   id: string;
   projectId: string;

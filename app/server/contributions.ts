@@ -149,8 +149,11 @@ export async function contributions(donor: string) {
   const result = await database.send(
     new QueryCommand({
       TableName: requireTable(),
-      KeyConditionExpression: "pk=:pk",
-      ExpressionAttributeValues: { ":pk": `DONOR#${donor}` },
+      KeyConditionExpression: "pk=:pk AND begins_with(sk,:payment)",
+      ExpressionAttributeValues: {
+        ":pk": `DONOR#${donor}`,
+        ":payment": "PAYMENT#",
+      },
       ScanIndexForward: false,
     }),
   );

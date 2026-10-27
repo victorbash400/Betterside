@@ -10,11 +10,13 @@ const storedConversation = z.object({
 });
 export function useConversation({
   conversationId,
+  recordIds,
   areaId,
   model,
   onAnalysis,
 }: {
   conversationId: string;
+  recordIds: string[];
   areaId?: string;
   model: "fast" | "reasoning";
   onAnalysis: (analysis: Analysis) => void;
@@ -24,7 +26,7 @@ export function useConversation({
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: { areaId, model },
+        body: { areaId, model, recordIds },
         fetch: async (input, init) => {
           const response = await fetch(input, init);
           if (!response.ok) {
@@ -36,7 +38,7 @@ export function useConversation({
           return response;
         },
       }),
-    [areaId, model],
+    [areaId, model, recordIds],
   );
   const chat = useChat({ id: conversationId, transport });
   const seen = useRef(new Set<string>()),

@@ -1,0 +1,80 @@
+.surface {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 8px 12px;
+  color: var(--muted);
+}
+.search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 13px;
+}
+.list {
+  max-height: 48dvh;
+  overflow: auto;
+}
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 8px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}
+.row > span {
+  flex: 1;
+  min-width: 0;
+}
+.row small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 4px;
+}
+.row:hover {
+  background: var(--hover);
+}
+.row[aria-checked="true"] {
+  background: var(--selection);
+}
+.row:disabled {
+  color: var(--muted);
+  background: transparent;
+  cursor: default;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+.actions button {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: transparent;
+  font-size: 12px;
+}
+.actions button:last-child {
+  background: var(--ink);
+  color: var(--surface);
+}
+.actions button:disabled {
+  opacity: 0.5;
+}

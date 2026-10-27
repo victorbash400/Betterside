@@ -3,7 +3,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Map, setWorkerUrl, type GeoJSONSource } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
-import type { Issue, Filters } from "../../lib/types";
+import type { MapItem as Issue, Filters } from "../../lib/types";
 import MapControls from "./MapControls";
 
 import { cleanMapStyle } from "./mapStyle";
@@ -205,24 +205,28 @@ export default function GlobeCanvas({
     if (!ready || !map.current) return;
     map.current.getSource<GeoJSONSource>("issues")?.setData({
       type: "FeatureCollection",
-      features: issues.map((issue) => ({
-        type: "Feature",
-        id: issue.id,
-        geometry: { type: "Point", coordinates: issue.coordinates },
-        properties: {
+      features: issues
+        .filter((issue) => metric !== "Funding gap" || issue.project)
+        .map((issue) => ({
+          type: "Feature",
           id: issue.id,
-          color: "#5a5a58",
-          severity: issue.severity,
-          freshness: !issue.source.published
-            ? "Unknown"
-            : Date.now() - Date.parse(issue.source.published) > 90 * 86400000
-              ? "Outdated"
-              : "Recent",
-          gap: issue.project.target - issue.project.raised,
-        },
-      })),
+          geometry: { type: "Point", coordinates: issue.coordinates },
+          properties: {
+            id: issue.id,
+            color: "#5a5a58",
+            severity: issue.severity,
+            freshness: !issue.source.published
+              ? "Unknown"
+              : Date.now() - Date.parse(issue.source.published) > 90 * 86400000
+                ? "Outdated"
+                : "Recent",
+            gap: issue.project
+              ? issue.project.target - issue.project.raised
+              : 0,
+          },
+        })),
     });
-  }, [ready, issues]);
+  }, [ready, issues, metric]);
   useEffect(() => {
     if (!ready || !map.current) return;
     const instance = map.current;

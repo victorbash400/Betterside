@@ -1,3 +1,5 @@
+import SidebarIssueFilter from "./SidebarIssueFilter";
+import type { InterestAction } from "../../lib/interestActions";
 import type { InterestChoice } from "../../lib/interestCategories";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -16,7 +18,7 @@ import IconButton from "../controls/IconButton";
 import AppIcon from "../controls/AppIcon";
 import ContextMenu from "../controls/ContextMenu";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
-import type { Issue, View } from "../../lib/types";
+import type { MapItem as Issue, IssueKind, View } from "../../lib/types";
 import styles from "./Sidebar.module.css";
 import searchStyles from "./SidebarSearch.module.css";
 export default function Sidebar({
@@ -32,9 +34,13 @@ export default function Sidebar({
   activeInterestId,
   onInterest,
   onCreateInterest,
+  onInterestAction,
+  onTrack,
   selected,
   onSelect,
   query,
+  issueKinds,
+  onIssueKinds,
   onQuery,
   settings,
 }: {
@@ -50,9 +56,13 @@ export default function Sidebar({
   activeInterestId?: string;
   onInterest: (id: string) => void;
   onCreateInterest: (choice: InterestChoice) => void;
+  onInterestAction: (action: InterestAction) => void;
+  onTrack: (id: string, interestId?: string) => void;
   selected?: string;
   onSelect: (issue: Issue) => void;
   query: string;
+  issueKinds: IssueKind[];
+  onIssueKinds: (kinds: IssueKind[]) => void;
   onQuery: (query: string) => void;
   settings: boolean;
 }) {
@@ -144,6 +154,9 @@ export default function Sidebar({
               </button>
             )}
           </label>
+          {!settings && view !== "Contributions" && (
+            <SidebarIssueFilter value={issueKinds} onChange={onIssueKinds} />
+          )}
           <nav className={styles.navigation}>
             <div className={styles.entries}>
               {settings ? (
@@ -178,6 +191,8 @@ export default function Sidebar({
                     </button>
                   ))}
                   <InterestList
+                    onAction={onInterestAction}
+                    onTrack={onTrack}
                     disabled={!trackingReady}
                     interests={interests}
                     following={following}

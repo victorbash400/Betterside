@@ -1,53 +1,90 @@
 .history {
-  overflow: auto;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
-  font-size: 12px;
+  container: contributions/inline-size;
 }
-.rows {
-  max-width: 800px;
-  margin: 0 auto;
-}
-.row {
+.toolbar {
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 12px;
-  border-radius: 10px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px 14px;
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
 }
-.row:nth-child(odd) {
-  background: var(--panel);
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: transparent;
+  font-size: 12px;
+  color: var(--ink);
 }
-.row > div {
-  display: grid;
-  gap: 6px;
+.actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
 }
-.row > div:last-child {
+.scroll {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 0 10px 24px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 42px 0 50px;
+  height: 30px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.header > span:first-child {
+  flex: 1;
+}
+.header > span:nth-child(2) {
+  width: 110px;
+}
+.header > span:nth-child(3) {
+  width: 115px;
+}
+.header > span:last-child {
+  width: 100px;
   text-align: right;
 }
-.row strong {
+.notice {
+  display: block;
+  padding: 18px;
   font-size: 12px;
-  font-weight: 500;
 }
-.row span {
-  font-size: 10px;
-  color: var(--muted);
-}
-.error {
-  display: grid;
-  gap: 10px;
-  color: var(--danger);
-}
-.error button,
+.notice button,
 .explore {
-  justify-self: start;
-  border: 0;
-  background: var(--panel);
-  border-radius: 8px;
-  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: transparent;
+  font-size: 12px;
+  padding: 8px 14px;
 }
 .explore {
   display: block;
-  margin: 32px auto;
+  margin: 20px auto;
+}
+@container contributions (max-width:680px) {
+  .header > span:nth-child(2) {
+    display: none;
+  }
+}
+@container contributions (max-width:460px) {
+  .header {
+    display: none;
+  }
+  .toolbar > span {
+    display: none;
+  }
 }

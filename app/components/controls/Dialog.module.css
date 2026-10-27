@@ -1,16 +1,15 @@
 .dialog {
   width: min(460px, calc(100vw - 32px));
   max-height: calc(100dvh - 40px);
-  padding: 20px;
+  padding: 28px;
   border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--surface);
+  border-radius: 16px;
+  background: var(--panel);
   color: var(--ink);
-  box-shadow: 0 16px 80px #1a241a18;
+  box-shadow: 0 8px 32px #2d2d2b12;
 }
 .dialog::backdrop {
-  background: #20251f33;
-  backdrop-filter: blur(3px);
+  background: #00000052;
 }
 .dialog > header {
   display: flex;
