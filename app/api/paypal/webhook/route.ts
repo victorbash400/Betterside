@@ -28,6 +28,18 @@ export async function POST(request: Request) {
   try {
     const webhookId = process.env.PAYPAL_WEBHOOK_ID;
     if (!webhookId) throw new Error("Configure PAYPAL_WEBHOOK_ID.");
+    const signatureHeaders = [
+      "paypal-auth-algo",
+      "paypal-cert-url",
+      "paypal-transmission-id",
+      "paypal-transmission-sig",
+      "paypal-transmission-time",
+    ];
+    if (signatureHeaders.some((name) => !request.headers.get(name)))
+      return Response.json(
+        { error: "Invalid PayPal signature." },
+        { status: 401 },
+      );
     const raw: unknown = await request.json();
     const verification = await paypalRequest(
       "/v1/notifications/verify-webhook-signature",
