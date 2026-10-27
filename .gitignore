@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.env*
+!.env.example
+*.md
+*.MD
+look and feel/
+.qa/
+*.tsbuildinfo
+.DS_Store
