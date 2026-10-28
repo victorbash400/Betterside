@@ -20,3 +20,15 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.action[data-prominent="true"] {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+  min-width: 112px;
+  min-height: 36px;
+  font-size: 12px;
+}
+.action[data-prominent="true"]:hover:not(:disabled) {
+  opacity: 0.85;
+}

@@ -8,12 +8,16 @@ export default function Dialog({
   children,
   animated = false,
   compact = false,
+  size = "standard",
+  footer,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
   animated?: boolean;
   compact?: boolean;
+  size?: "standard" | "profile";
+  footer?: ReactNode;
 }) {
   const [closing, setClosing] = useState(false);
   function dismiss() {
@@ -34,6 +38,7 @@ export default function Dialog({
     <dialog
       ref={ref}
       className={`${styles.dialog} ${animated ? styles.animated : ""}`}
+      data-size={size}
       data-compact={compact}
       data-closing={closing}
       onAnimationEnd={(event) => {
@@ -63,6 +68,7 @@ export default function Dialog({
         </IconButton>
       </header>
       <div className={styles.body}>{children}</div>
+      {footer && <footer className={styles.footer}>{footer}</footer>}
     </dialog>
   );
 }

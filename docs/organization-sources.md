@@ -45,3 +45,5 @@ Verified the organization navigation, search, country/cause/donation filters, ma
 ## Organization and issue selection
 
 The map workspace places borderless organization and issue overlays on the left and right of a full-width map. Selecting an organization shades its reported issue topics and operating areas; the separate details action opens its profile. Organization rows and profile headers use names directly without logo or initial tiles. The left list includes catalogue organizations without mapped operating areas, rather than hiding them.
+
+Organization information now opens in a centered, fixed-size profile modal with an internally scrolling body and persistent Website/Donate footer actions. Work, operating areas and published evaluations appear directly in the profile; provenance is available through an inline Sources disclosure rather than a separate Evidence tab. No rating or financial data is inferred for organizations without reported evidence.

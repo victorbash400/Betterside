@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "lucide-react";
 import type { DirectoryOrganization } from "../../lib/organizations";
 import styles from "./OrganizationLocations.module.css";
 export default function OrganizationLocations({
@@ -33,8 +34,14 @@ export default function OrganizationLocations({
                 : ""}
             </time>
           )}
-          <a href={area.evidence.url} target="_blank" rel="noopener noreferrer">
-            {area.evidence.label}
+          <a
+            href={area.evidence.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${area.country}: ${area.evidence.label}`}
+            title={area.evidence.label}
+          >
+            <ArrowUpRight size={13} />
           </a>
         </article>
       ))}

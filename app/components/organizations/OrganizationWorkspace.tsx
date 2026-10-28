@@ -87,7 +87,6 @@ export default function OrganizationWorkspace({
       {state.organization && details === state.selected && (
         <OrganizationDetails
           key={state.organization.id}
-          map={mode === "map"}
           organization={state.organization}
           onClose={() => setDetails(undefined)}
           onCountry={country}

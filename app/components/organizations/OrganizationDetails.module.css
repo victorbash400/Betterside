@@ -1,60 +1,13 @@
-.header {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 20px 16px 12px 20px;
-  flex-shrink: 0;
-}
-.header > span {
-  flex: 1;
-  min-width: 0;
-}
-.header h2 {
-  font-size: 18px;
-  line-height: 1.35;
-  margin: 0;
-  font-weight: 550;
-}
-.header small {
-  display: block;
-  margin-top: 5px;
-  font-size: 11px;
-  color: var(--muted);
-}
-.donate {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 0 20px 14px;
-  flex-shrink: 0;
-}
-.donate > a {
+.website {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  text-decoration: none;
-}
-
-.donate > a {
+  gap: 6px;
+  padding: 9px 12px;
+  font-size: 12px;
   color: var(--ink);
+  text-decoration: none;
+  border-radius: 18px;
 }
-
-.card {
-  left: 284px;
-  width: min(340px, calc(100% - 536px));
-}
-@media (max-width: 1000px) {
-  .card {
-    left: 284px;
-    right: 10px;
-    width: auto;
-  }
-}
-@media (max-width: 760px) {
-  .card {
-    left: 8px;
-    right: 8px;
-    width: auto;
-  }
+.website:hover {
+  background: var(--hover);
 }

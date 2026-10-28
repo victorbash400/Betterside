@@ -102,3 +102,30 @@
 .dialog[data-compact="true"] .body {
   flex: 0 1 auto;
 }
+
+.dialog[data-size="profile"] {
+  width: min(720px, calc(100vw - 32px));
+  height: min(540px, calc(100dvh - 40px));
+  padding: 24px;
+}
+.dialog[data-size="profile"] > header {
+  font-size: 20px;
+  line-height: 1.3;
+  gap: 20px;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  padding-top: 20px;
+}
+@media (max-width: 600px) {
+  .dialog[data-size="profile"] {
+    padding: 20px;
+    height: min(620px, calc(100dvh - 32px));
+  }
+}

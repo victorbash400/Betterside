@@ -8,17 +8,6 @@ export default function OrganizationEvidence({
 }) {
   return (
     <div className={styles.evidence}>
-      {organization.evaluations.map((item) => (
-        <a
-          key={item.url}
-          href={item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {item.label}
-          <ArrowUpRight size={13} />
-        </a>
-      ))}
       {organization.sources.map((item) => (
         <a
           key={item.url}
