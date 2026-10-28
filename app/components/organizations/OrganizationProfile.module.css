@@ -1,11 +1,22 @@
 .profile {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  align-items: start;
-  gap: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
-.profile:has(> :only-child) {
-  grid-template-columns: 1fr;
+.overview {
+  padding: 20px;
+  border-radius: 22px;
+  background: var(--hover);
+}
+.overview > p {
+  font-size: 14px;
+  line-height: 1.65;
+}
+.overview dl {
+  font-size: 13px;
+}
+.overview dt {
+  font-size: 12px;
 }
 .type {
   margin: 0 0 16px;
@@ -19,9 +30,10 @@
 }
 .locations {
   min-width: 0;
+  padding-inline: 4px;
 }
 .sources {
-  margin-top: 24px;
+  margin-top: 0;
 }
 .sources summary {
   display: flex;
@@ -49,10 +61,4 @@
   font-size: 12px;
   line-height: 1.6;
   color: var(--ink);
-}
-@media (max-width: 600px) {
-  .profile {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-  }
 }

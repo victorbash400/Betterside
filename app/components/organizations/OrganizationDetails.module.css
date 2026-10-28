@@ -1,13 +1,17 @@
 .website {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 9px 12px;
-  font-size: 12px;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--ink);
+  background: var(--hover);
   text-decoration: none;
-  border-radius: 18px;
+  border-radius: 28px;
 }
 .website:hover {
-  background: var(--hover);
+  background: var(--selection);
 }

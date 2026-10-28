@@ -40,12 +40,6 @@ export default function OrganizationProfile({
             ))}
           </section>
         )}
-        <details className={styles.sources}>
-          <summary>
-            Sources <ChevronDown size={14} />
-          </summary>
-          <OrganizationEvidence organization={organization} />
-        </details>
       </section>
       {organization.presence.length > 0 && (
         <section
@@ -59,6 +53,12 @@ export default function OrganizationProfile({
           />
         </section>
       )}
+      <details className={styles.sources}>
+        <summary>
+          Sources <ChevronDown size={14} />
+        </summary>
+        <OrganizationEvidence organization={organization} />
+      </details>
     </div>
   );
 }

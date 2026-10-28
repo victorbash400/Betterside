@@ -22,12 +22,15 @@
 }
 
 .action[data-prominent="true"] {
-  background: var(--ink);
-  color: var(--surface);
-  border-color: var(--ink);
+  background: #ffe339;
+  color: #191919;
+  border: 0;
+  border-radius: 28px;
   min-width: 112px;
-  min-height: 36px;
-  font-size: 12px;
+  min-height: 52px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
 }
 .action[data-prominent="true"]:hover:not(:disabled) {
   opacity: 0.85;
