@@ -1,0 +1,10 @@
+.bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.bar > button {
+  height: 40px;
+  border-radius: 20px;
+}

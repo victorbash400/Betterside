@@ -1,26 +1,35 @@
 import { ArrowLeft, PanelLeftOpen } from "lucide-react";
 import IconButton from "../controls/IconButton";
-import SettingsGroup from "./SettingsGroup";
-import SettingsRow from "./SettingsRow";
-import SettingsPicker from "./SettingsPicker";
+import AppearanceSettings from "../appearance/AppearanceSettings";
+import { AppearanceSettingsProvider } from "../../state/AppearanceContext";
+import ModelSettings from "./ModelSettings";
+import PayPalSettings from "./PayPalSettings";
+import { settingsSections } from "./SettingsNavigation";
+import { useSettingsConfiguration } from "../../state/useSettingsConfiguration";
+import type { SettingsSection } from "../../lib/settings";
+import type { Appearance } from "../../lib/appearance";
 import styles from "./SettingsDialog.module.css";
 export default function SettingsDialog({
-  projection,
-  onProjection,
+  section,
+  appearance,
+  onAppearance,
   model,
   onModel,
   onClose,
   onNavigation,
 }: {
-  projection: "globe" | "mercator";
-  onProjection: (value: "globe" | "mercator") => void;
+  section: SettingsSection;
+  appearance: Appearance;
+  onAppearance: (value: Appearance) => void;
   model: "fast" | "reasoning";
   onModel: (value: "fast" | "reasoning") => void;
   onClose: () => void;
   onNavigation: () => void;
 }) {
+  const configuration = useSettingsConfiguration();
+  const title = settingsSections.find((item) => item.id === section)!.label;
   return (
-    <main className={styles.main} aria-label="Settings">
+    <main className={styles.main} aria-label={title}>
       <div className={styles.content}>
         <header>
           <span className={styles.mobile}>
@@ -31,41 +40,32 @@ export default function SettingsDialog({
           <IconButton label="Back to map" onClick={onClose}>
             <ArrowLeft />
           </IconButton>
-          <h1>Settings</h1>
+          <h1>{title}</h1>
         </header>
         <div className={styles.surface}>
-          <SettingsGroup>
-            <SettingsRow label="Appearance">
-              <span>Light</span>
-            </SettingsRow>
-            <SettingsRow label="Map projection">
-              <SettingsPicker
-                label="Map projection"
-                value={projection}
-                options={[
-                  { value: "globe", label: "Globe" },
-                  { value: "mercator", label: "Flat" },
-                ]}
-                onChange={(value) =>
-                  onProjection(value as "globe" | "mercator")
-                }
-              />
-            </SettingsRow>
-            <SettingsRow label="Chat model">
-              <SettingsPicker
-                label="Chat model"
-                value={model}
-                options={[
-                  { value: "fast", label: "GLM 4.7 Flash" },
-                  { value: "reasoning", label: "GLM 5" },
-                ]}
-                onChange={(value) => onModel(value as "fast" | "reasoning")}
-              />
-            </SettingsRow>
-            <SettingsRow label="Payments">
-              <span>PayPal Sandbox</span>
-            </SettingsRow>
-          </SettingsGroup>
+          {section === "appearance" ? (
+            <AppearanceSettingsProvider
+              value={appearance}
+              update={onAppearance}
+            >
+              <AppearanceSettings />
+            </AppearanceSettingsProvider>
+          ) : configuration.error ? (
+            <div className={styles.error} role="alert">
+              {configuration.error}
+              <button onClick={configuration.retry}>Retry settings</button>
+            </div>
+          ) : !configuration.data ? (
+            <span role="status">Loading settings</span>
+          ) : section === "models" ? (
+            <ModelSettings
+              value={model}
+              onChange={onModel}
+              configuration={configuration.data.models}
+            />
+          ) : (
+            <PayPalSettings configuration={configuration.data.paypal} />
+          )}
         </div>
       </div>
     </main>

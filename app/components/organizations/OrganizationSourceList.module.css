@@ -1,0 +1,29 @@
+.sources {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.sources article {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  font-size: 11px;
+}
+.sources a,
+.name {
+  grid-column: 1/-1;
+  font-size: 12px;
+  text-decoration: none;
+}
+.sources span {
+  color: var(--muted);
+}
+.sources small {
+  grid-column: 1/-1;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.sources article[data-state="error"] small {
+  color: var(--danger);
+}

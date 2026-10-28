@@ -1,5 +1,6 @@
 import { Plus, Minus, LocateFixed } from "lucide-react";
 import IconButton from "../controls/IconButton";
+import ToggleSwitch from "../controls/ToggleSwitch";
 import styles from "./MapControls.module.css";
 export default function MapControls({
   globe,
@@ -15,13 +16,14 @@ export default function MapControls({
   return (
     <div className={styles.options} role="group" aria-label="Map controls">
       <div className={styles.actions}>
-        <div className={styles.group}>
-          <IconButton
-            label={globe ? "Switch to flat map" : "Switch to globe"}
-            onClick={onProjection}
-          >
-            <span>{globe ? "2D" : "Globe"}</span>
-          </IconButton>
+        <div className={styles.projection}>
+          <span>2D</span>
+          <ToggleSwitch
+            label="3D globe"
+            checked={globe}
+            onChange={onProjection}
+          />
+          <span>3D</span>
         </div>
         <div className={styles.group}>
           <IconButton label="Zoom out" onClick={() => onZoom(-1)}>

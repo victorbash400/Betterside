@@ -1,0 +1,30 @@
+.locations {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.locations article {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+}
+.locations button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  font-weight: 500;
+  cursor: pointer;
+}
+.locations span,
+.locations time,
+.locations a {
+  font-size: 11px;
+  color: var(--muted);
+}
+.locations a {
+  color: var(--accent);
+  text-decoration: none;
+}

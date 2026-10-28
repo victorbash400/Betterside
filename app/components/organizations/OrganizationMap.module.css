@@ -1,0 +1,6 @@
+.canvas {
+  margin: 0;
+}
+.canvas > [aria-label="Globe orientation"] {
+  bottom: 60px;
+}

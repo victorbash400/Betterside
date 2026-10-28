@@ -1,13 +1,100 @@
 .rail {
-  position: absolute;
-  right: 12px;
-  top: 14px;
-  z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 5px;
-  background: var(--surface);
+  flex-shrink: 0;
+  width: calc(var(--sidebar-width) - 16px);
+  margin-left: 8px;
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: 14px;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  padding: 8px;
+  background: var(--panel);
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.header > span:first-child {
+  flex: 1;
+}
+.header > span:nth-child(2) {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  padding: 2px 8px 10px;
+}
+.actions button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 0;
+  cursor: pointer;
+}
+.list {
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+  padding-right: 4px;
+}
+.list::-webkit-scrollbar {
+  width: 5px;
+}
+.list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.settings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 8px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+.settings:hover,
+.header:hover {
+  background: var(--hover);
+}
+.rail[data-open="false"] {
+  align-self: flex-start;
+}
+@media (max-width: 760px) {
+  .rail {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    width: 210px;
+    height: calc(100% - 72px);
+    max-height: calc(100% - 72px);
+    border-radius: 14px;
+    padding: 4px;
+    background: var(--panel);
+  }
+  .rail[data-open="false"] {
+    width: 142px;
+    height: 36px;
+  }
 }

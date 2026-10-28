@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { issueKinds } from "./issueKinds.ts";
 export const issueSchema = z.object({
   id: z.string(),
   location: z.string(),
@@ -7,7 +8,7 @@ export const issueSchema = z.object({
     z.number().min(-180).max(180),
     z.number().min(-90).max(90),
   ]),
-  kind: z.enum(["Water", "Hunger", "Displacement", "Disaster response"]),
+  kind: z.enum(issueKinds),
   severity: z.enum(["High", "Critical", "Insufficient data"]),
   summary: z.string(),
   source: z.object({

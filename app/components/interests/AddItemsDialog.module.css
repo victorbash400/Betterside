@@ -51,6 +51,7 @@
   background: var(--hover);
 }
 .row[aria-checked="true"] {
+  font-weight: 600;
   background: var(--selection);
 }
 .row:disabled {
@@ -77,4 +78,9 @@
 }
 .actions button:disabled {
   opacity: 0.5;
+}
+
+.kind {
+  display: block;
+  margin-top: 3px;
 }

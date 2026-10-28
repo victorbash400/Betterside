@@ -1,5 +1,8 @@
 .funding {
-  padding-top: 26px;
+  margin-top: 22px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--panel);
 }
 .label {
   display: flex;
@@ -8,8 +11,8 @@
   color: var(--muted);
 }
 .funding h3 {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   line-height: 1.4;
   margin: 14px 0 5px;
 }
@@ -26,7 +29,7 @@
 }
 .totals strong {
   font-size: 23px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.7px;
 }
 .totals span {
@@ -36,7 +39,7 @@
 .funding progress {
   display: block;
   width: 100%;
-  height: 4px;
+  height: 6px;
   border: 0;
   border-radius: 4px;
   overflow: hidden;

@@ -23,10 +23,3 @@
   overflow-wrap: anywhere;
   user-select: text;
 }
-@container (max-width: 411px) {
-  .row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-}

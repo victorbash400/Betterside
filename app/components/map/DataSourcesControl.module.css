@@ -1,28 +1,22 @@
-.sources {
+.warning {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--danger);
+  font-size: 11px;
+}
+.actions {
+  margin-bottom: 12px;
+}
+.actions button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 0 12px 12px;
-  flex-shrink: 0;
-}
-.control {
-  display: flex;
-  align-items: center;
-  gap: 7px;
   height: 32px;
   padding: 0 10px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 6px;
   background: transparent;
-  font-size: 12px;
-  color: var(--icon);
-}
-.control:hover {
-  background: var(--hover);
-}
-.sources > span {
-  display: flex;
-  align-items: center;
   font-size: 11px;
-  color: var(--danger);
+  cursor: pointer;
 }

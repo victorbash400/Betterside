@@ -1,6 +1,6 @@
 import { filterIssues, issueKinds } from "../../lib/catalogue";
 import { useEffect, useRef, useState } from "react";
-import { Search, Check, FileText } from "lucide-react";
+import { Search, FileText } from "lucide-react";
 import Dialog from "../controls/Dialog";
 import { interestCategories } from "../../lib/interestCategories";
 import type { Interest } from "../../lib/tracking";
@@ -76,10 +76,11 @@ export default function AddItemsDialog({
                 <span>
                   {item.location}
                   <small>
-                    {item.source.label} · {item.kind}
+                    {item.source.label}
+                    <span className={styles.kind}>{item.kind}</span>
                   </small>
                 </span>
-                {(selected.has(item.id) || added) && <Check size={16} />}
+                {added && <small>Added</small>}
               </button>
             );
           })}

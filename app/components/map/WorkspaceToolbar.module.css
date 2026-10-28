@@ -1,0 +1,102 @@
+.bar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+}
+.bar > * {
+  flex-shrink: 0;
+}
+.group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+.control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.control svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.8;
+}
+.control svg:last-child:not(:first-child) {
+  width: 12px;
+  height: 12px;
+}
+.control:hover {
+  background: var(--hover);
+}
+.control[aria-expanded="true"] {
+  background: var(--selection);
+}
+.group > .control {
+  height: 32px;
+  min-width: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 16px;
+  gap: 5px;
+}
+.group > .control > svg:last-child:not(:first-child) {
+  display: none;
+}
+.optional {
+  display: none;
+}
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.rows > label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.reset {
+  align-self: flex-start;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  font-size: 11px;
+  cursor: pointer;
+}
+.slider {
+  appearance: none;
+  width: 160px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+}
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--ink);
+}
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--ink);
+}

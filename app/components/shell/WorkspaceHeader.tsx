@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   PanelLeft,
   ArrowLeft,
@@ -27,6 +28,7 @@ export default function WorkspaceHeader({
   onCreate,
   onRefresh,
   busy,
+  children,
 }: {
   view: View;
   path: Interest[];
@@ -42,6 +44,7 @@ export default function WorkspaceHeader({
   onCreate: () => void;
   onRefresh: () => void;
   busy: boolean;
+  children?: ReactNode;
 }) {
   return (
     <header className={styles.toolbar}>
@@ -66,6 +69,7 @@ export default function WorkspaceHeader({
           onInterest={onInterest}
         />
       </div>
+      {children}
       <div className={styles.actions}>
         <div className={styles.group} role="group" aria-label="Chat">
           <IconButton

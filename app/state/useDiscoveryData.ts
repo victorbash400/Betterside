@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+import { feedProblemSummary } from "../lib/feedStatus";
+import type { FeedStatus } from "../lib/dataSources";
 import type { MapItem } from "../lib/types";
 export function useDiscoveryData() {
   const [catalogue, setCatalogue] = useState<MapItem[]>([]),
     [events, setEvents] = useState<MapItem[]>([]),
+    [sources, setSources] = useState<FeedStatus[]>([]),
     [error, setError] = useState(""),
     [eventError, setEventError] = useState(""),
     [attempt, setAttempt] = useState(0),
@@ -18,6 +21,12 @@ export function useDiscoveryData() {
       try {
         const response = await fetch(path, { signal: controller.signal });
         const data = await response.json();
+        if (path === "/api/events" && Array.isArray(data.sources)) {
+          setSources(data.sources);
+          apply(data.issues);
+          fail(feedProblemSummary(data.sources as FeedStatus[]));
+          return;
+        }
         if (!response.ok) throw new Error(data.error);
         apply(data.issues);
         fail("");
@@ -39,6 +48,7 @@ export function useDiscoveryData() {
   return {
     catalogue,
     events,
+    sources,
     error,
     eventError,
     busy,

@@ -3,8 +3,11 @@ import { createPortal } from "react-dom";
 import type { LucideIcon } from "lucide-react";
 import styles from "./ContextMenu.module.css";
 export interface MenuEntry {
+  id?: string;
   label: string;
   icon?: LucideIcon;
+  selected?: boolean;
+  detail?: string;
   danger?: boolean;
   disabled?: boolean;
   action: () => void;
@@ -55,6 +58,7 @@ export default function ContextMenu({
         previous.focus();
     };
   }, [x, y]);
+  const hasIcons = entries.some((entry) => Boolean(entry.icon));
   return createPortal(
     <div
       ref={menu}
@@ -93,22 +97,39 @@ export default function ContextMenu({
         }
       }}
     >
-      {entries.map(({ label, icon: Icon, danger, disabled, action }) => (
-        <button
-          key={label}
-          type="button"
-          role="menuitem"
-          disabled={disabled}
-          className={danger ? styles.danger : undefined}
-          onClick={() => {
-            onClose();
-            action();
-          }}
-        >
-          {Icon && <Icon size={16} />}
-          <span>{label}</span>
-        </button>
-      ))}
+      {entries.map(
+        ({
+          id,
+          label,
+          icon: Icon,
+          selected,
+          detail,
+          danger,
+          disabled,
+          action,
+        }) => (
+          <button
+            key={id ?? label}
+            type="button"
+            role={selected === undefined ? "menuitem" : "menuitemradio"}
+            aria-checked={selected}
+            disabled={disabled}
+            className={danger ? styles.danger : undefined}
+            onClick={() => {
+              onClose();
+              action();
+            }}
+          >
+            {hasIcons && (
+              <span className={styles.icon}>{Icon && <Icon size={16} />}</span>
+            )}
+            <span>
+              {label}
+              {detail && <small>{detail}</small>}
+            </span>
+          </button>
+        ),
+      )}
     </div>,
     portal,
   );

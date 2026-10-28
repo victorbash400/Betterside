@@ -1,6 +1,13 @@
 export type IssueKind =
-  "Water" | "Hunger" | "Displacement" | "Disaster response";
-export type View = "Explore" | "Contributions" | "Following";
+  | "Water"
+  | "Hunger"
+  | "Displacement"
+  | "Disaster response"
+  | "Humanitarian needs"
+  | "Conflict"
+  | "Health"
+  | "Climate";
+export type View = "Explore" | "Contributions" | "Organizations" | "Following";
 export interface Source {
   label: string;
   url: string;
@@ -28,9 +35,19 @@ export interface Issue {
 }
 export type MapItem = Omit<Issue, "project"> & {
   project?: Issue["project"];
-  dataset?: "catalogue" | "eonet";
+  dataset?: import("./dataSources").DatasetId;
+  recordType?: "Observation" | "Emergency" | "Indicator";
+  geographicPrecision?: "Event location" | "Country centroid";
+  referencePeriod?: { start: string; end: string | null };
+  sourceAlert?: string;
+  identities?: string[];
+  relatedSources?: Source[];
+  aliases?: string[];
   categoryIds?: string[];
   eventStatus?: "Open" | "Closed";
+  measurements?: import("./measurements").Measurement[];
+  reportingArea?: import("./measurements").ReportingArea;
+  eventType?: string;
 };
 export interface Contribution {
   id: string;

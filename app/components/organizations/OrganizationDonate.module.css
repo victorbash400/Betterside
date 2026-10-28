@@ -1,0 +1,22 @@
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: transparent;
+  font-size: 11px;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--ink);
+}
+.action:hover {
+  background: var(--hover);
+}
+.action:disabled {
+  color: var(--muted);
+  opacity: 0.5;
+  cursor: default;
+}

@@ -1,3 +1,5 @@
+import SettingsNavigation from "../settings/SettingsNavigation";
+import type { SettingsSection } from "../../lib/settings";
 import SidebarIssueFilter from "./SidebarIssueFilter";
 import type { InterestAction } from "../../lib/interestActions";
 import type { InterestChoice } from "../../lib/interestCategories";
@@ -6,6 +8,7 @@ import {
   House,
   PanelLeftClose,
   Heart,
+  Building2,
   CircleUserRound,
   Settings,
   Search,
@@ -42,6 +45,8 @@ export default function Sidebar({
   onIssueKinds,
   onQuery,
   settings,
+  settingsSection,
+  onSettingsSection,
 }: {
   view: View;
   onView: (view: View) => void;
@@ -64,6 +69,8 @@ export default function Sidebar({
   onIssueKinds: (kinds: IssueKind[]) => void;
   onQuery: (query: string) => void;
   settings: boolean;
+  settingsSection: SettingsSection;
+  onSettingsSection: (value: SettingsSection) => void;
 }) {
   const narrow = useNarrowLayout(),
     sidebar = useRef<HTMLElement>(null);
@@ -134,38 +141,46 @@ export default function Sidebar({
             <House size={24} strokeWidth={1.8} />
             Home
           </button>
-          <label className={searchStyles.search}>
-            <Search size={18} />
-            <input
-              type="search"
-              aria-label="Search locations, issues and projects"
-              placeholder="Search"
-              value={query}
-              onChange={(event) => onQuery(event.target.value)}
-            />
-            {query && (
-              <button
-                className={searchStyles.clear}
-                aria-label="Clear search"
-                onClick={() => onQuery("")}
-              >
-                <X size={14} />
-              </button>
-            )}
-          </label>
-          {!settings && view !== "Contributions" && (
-            <SidebarIssueFilter value={issueKinds} onChange={onIssueKinds} />
+          {!settings && (
+            <label className={searchStyles.search}>
+              <Search size={18} />
+              <input
+                type="search"
+                aria-label={
+                  view === "Organizations"
+                    ? "Search organizations"
+                    : "Search locations, issues and projects"
+                }
+                placeholder="Search"
+                value={query}
+                onChange={(event) => onQuery(event.target.value)}
+              />
+              {query && (
+                <button
+                  className={searchStyles.clear}
+                  aria-label="Clear search"
+                  onClick={() => onQuery("")}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </label>
           )}
+          {!settings &&
+            view !== "Contributions" &&
+            view !== "Organizations" && (
+              <SidebarIssueFilter value={issueKinds} onChange={onIssueKinds} />
+            )}
           <nav className={styles.navigation}>
             <div className={styles.entries}>
               {settings ? (
-                <button
-                  className={`${styles.home} ${styles.selected}`}
-                  onClick={onSettings}
-                >
-                  <Settings size={24} />
-                  Settings
-                </button>
+                <SettingsNavigation
+                  value={settingsSection}
+                  onChange={(value) => {
+                    onSettingsSection(value);
+                    onClose();
+                  }}
+                />
               ) : (
                 <>
                   <div className={styles.section}>
@@ -180,6 +195,16 @@ export default function Sidebar({
                   >
                     <Heart size={24} strokeWidth={1.8} />
                     Contributions
+                  </button>
+                  <button
+                    className={`${styles.home} ${view === "Organizations" ? styles.selected : ""}`}
+                    onClick={() => {
+                      onView("Organizations");
+                      onClose();
+                    }}
+                  >
+                    <Building2 size={24} strokeWidth={1.8} />
+                    Organizations
                   </button>
                   <InterestList
                     onAction={onInterestAction}

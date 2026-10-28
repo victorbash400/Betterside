@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sourceUrlIdentity } from "./feeds/shared.ts";
 import type { MapItem } from "./types.ts";
 const geometry = z.object({
   date: z.iso.datetime({ offset: true }),
@@ -52,6 +53,9 @@ export function naturalEvents(raw: unknown, reviewed: string): MapItem[] {
           reviewed,
         },
         dataset: "eonet",
+        recordType: "Observation",
+        geographicPrecision: "Event location",
+        identities: event.sources.map((source) => sourceUrlIdentity(source.url)),
         categoryIds: event.categories.map(
           (category) => categoryIds[category.id] ?? "disaster-response",
         ),

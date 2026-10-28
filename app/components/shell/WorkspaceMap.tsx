@@ -1,8 +1,9 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import MapTools from "../map/MapTools";
 import MapWindow from "../map/MapWindow";
 import type { MapItem, Filters } from "../../lib/types";
+import type { OverlaySettings } from "../../lib/concerns";
+import type { MapViewSettings } from "../../lib/mapViews";
 import type { Analysis } from "../../lib/analysis";
 import styles from "./Workspace.module.css";
 const GlobeCanvas = dynamic(() => import("../map/GlobeCanvas"), { ssr: false });
@@ -18,6 +19,10 @@ export default function WorkspaceMap({
   projection,
   onProjection,
   analysis,
+  overlay,
+  country,
+  countryCode,
+  mapViewSettings,
 }: {
   items: MapItem[];
   selected?: MapItem;
@@ -27,11 +32,13 @@ export default function WorkspaceMap({
   projection: "globe" | "mercator";
   onProjection: (projection: "globe" | "mercator") => void;
   analysis?: Analysis;
+  overlay: OverlaySettings;
+  country: string;
+  countryCode?: string;
+  mapViewSettings: MapViewSettings;
 }) {
   const [funding, setFunding] = useState(false),
     [projects, setProjects] = useState(false),
-    [markers, setMarkers] = useState(true),
-    [focus, setFocus] = useState(0),
     [opened, setOpened] = useState({ funding: false, projects: false });
   useEffect(() => {
     if (!analysis) return;
@@ -46,31 +53,17 @@ export default function WorkspaceMap({
   return (
     <div className={styles.mapWorkspace}>
       <GlobeCanvas
-        issues={markers ? items : []}
-        focusRequest={focus}
+        issues={items}
+        overlay={overlay}
+        country={country}
+        countryCode={countryCode}
+        mapViewSettings={mapViewSettings}
+        focusRequest={0}
         selected={selected}
         onSelect={onSelect}
         metric={metric}
         projection={projection}
         onProjection={onProjection}
-      />
-      <MapTools
-        funding={funding}
-        projects={projects}
-        markers={markers}
-        metric={metric}
-        onFunding={() => {
-          setOpened((value) => ({ ...value, funding: true }));
-          setFunding((value) => !value);
-        }}
-        onProjects={() => {
-          setOpened((value) => ({ ...value, projects: true }));
-          setProjects((value) => !value);
-        }}
-        onMarkers={() => setMarkers((value) => !value)}
-        onMetric={onMetric}
-        canFocus={Boolean(selected)}
-        onFocus={() => setFocus((value) => value + 1)}
       />
       {opened.funding && (
         <MapWindow

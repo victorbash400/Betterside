@@ -1,104 +1,113 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
 import {
-  ChartColumn,
-  Table2,
-  Layers,
-  MapPin,
-  Check,
-  Focus,
-} from "lucide-react";
-import IconButton from "../controls/IconButton";
-import ContextMenu from "../controls/ContextMenu";
-import type { Filters } from "../../lib/types";
+  concerns,
+  matchesConcern,
+  type OverlaySettings,
+} from "../../lib/concerns";
+import type { MapItem } from "../../lib/types";
+import { useNarrowLayout } from "../../state/useNarrowLayout";
+import IssueLayerToggle from "./IssueLayerToggle";
+import LayerControlsDialog from "./LayerControlsDialog";
 import styles from "./MapTools.module.css";
 export default function MapTools({
-  funding,
-  projects,
-  markers,
-  metric,
-  onFunding,
-  onProjects,
-  onMarkers,
-  onMetric,
-  onFocus,
-  canFocus,
+  value,
+  items,
+  mapView,
+  onChange,
 }: {
-  funding: boolean;
-  projects: boolean;
-  markers: boolean;
-  metric: Filters["metric"];
-  onFunding: () => void;
-  onProjects: () => void;
-  onMarkers: () => void;
-  onMetric: (value: Filters["metric"]) => void;
-  onFocus: () => void;
-  canFocus: boolean;
+  value: OverlaySettings;
+  items: MapItem[];
+  mapView: boolean;
+  onChange: (value: OverlaySettings) => void;
 }) {
-  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+  const narrow = useNarrowLayout();
+  const [expanded, setExpanded] = useState<boolean>();
+  const [settings, setSettings] = useState(false);
+  const open = expanded ?? !narrow;
+  const counts = useMemo(
+    () =>
+      new Map(
+        concerns.map((concern) => [
+          concern.id,
+          items.filter((item) => matchesConcern(item, concern.id)).length,
+        ]),
+      ),
+    [items],
+  );
   return (
     <>
-      <div
-        className={styles.rail}
-        role="toolbar"
-        aria-label="Map workspace tools"
-      >
-        <IconButton
-          label="Funding chart"
-          title="Funding chart"
-          selected={funding}
-          onClick={onFunding}
+      <aside className={styles.rail} data-open={open} aria-label="Issue layers">
+        <button
+          className={styles.header}
+          aria-expanded={open}
+          aria-controls="issue-layer-list"
+          onClick={() => setExpanded(!open)}
         >
-          <ChartColumn />
-        </IconButton>
-        <IconButton
-          label="Projects table"
-          title="Projects table"
-          selected={projects}
-          onClick={onProjects}
-        >
-          <Table2 />
-        </IconButton>
-        <IconButton
-          label="Area markers"
-          title="Area markers"
-          selected={markers}
-          onClick={onMarkers}
-        >
-          <MapPin />
-        </IconButton>
-        <IconButton
-          label="Map layers"
-          title="Map layers"
-          aria-haspopup="menu"
-          aria-expanded={Boolean(menu)}
-          onClick={(event) => {
-            const rect = event.currentTarget.getBoundingClientRect();
-            setMenu(menu ? null : { x: rect.left - 172, y: rect.top });
-          }}
-        >
-          <Layers />
-        </IconButton>
-        <IconButton
-          label="Focus selected area"
-          title="Focus selected area"
-          disabled={!canFocus}
-          onClick={onFocus}
-        >
-          <Focus />
-        </IconButton>
-      </div>
-      {menu && (
-        <ContextMenu
-          {...menu}
-          label="Map layers"
-          entries={(["Severity", "Funding gap", "Freshness"] as const).map(
-            (value) => ({
-              label: value,
-              icon: metric === value ? Check : undefined,
-              action: () => onMetric(value),
-            }),
-          )}
-          onClose={() => setMenu(null)}
+          <span>Issues</span>
+          <span>
+            {value.concerns.length} / {concerns.length}
+          </span>
+          {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </button>
+        {open && (
+          <>
+            <div className={styles.actions}>
+              <button
+                onClick={() =>
+                  onChange({
+                    ...value,
+                    concerns: concerns.map((concern) => concern.id),
+                  })
+                }
+              >
+                Select all
+              </button>
+              <button onClick={() => onChange({ ...value, concerns: [] })}>
+                Clear
+              </button>
+            </div>
+            <div
+              className={styles.list}
+              id="issue-layer-list"
+              role="group"
+              aria-label="Problems"
+            >
+              {concerns.map((concern) => (
+                <IssueLayerToggle
+                  key={concern.id}
+                  concern={concern}
+                  selected={value.concerns.includes(concern.id)}
+                  count={counts.get(concern.id) ?? 0}
+                  onToggle={() =>
+                    onChange({
+                      ...value,
+                      concerns: value.concerns.includes(concern.id)
+                        ? value.concerns.filter((id) => id !== concern.id)
+                        : [...value.concerns, concern.id],
+                    })
+                  }
+                />
+              ))}
+            </div>
+            <button
+              className={styles.settings}
+              onClick={() => setSettings(true)}
+              aria-haspopup="dialog"
+            >
+              <SlidersHorizontal size={15} />
+              Layer settings
+            </button>
+          </>
+        )}
+      </aside>
+      {settings && (
+        <LayerControlsDialog
+          value={value}
+          items={items}
+          showAppearance={mapView}
+          onChange={onChange}
+          onClose={() => setSettings(false)}
         />
       )}
     </>

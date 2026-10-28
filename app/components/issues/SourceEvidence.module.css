@@ -1,0 +1,36 @@
+.evidence {
+  margin-top: 22px;
+  font-size: 11px;
+}
+.evidence summary {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 32px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink);
+  font-weight: 500;
+}
+.evidence summary::-webkit-details-marker {
+  display: none;
+}
+.evidence summary > svg:last-child {
+  margin-left: auto;
+}
+.evidence[open] summary > svg:last-child {
+  transform: rotate(180deg);
+}
+.evidence a {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  padding: 9px 0;
+  color: var(--accent);
+  line-height: 1.6;
+  text-decoration: none;
+}
+.evidence a > svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}

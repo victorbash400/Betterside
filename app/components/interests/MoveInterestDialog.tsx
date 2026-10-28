@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Folder, Bookmark, Check } from "lucide-react";
+import { Folder, Bookmark } from "lucide-react";
 import Dialog from "../controls/Dialog";
 import { interestPath, canMoveInterest } from "../../lib/interestTree";
 import type { Interest } from "../../lib/tracking";
@@ -26,7 +26,6 @@ export default function MoveInterestDialog({
         >
           <Bookmark size={20} />
           <span>Following</span>
-          {!selected && <Check size={16} />}
         </button>
         {interests
           .filter(
@@ -46,7 +45,6 @@ export default function MoveInterestDialog({
                   .map((item) => item.name)
                   .join(" / ")}
               </span>
-              {selected === interest.id && <Check size={16} />}
             </button>
           ))}
       </div>

@@ -1,0 +1,32 @@
+.workspace {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.status,
+.error {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 15;
+  max-width: calc(100% - 32px);
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 12px;
+}
+.error {
+  color: var(--danger);
+}
+.error button {
+  margin-left: 12px;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+}

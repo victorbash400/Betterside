@@ -1,0 +1,35 @@
+.layer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  align-items: center;
+  gap: 8px;
+}
+.values {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 6px 12px;
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.5;
+}
+.values dt {
+  color: var(--muted);
+}
+.values dd {
+  margin: 0;
+  color: var(--ink);
+}
+@media (max-width: 440px) {
+  .controls {
+    grid-template-columns: minmax(0, 1fr) 80px;
+    gap: 5px;
+  }
+  .values {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+}

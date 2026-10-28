@@ -4,7 +4,7 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-  background: #e9eeeb;
+  background: #eef0f1;
 }
 .canvas > .map {
   position: absolute;

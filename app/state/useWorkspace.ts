@@ -1,16 +1,38 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import {
+  defaultOverlaySettings,
+  matchesConcern,
+  inOverlayPeriod,
+  type OverlaySettings,
+} from "../lib/concerns";
+import {
+  defaultDiscoveryFilters,
+  matchesDiscoveryFilters,
+} from "../lib/discoveryFilters";
+import { defaultMapView } from "../lib/mapViews";
+import { defaultDatasets } from "../lib/dataSources";
+import { deduplicateRecords } from "../lib/feeds/deduplicate";
 import { useDiscoveryData } from "./useDiscoveryData";
+import { useAppearance } from "./useAppearance";
 import { useTracking } from "./useTracking";
 import { filterIssues, issueKinds } from "../lib/catalogue";
 import type { Analysis } from "../lib/analysis";
 import type { Filters, MapItem as Issue, View } from "../lib/types";
 export function useWorkspace() {
   const tracking = useTracking();
+  const appearance = useAppearance();
   const following = tracking.following;
   const [selectedInterestId, setSelectedInterestId] = useState<string>();
   const discovery = useDiscoveryData();
-  const [datasets, setDatasets] = useState({ catalogue: true, eonet: true });
+  const [overlay, setOverlay] = useState<OverlaySettings>(
+    defaultOverlaySettings,
+  );
+  const [mapViewSettings, setMapViewSettings] = useState(defaultMapView);
+  const [discoveryFilters, setDiscoveryFilters] = useState(
+    defaultDiscoveryFilters,
+  );
+  const [datasets, setDatasets] = useState(defaultDatasets);
   const [collectionMode, setCollectionMode] = useState<"list" | "map">("map");
   const [analysis, setAnalysis] = useState<Analysis>();
   const catalogue = useMemo(
@@ -62,7 +84,7 @@ export function useWorkspace() {
   const activeInterest = tracking.interests.find(
     (item) => item.id === selectedInterestId,
   );
-  const records = useMemo(
+  const availableRecords = useMemo(
     () =>
       filterIssues(
         view === "Following"
@@ -73,8 +95,10 @@ export function useWorkspace() {
                     ?.issueIds.includes(issue.id)
                 : following.includes(issue.id),
             )
-          : catalogue.filter((item) =>
-              item.dataset === "eonet" ? datasets.eonet : datasets.catalogue,
+          : deduplicateRecords(
+              catalogue.filter(
+                (item) => datasets[item.dataset ?? "catalogue"] !== false,
+              ),
             ),
         {
           ...filters,
@@ -85,8 +109,14 @@ export function useWorkspace() {
                 )
               : filters.kinds,
         },
+      ).filter(
+        (item) =>
+          inOverlayPeriod(item, overlay.period, Date.now()) &&
+          matchesDiscoveryFilters(item, discoveryFilters),
       ),
     [
+      overlay.period,
+      discoveryFilters,
       catalogue,
       filters,
       following,
@@ -97,9 +127,35 @@ export function useWorkspace() {
       datasets,
     ],
   );
-  const selected = catalogue.find((issue) => issue.id === selectedId);
+  const records = useMemo(
+    () =>
+      availableRecords.filter((item) =>
+        overlay.concerns.some((id) => matchesConcern(item, id)),
+      ),
+    [availableRecords, overlay.concerns],
+  );
+  const selected =
+    records.find((issue) => issue.id === selectedId) ??
+    catalogue.find((issue) => issue.id === selectedId);
   return {
+    appearance,
+    mapViewSettings,
+    setMapViewSettings,
+    discoveryFilters,
+    setDiscoveryFilters: (next: typeof discoveryFilters) => {
+      setDiscoveryFilters(next);
+      setSelectedId(undefined);
+    },
+    countries: [
+      ...new Set(
+        catalogue.flatMap((item) => (item.country ? [item.country] : [])),
+      ),
+    ].sort(),
     retryCatalogue: () => {
+      if (appearance.error) {
+        appearance.retry();
+        return;
+      }
       if (tracking.error) {
         tracking.retry();
         return;
@@ -108,12 +164,18 @@ export function useWorkspace() {
       discovery.refresh();
     },
     analysis,
+    overlay,
+    setOverlay: (next: OverlaySettings) => {
+      setOverlay(next);
+      setSelectedId(undefined);
+    },
     activeInterest,
     collectionMode,
     setCollectionMode,
     datasets,
     setDatasets,
     dataBusy: discovery.busy,
+    dataSources: discovery.sources,
     dataError: discovery.eventError,
     refreshData: discovery.refresh,
     allRecords: catalogue,
@@ -154,14 +216,14 @@ export function useWorkspace() {
     setNavigationOpen,
     checkout,
     setCheckout,
-    error:
-      error ||
-      tracking.error ||
-      discovery.error ||
-      (collectionMode === "list" ? discovery.eventError : ""),
+    error: error || appearance.error || tracking.error || discovery.error,
     errorDismissible:
-      !tracking.error && !discovery.error && !discovery.eventError,
+      !appearance.error &&
+      !tracking.error &&
+      !discovery.error &&
+      !discovery.eventError,
     setError,
     records,
+    availableRecords,
   };
 }

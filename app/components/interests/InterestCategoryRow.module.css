@@ -1,8 +1,9 @@
 .row {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   min-height: 42px;
-  border-radius: 9px;
+  border-radius: 8px;
+  transition: background 140ms ease;
 }
 .row:hover {
   background: var(--hover);
@@ -14,13 +15,19 @@
   background: transparent;
   color: var(--ink);
   font-size: 13px;
+  cursor: pointer;
+  border-radius: 7px;
 }
 .choose {
   flex: 1;
   min-width: 0;
   gap: 10px;
-  padding: 10px;
+  padding: 11px 10px;
   text-align: left;
+}
+.choose > svg {
+  flex-shrink: 0;
+  color: var(--muted);
 }
 .choose > span {
   flex: 1;
@@ -31,14 +38,24 @@
   font-size: 11px;
   margin-top: 3px;
 }
-.choose:disabled {
+.row button:disabled {
   color: var(--muted);
+  cursor: default;
 }
-.browse {
+.add {
   justify-content: center;
-  width: 40px;
-  border-radius: 9px;
+  min-width: 30px;
+  padding: 0 6px;
+  height: 30px;
+  margin-right: 6px;
+  flex-shrink: 0;
 }
-.browse:hover {
+.add:hover:enabled {
   background: var(--selection);
+}
+.chevron {
+  transition: transform 180ms ease;
+}
+.chevron[data-expanded="true"] {
+  transform: rotate(90deg);
 }

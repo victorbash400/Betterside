@@ -1,11 +1,17 @@
 "use client";
+import type { SettingsSection } from "../../lib/settings";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { useOrganizations } from "../../state/useOrganizations";
+import OrganizationWorkspace from "../organizations/OrganizationWorkspace";
+import OrganizationToolbar from "../organizations/OrganizationToolbar";
 import Sidebar from "./Sidebar";
 import WorkspaceHeader from "./WorkspaceHeader";
 import WorkspaceMap from "./WorkspaceMap";
+import CountryOrganizations from "../issues/CountryOrganizations";
+import WorkspaceToolbar from "../map/WorkspaceToolbar";
+import MapTools from "../map/MapTools";
 import IssueDetails from "../issues/IssueDetails";
-import DataSourcesControl from "../map/DataSourcesControl";
 import InterestContents from "../collections/InterestContents";
 import InterestActionDialog from "../interests/InterestActionDialog";
 import AddItemsDialog from "../interests/AddItemsDialog";
@@ -22,10 +28,27 @@ import styles from "./Workspace.module.css";
 const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), { ssr: false });
 export default function Workspace() {
   const state = useWorkspace();
+  const organizations = useOrganizations(
+    state.view === "Organizations",
+    state.filters.query,
+  );
+  const [organizationCountry, setOrganizationCountry] = useState<{
+    code: string;
+    country: string;
+  }>();
+  const organizationCode = state.allRecords.find(
+    (item) =>
+      item.country === state.discoveryFilters.country && item.reportingArea,
+  )?.reportingArea?.countryCode;
+  const [settingsSection, setSettingsSection] =
+    useState<SettingsSection>("appearance");
   const [action, setAction] = useState<InterestAction | null>(null),
     [adding, setAdding] = useState(false),
     [creating, setCreating] = useState(false);
   function home() {
+    if (state.view === "Organizations") {
+      state.setFilters({ ...state.filters, query: "" });
+    }
     state.setView("Explore");
     state.setCollectionMode("map");
     state.setSelectedId(undefined);
@@ -33,6 +56,9 @@ export default function Workspace() {
     state.setSettingsOpen(false);
   }
   function following() {
+    if (state.view === "Organizations") {
+      state.setFilters({ ...state.filters, query: "" });
+    }
     state.setView("Following");
     state.setCollectionMode("list");
     state.setSelectedId(undefined);
@@ -40,6 +66,9 @@ export default function Workspace() {
     state.setSettingsOpen(false);
   }
   function openInterest(id: string) {
+    if (state.view === "Organizations") {
+      state.setFilters({ ...state.filters, query: "" });
+    }
     state.setSelectedInterestId(id);
     state.setSelectedId(undefined);
     state.setView("Following");
@@ -105,6 +134,8 @@ export default function Workspace() {
           else if (view === "Following") following();
           else {
             state.setView(view);
+            state.setSelectedInterestId(undefined);
+            state.setFilters({ ...state.filters, query: "" });
             state.setSelectedId(undefined);
             state.setSettingsOpen(false);
           }
@@ -130,11 +161,14 @@ export default function Workspace() {
         query={state.filters.query}
         onQuery={(query) => state.setFilters({ ...state.filters, query })}
         settings={state.settingsOpen}
+        settingsSection={settingsSection}
+        onSettingsSection={setSettingsSection}
       />
       {state.settingsOpen ? (
         <SettingsDialog
-          projection={state.projection}
-          onProjection={state.setProjection}
+          section={settingsSection}
+          appearance={state.appearance.value}
+          onAppearance={state.appearance.update}
           model={state.model}
           onModel={state.setModel}
           onClose={() => state.setSettingsOpen(false)}
@@ -160,12 +194,89 @@ export default function Workspace() {
             mode={state.collectionMode}
             onMode={state.setCollectionMode}
             onCreate={() => setCreating(true)}
-            onRefresh={state.refreshData}
-            busy={state.dataBusy}
-          />
+            onRefresh={
+              state.view === "Organizations"
+                ? organizations.refresh
+                : state.refreshData
+            }
+            busy={
+              state.view === "Organizations"
+                ? organizations.busy
+                : state.dataBusy
+            }
+          >
+            {state.view === "Organizations" && (
+              <OrganizationToolbar
+                mapView={state.mapViewSettings}
+                onMapView={state.setMapViewSettings}
+                showMap={state.collectionMode === "map"}
+                filters={organizations.filters}
+                onChange={organizations.update}
+                countries={organizations.countries.map(
+                  (country) => country.name,
+                )}
+                organizations={organizations.data?.organizations ?? []}
+                sources={organizations.data?.sources ?? []}
+              />
+            )}
+            {state.view !== "Contributions" &&
+              state.view !== "Organizations" && (
+                <WorkspaceToolbar
+                  overlay={state.overlay}
+                  onOverlay={state.setOverlay}
+                  filters={state.discoveryFilters}
+                  onFilters={(value) => {
+                    state.setDiscoveryFilters(value);
+                    setOrganizationCountry(undefined);
+                  }}
+                  countries={state.countries}
+                  mapView={state.mapViewSettings}
+                  onMapView={state.setMapViewSettings}
+                  showMap={state.collectionMode === "map"}
+                  showSources={state.view === "Explore"}
+                  datasets={state.datasets}
+                  onDatasets={state.setDatasets}
+                  sources={state.dataSources}
+                  error={state.dataError}
+                  busy={state.dataBusy}
+                  onRefresh={state.refreshData}
+                  onOrganizations={
+                    organizationCode
+                      ? () =>
+                          setOrganizationCountry({
+                            code: organizationCode,
+                            country: state.discoveryFilters.country,
+                          })
+                      : undefined
+                  }
+                  onAdd={
+                    state.activeInterest
+                      ? () =>
+                          setAction({
+                            kind: "add",
+                            interest: state.activeInterest!,
+                          })
+                      : undefined
+                  }
+                />
+              )}
+          </WorkspaceHeader>
           <div className={styles.workspace}>
             <div className={styles.surface}>
-              {state.view === "Contributions" ? (
+              {state.view === "Organizations" ? (
+                <OrganizationWorkspace
+                  state={organizations}
+                  query={state.filters.query}
+                  onQuery={(query) =>
+                    state.setFilters({ ...state.filters, query })
+                  }
+                  mode={state.collectionMode}
+                  onMode={state.setCollectionMode}
+                  projection={state.projection}
+                  onProjection={state.setProjection}
+                  mapView={state.mapViewSettings}
+                />
+              ) : state.view === "Contributions" ? (
                 <ContributionHistory
                   onExplore={home}
                   onProject={(projectId) => {
@@ -176,87 +287,82 @@ export default function Workspace() {
                     if (item) select(item);
                   }}
                 />
-              ) : state.collectionMode === "list" ? (
-                <InterestContents
-                  discovery={state.view === "Explore"}
-                  interest={state.activeInterest}
-                  interests={state.interests}
-                  items={state.records}
-                  onAdd={() =>
-                    state.activeInterest
-                      ? setAction({
-                          kind: "add",
-                          interest: state.activeInterest,
-                        })
-                      : setAdding(true)
-                  }
-                  onSelect={select}
-                  onAction={handleAction}
-                  canEdit={state.trackingReady}
-                />
               ) : (
-                <>
-                  <div className={styles.dataToolbar}>
-                    <DataSourcesControl
-                      value={state.datasets}
-                      onChange={state.setDatasets}
-                      error={state.dataError}
-                      busy={state.dataBusy}
-                      onRefresh={state.refreshData}
+                <div className={styles.discoveryContent}>
+                  {state.collectionMode === "list" ? (
+                    <InterestContents
+                      discovery={state.view === "Explore"}
+                      interest={state.activeInterest}
+                      interests={state.interests}
+                      items={state.records}
+                      onAdd={() =>
+                        state.activeInterest
+                          ? setAction({
+                              kind: "add",
+                              interest: state.activeInterest,
+                            })
+                          : setAdding(true)
+                      }
+                      onSelect={select}
+                      onAction={handleAction}
+                      canEdit={state.trackingReady}
                     />
-                    <span className={styles.recordCount}>
-                      {state.records.length} records
-                    </span>
-                    {state.activeInterest && (
-                      <button
-                        className={styles.addItems}
-                        onClick={() =>
-                          setAction({
-                            kind: "add",
-                            interest: state.activeInterest!,
-                          })
+                  ) : (
+                    <>
+                      <WorkspaceMap
+                        overlay={state.overlay}
+                        country={state.discoveryFilters.country}
+                        countryCode={organizationCode}
+                        mapViewSettings={state.mapViewSettings}
+                        items={state.records}
+                        selected={state.selected}
+                        onSelect={select}
+                        metric={state.filters.metric}
+                        onMetric={(metric) =>
+                          state.setFilters({ ...state.filters, metric })
                         }
-                      >
-                        Add items
-                      </button>
-                    )}
-                  </div>
-                  <WorkspaceMap
-                    items={state.records}
-                    selected={state.selected}
-                    onSelect={select}
-                    metric={state.filters.metric}
-                    onMetric={(metric) =>
-                      state.setFilters({ ...state.filters, metric })
-                    }
-                    projection={state.projection}
-                    onProjection={state.setProjection}
-                    analysis={state.analysis}
+                        projection={state.projection}
+                        onProjection={state.setProjection}
+                        analysis={state.analysis}
+                      />
+                    </>
+                  )}
+                  <MapTools
+                    value={state.overlay}
+                    items={state.availableRecords}
+                    mapView={state.collectionMode === "map"}
+                    onChange={state.setOverlay}
                   />
-                </>
-              )}
-              {state.selected && state.view !== "Contributions" && (
-                <IssueDetails
-                  issue={state.selected}
-                  followed={state.following.includes(state.selected.id)}
-                  interests={state.interests}
-                  trackingReady={state.trackingReady}
-                  onTrack={(interestId) =>
-                    state.track(state.selected!.id, interestId)
-                  }
-                  onUntrack={() => state.untrack(state.selected!.id)}
-                  onCreateInterest={(choice) => {
-                    const id = state.createInterest(
-                      choice.name,
-                      state.selected!.id,
-                      choice.categoryId,
-                    );
-                    state.track(state.selected!.id, id);
-                  }}
-                  onClose={() => state.setSelectedId(undefined)}
-                  onContribute={() => state.setCheckout(state.selected)}
-                  onAsk={() => state.setChatOpen(true)}
-                />
+                  {organizationCountry && (
+                    <CountryOrganizations
+                      {...organizationCountry}
+                      onClose={() => setOrganizationCountry(undefined)}
+                    />
+                  )}
+                  {state.selected && (
+                    <IssueDetails
+                      issue={state.selected}
+                      followed={state.following.includes(state.selected.id)}
+                      interests={state.interests}
+                      trackingReady={state.trackingReady}
+                      onTrack={(interestId) =>
+                        state.track(state.selected!.id, interestId)
+                      }
+                      onUntrack={() => state.untrack(state.selected!.id)}
+                      onCreateInterest={(choice) => {
+                        const id = state.createInterest(
+                          choice.name,
+                          state.selected!.id,
+                          choice.categoryId,
+                        );
+                        state.track(state.selected!.id, id);
+                      }}
+                      onClose={() => state.setSelectedId(undefined)}
+                      onContribute={() => state.setCheckout(state.selected)}
+                      onAsk={() => state.setChatOpen(true)}
+                    />
+                  )}
+                </div>
               )}
             </div>
             {state.chatOpen && (

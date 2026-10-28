@@ -1,6 +1,6 @@
 import type { InterestChoice } from "../../lib/interestCategories";
 import { useState } from "react";
-import { Bookmark, Check, FolderPlus, X } from "lucide-react";
+import { Bookmark, FolderPlus, X } from "lucide-react";
 import ContextMenu from "../controls/ContextMenu";
 import NewInterestDialog from "./NewInterestDialog";
 import type { Interest } from "../../state/useTracking";
@@ -49,12 +49,13 @@ export default function TrackingButton({
           entries={[
             {
               label: "Following",
-              icon: followed && !assigned ? Check : Bookmark,
+              icon: Bookmark,
+              selected: followed && !assigned,
               action: () => onTrack(),
             },
             ...interests.map((interest) => ({
               label: interest.name,
-              icon: assigned?.id === interest.id ? Check : undefined,
+              selected: assigned?.id === interest.id,
               action: () => onTrack(interest.id),
             })),
             {

@@ -1,0 +1,23 @@
+.evidence {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.evidence > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  text-decoration: none;
+}
+.evidence small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.evidence > a {
+  color: var(--ink);
+}

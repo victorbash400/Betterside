@@ -1,0 +1,2171 @@
+[
+  {
+    "id": "profile:women-for-women",
+    "name": "Women for Women International",
+    "acronym": "WfWI",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "women-for-women"
+      }
+    ],
+    "topics": [
+      "Women's rights",
+      "Conflict response",
+      "Poverty"
+    ],
+    "description": "Economic and social support for women affected by conflict.",
+    "website": "https://www.womenforwomen.org/",
+    "donateUrl": "https://www.womenforwomen.org/stand-with-her?src=DBSWH263A#donate-form",
+    "logoUrl": null,
+    "presence": [
+      {
+        "countryCode": "AFG",
+        "country": "Afghanistan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "BIH",
+        "country": "Bosnia and Herzegovina",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "COD",
+        "country": "Democratic Republic of the Congo",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "IRQ",
+        "country": "Iraq",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "XKX",
+        "country": "Kosovo",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "NGA",
+        "country": "Nigeria",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "PSE",
+        "country": "Palestine",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "RWA",
+        "country": "Rwanda",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "SSD",
+        "country": "South Sudan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+          "date": "2026-10-28"
+        }
+      }
+    ],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.womenforwomen.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Operating countries",
+        "url": "https://www.womenforwomen.org/what-we-do/where-we-work",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.womenforwomen.org/stand-with-her?src=DBSWH263A#donate-form",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Women for Women International"
+    ]
+  },
+  {
+    "id": "profile:equality-now",
+    "name": "Equality Now",
+    "acronym": "",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "equality-now"
+      }
+    ],
+    "topics": [
+      "Women's rights",
+      "Human rights"
+    ],
+    "description": "Legal advocacy against discrimination and violence affecting women and girls.",
+    "website": "https://equalitynow.org/",
+    "donateUrl": "https://equalitynow.org/get-involved/donate-to-equality-now/",
+    "logoUrl": "https://equalitynow.org/wp-content/smush-webp/2026/06/EN-Logo-purple-300x112.jpg.webp",
+    "presence": [],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://equalitynow.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://equalitynow.org/get-involved/donate-to-equality-now/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://equalitynow.org/about-us/annual-reports/",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Equality Now"
+    ]
+  },
+  {
+    "id": "profile:womankind",
+    "name": "Womankind Worldwide",
+    "acronym": "",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "womankind"
+      }
+    ],
+    "topics": [
+      "Women's rights",
+      "Human rights"
+    ],
+    "description": "Partnerships and funding for women’s rights organizations and movements.",
+    "website": "https://www.womankind.org.uk/",
+    "donateUrl": "https://www.womankind.org.uk/donate/",
+    "logoUrl": null,
+    "presence": [
+      {
+        "countryCode": "AFG",
+        "country": "Afghanistan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womankind.org.uk/where-we-work/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ETH",
+        "country": "Ethiopia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womankind.org.uk/where-we-work/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "KEN",
+        "country": "Kenya",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womankind.org.uk/where-we-work/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "NPL",
+        "country": "Nepal",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womankind.org.uk/where-we-work/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "UGA",
+        "country": "Uganda",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womankind.org.uk/where-we-work/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ZWE",
+        "country": "Zimbabwe",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.womankind.org.uk/where-we-work/",
+          "date": "2026-10-28"
+        }
+      }
+    ],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.womankind.org.uk/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Operating countries",
+        "url": "https://www.womankind.org.uk/where-we-work/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.womankind.org.uk/donate/",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Womankind Worldwide"
+    ]
+  },
+  {
+    "id": "profile:malala",
+    "name": "Malala Fund",
+    "acronym": "",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "malala"
+      }
+    ],
+    "topics": [
+      "Women's rights",
+      "Education",
+      "Children"
+    ],
+    "description": "Grantmaking and advocacy for girls’ secondary education.",
+    "website": "https://malala.org/",
+    "donateUrl": "https://malala.org/donate?sc=header",
+    "logoUrl": "https://malala.org/packs/static/images/malala-primary-logo-large-0a880532137530e3eed5.svg",
+    "presence": [
+      {
+        "countryCode": "AFG",
+        "country": "Afghanistan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://malala.org/our-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "BRA",
+        "country": "Brazil",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://malala.org/our-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ETH",
+        "country": "Ethiopia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://malala.org/our-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "NGA",
+        "country": "Nigeria",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://malala.org/our-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "PAK",
+        "country": "Pakistan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://malala.org/our-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "TZA",
+        "country": "Tanzania",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://malala.org/our-work",
+          "date": "2026-10-28"
+        }
+      }
+    ],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://malala.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Operating countries",
+        "url": "https://malala.org/our-work",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://malala.org/donate?sc=header",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://malala.org/financial-information-us",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Malala Fund"
+    ]
+  },
+  {
+    "id": "profile:msf",
+    "name": "Médecins Sans Frontières",
+    "acronym": "MSF",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "msf"
+      }
+    ],
+    "topics": [
+      "Health",
+      "Conflict response",
+      "Disaster response"
+    ],
+    "description": "Medical care during conflicts, epidemics and disasters.",
+    "website": "https://www.msf.org/",
+    "donateUrl": "https://www.msf.org/donate",
+    "logoUrl": "https://www.msf.org/themes/custom/msf_theme/src/kss/components/icons/assets/logo-white-en.svg",
+    "presence": [],
+    "size": {
+      "label": "Reported revenue (2025)",
+      "value": "More than €2.6 billion",
+      "evidence": {
+        "label": "MSF audited international figures",
+        "url": "https://www.msf.org/international-activity-report-2025/2025-figures",
+        "date": "2026-10-28"
+      }
+    },
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.msf.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.msf.org/donate",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.msf.org/reports-and-finances",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Médecins Sans Frontières",
+      "Medecins Sans Frontieres"
+    ],
+    "logoTone": "light"
+  },
+  {
+    "id": "profile:irc",
+    "name": "International Rescue Committee",
+    "acronym": "IRC",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "irc"
+      }
+    ],
+    "topics": [
+      "Health",
+      "Refugees",
+      "Conflict response",
+      "Education",
+      "Women's rights"
+    ],
+    "description": "Emergency assistance and recovery support for people affected by conflict and displacement.",
+    "website": "https://www.rescue.org/",
+    "donateUrl": "https://www.rescue.org/?form=donate&ms=ws_resq_top_nav_btn_fy27_q1_mmus_oct",
+    "logoUrl": null,
+    "presence": [
+      {
+        "countryCode": "BFA",
+        "country": "Burkina Faso",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "BDI",
+        "country": "Burundi",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "CMR",
+        "country": "Cameroon",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "CAF",
+        "country": "Central African Republic",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "TCD",
+        "country": "Chad",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "CIV",
+        "country": "Ivory Coast",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "COD",
+        "country": "Democratic Republic of the Congo",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ETH",
+        "country": "Ethiopia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "KEN",
+        "country": "Kenya",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "LBR",
+        "country": "Liberia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "LBY",
+        "country": "Libya",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MLI",
+        "country": "Mali",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "NER",
+        "country": "Niger",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "NGA",
+        "country": "Nigeria",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "SOM",
+        "country": "Somalia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "SSD",
+        "country": "South Sudan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "SDN",
+        "country": "Sudan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "TZA",
+        "country": "Tanzania",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "UGA",
+        "country": "Uganda",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "AFG",
+        "country": "Afghanistan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "BGD",
+        "country": "Bangladesh",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MYS",
+        "country": "Malaysia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MMR",
+        "country": "Myanmar",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "PAK",
+        "country": "Pakistan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "THA",
+        "country": "Thailand",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "DEU",
+        "country": "Germany",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "GRC",
+        "country": "Greece",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ITA",
+        "country": "Italy",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "POL",
+        "country": "Poland",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "UKR",
+        "country": "Ukraine",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "COL",
+        "country": "Colombia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ECU",
+        "country": "Ecuador",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "SLV",
+        "country": "El Salvador",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "HND",
+        "country": "Honduras",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MEX",
+        "country": "Mexico",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "PER",
+        "country": "Peru",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "VEN",
+        "country": "Venezuela",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.rescue.org/where-we-work",
+          "date": "2026-10-28"
+        }
+      }
+    ],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.rescue.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Operating countries",
+        "url": "https://www.rescue.org/where-we-work",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.rescue.org/?form=donate&ms=ws_resq_top_nav_btn_fy27_q1_mmus_oct",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.rescue.org/2025annualreport",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "International Rescue Committee"
+    ]
+  },
+  {
+    "id": "profile:unicef",
+    "name": "UNICEF",
+    "acronym": "UNICEF",
+    "type": "United Nations agency",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "unicef"
+      }
+    ],
+    "topics": [
+      "Children",
+      "Health",
+      "Education",
+      "Water",
+      "Hunger"
+    ],
+    "description": "Children’s health, nutrition, protection and education.",
+    "website": "https://www.unicef.org/",
+    "donateUrl": "https://help.unicef.org/global/donate",
+    "logoUrl": "https://www.unicef.org/sites/default/files/styles/logo/public/English_9.png.webp?itok=8H0Aa4or",
+    "presence": [],
+    "size": {
+      "label": "Reported reach",
+      "value": "190+ countries and territories",
+      "evidence": {
+        "label": "UNICEF global reach",
+        "url": "https://www.unicef.org/",
+        "date": "2026-10-28"
+      }
+    },
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.unicef.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://help.unicef.org/global/donate",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.unicef.org/reports/unicef-annual-report",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "UNICEF",
+      "United Nations Children's Fund"
+    ]
+  },
+  {
+    "id": "profile:wfp",
+    "name": "World Food Programme",
+    "acronym": "WFP",
+    "type": "United Nations agency",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "wfp"
+      }
+    ],
+    "topics": [
+      "Hunger",
+      "Disaster response",
+      "Conflict response"
+    ],
+    "description": "Emergency food assistance and food-security programmes.",
+    "website": "https://www.wfp.org/",
+    "donateUrl": "https://donate.wfp.org/1243/donation/regular/?campaign=1517",
+    "logoUrl": "https://cdn.wfp.org/guides/ui/assets/v0.0.1/logos/standard/en/wfp-logo-standard-white-en.svg",
+    "presence": [],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.wfp.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://donate.wfp.org/1243/donation/regular/?campaign=1517",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.wfp.org/annual-country-reports-2025",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "World Food Programme",
+      "United Nations World Food Programme"
+    ],
+    "logoTone": "light"
+  },
+  {
+    "id": "profile:icrc",
+    "name": "International Committee of the Red Cross",
+    "acronym": "ICRC",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "icrc"
+      }
+    ],
+    "topics": [
+      "Conflict response",
+      "Health",
+      "Water",
+      "Human rights"
+    ],
+    "description": "Protection and assistance for people affected by armed conflict.",
+    "website": "https://www.icrc.org/en",
+    "donateUrl": "https://www.icrc.org/en/donate",
+    "logoUrl": "https://www.icrc.org/themes/custom/icrc_theme/html/images/logo/logo.svg",
+    "presence": [
+      {
+        "countryCode": "SOM",
+        "country": "Somalia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "COD",
+        "country": "Democratic Republic of the Congo",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ETH",
+        "country": "Ethiopia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "PSE",
+        "country": "Palestine",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MMR",
+        "country": "Myanmar",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "SDN",
+        "country": "Sudan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "LBN",
+        "country": "Lebanon",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "UKR",
+        "country": "Ukraine",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "YEM",
+        "country": "Yemen",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.icrc.org/en/where-we-work",
+          "date": "2026-10-28"
+        }
+      }
+    ],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.icrc.org/en",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Operating countries",
+        "url": "https://www.icrc.org/en/where-we-work",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.icrc.org/en/donate",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.icrc.org/en/report/icrc-annual-report-2025",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "International Committee of the Red Cross"
+    ]
+  },
+  {
+    "id": "profile:oxfam",
+    "name": "Oxfam International",
+    "acronym": "Oxfam",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "oxfam"
+      }
+    ],
+    "topics": [
+      "Poverty",
+      "Water",
+      "Hunger",
+      "Climate",
+      "Women's rights",
+      "Disaster response"
+    ],
+    "description": "Work on poverty, inequality, gender justice and humanitarian emergencies.",
+    "website": "https://www.oxfam.org/en",
+    "donateUrl": "https://www.oxfam.org/en/donate-oxfam-affiliate",
+    "logoUrl": "https://www.oxfam.org/en/themes/custom/oxfamint/images/logo.png",
+    "presence": [],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.oxfam.org/en",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.oxfam.org/en/donate-oxfam-affiliate",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.oxfam.org/en/what-we-do/about/our-finances-and-accountability/annual-reports-and-financial-statements",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Oxfam International"
+    ],
+    "logoTone": "light"
+  },
+  {
+    "id": "profile:wateraid",
+    "name": "WaterAid",
+    "acronym": "",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "wateraid"
+      }
+    ],
+    "topics": [
+      "Water",
+      "Health",
+      "Climate"
+    ],
+    "description": "Safe water, sanitation and hygiene through local partnerships.",
+    "website": "https://www.wateraid.org/global",
+    "donateUrl": "https://www.wateraid.org/global?form=donate",
+    "logoUrl": null,
+    "presence": [
+      {
+        "countryCode": "BGD",
+        "country": "Bangladesh",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "KHM",
+        "country": "Cambodia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "IND",
+        "country": "India",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "NPL",
+        "country": "Nepal",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "PAK",
+        "country": "Pakistan",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "PNG",
+        "country": "Papua New Guinea",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "TLS",
+        "country": "East Timor",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ETH",
+        "country": "Ethiopia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "RWA",
+        "country": "Rwanda",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "TZA",
+        "country": "Tanzania",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "UGA",
+        "country": "Uganda",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MDG",
+        "country": "Madagascar",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MWI",
+        "country": "Malawi",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MOZ",
+        "country": "Mozambique",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "ZMB",
+        "country": "Zambia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "BFA",
+        "country": "Burkina Faso",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "GHA",
+        "country": "Ghana",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "LBR",
+        "country": "Liberia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MLI",
+        "country": "Mali",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "NER",
+        "country": "Niger",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "NGA",
+        "country": "Nigeria",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "SEN",
+        "country": "Senegal",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "COL",
+        "country": "Colombia",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.wateraid.org/global/our-work/where-we-work",
+          "date": "2026-10-28"
+        }
+      }
+    ],
+    "size": null,
+    "evaluations": [],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.wateraid.org/global",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Operating countries",
+        "url": "https://www.wateraid.org/global/our-work/where-we-work",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.wateraid.org/global?form=donate",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "WaterAid"
+    ]
+  },
+  {
+    "id": "profile:givedirectly",
+    "name": "GiveDirectly",
+    "acronym": "",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "givedirectly"
+      }
+    ],
+    "topics": [
+      "Poverty",
+      "Disaster response"
+    ],
+    "description": "Direct cash transfers to people living in poverty and affected by crises.",
+    "website": "https://www.givedirectly.org/",
+    "donateUrl": "https://donate.givedirectly.org/",
+    "logoUrl": null,
+    "presence": [
+      {
+        "countryCode": "COD",
+        "country": "Democratic Republic of the Congo",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.givedirectly.org/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "KEN",
+        "country": "Kenya",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.givedirectly.org/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MWI",
+        "country": "Malawi",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.givedirectly.org/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "MOZ",
+        "country": "Mozambique",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.givedirectly.org/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "RWA",
+        "country": "Rwanda",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.givedirectly.org/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "UGA",
+        "country": "Uganda",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.givedirectly.org/",
+          "date": "2026-10-28"
+        }
+      },
+      {
+        "countryCode": "USA",
+        "country": "United States of America",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.givedirectly.org/",
+          "date": "2026-10-28"
+        }
+      }
+    ],
+    "size": null,
+    "evaluations": [
+      {
+        "label": "Published research on cash transfers",
+        "url": "https://www.givedirectly.org/research-on-cash-transfers/",
+        "date": "2026-10-28"
+      }
+    ],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.givedirectly.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Operating countries",
+        "url": "https://www.givedirectly.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://donate.givedirectly.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.givedirectly.org/financials/",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "GiveDirectly"
+    ]
+  },
+  {
+    "id": "profile:amf",
+    "name": "Against Malaria Foundation",
+    "acronym": "AMF",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "amf"
+      }
+    ],
+    "topics": [
+      "Health",
+      "Children"
+    ],
+    "description": "Funding and monitoring distribution of insecticide-treated bed nets.",
+    "website": "https://www.againstmalaria.com/",
+    "donateUrl": "https://www.againstmalaria.com/Donate.aspx",
+    "logoUrl": "https://www.againstmalaria.com/images/logo_AMF_Square.png",
+    "presence": [],
+    "size": null,
+    "evaluations": [
+      {
+        "label": "GiveWell review: insecticide-treated nets",
+        "url": "https://www.givewell.org/charities/amf",
+        "date": "2026-10-28"
+      }
+    ],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.againstmalaria.com/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.againstmalaria.com/Donate.aspx",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.againstmalaria.com/FinancialInformation.aspx",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Against Malaria Foundation"
+    ]
+  },
+  {
+    "id": "profile:malaria-consortium",
+    "name": "Malaria Consortium",
+    "acronym": "",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "malaria-consortium"
+      }
+    ],
+    "topics": [
+      "Health",
+      "Children"
+    ],
+    "description": "Prevention and treatment of malaria and other infectious diseases.",
+    "website": "https://www.malariaconsortium.org/",
+    "donateUrl": "https://www.malariaconsortium.org/donate-to-malaria-consortium",
+    "logoUrl": null,
+    "presence": [],
+    "size": null,
+    "evaluations": [
+      {
+        "label": "GiveWell review: seasonal malaria prevention",
+        "url": "https://www.givewell.org/charities/malaria-consortium",
+        "date": "2026-10-28"
+      }
+    ],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.malariaconsortium.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.malariaconsortium.org/donate-to-malaria-consortium",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Malaria Consortium"
+    ]
+  },
+  {
+    "id": "profile:helen-keller",
+    "name": "Helen Keller Intl",
+    "acronym": "HKI",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "helen-keller"
+      }
+    ],
+    "topics": [
+      "Health",
+      "Hunger",
+      "Children"
+    ],
+    "description": "Nutrition and vision-health programmes.",
+    "website": "https://helenkellerintl.org/",
+    "donateUrl": "https://helenkellerintl.org/more-ways-to-give/",
+    "logoUrl": "https://helenkellerintl.org/wp-content/uploads/2023/08/HKIntl_Logo_Secondary_Horizontal_WHITE-1024x101.png",
+    "presence": [],
+    "size": null,
+    "evaluations": [
+      {
+        "label": "GiveWell review: vitamin A supplementation",
+        "url": "https://www.givewell.org/charities/helen-keller-international",
+        "date": "2026-10-28"
+      }
+    ],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://helenkellerintl.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://helenkellerintl.org/more-ways-to-give/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://helenkellerintl.org/who-we-are/annual-reports/",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "Helen Keller Intl",
+      "Helen Keller International"
+    ],
+    "logoTone": "light"
+  },
+  {
+    "id": "profile:new-incentives",
+    "name": "New Incentives",
+    "acronym": "",
+    "type": "Non-governmental organization",
+    "identifiers": [
+      {
+        "scheme": "BetterSide reviewed profile",
+        "value": "new-incentives"
+      }
+    ],
+    "topics": [
+      "Health",
+      "Children",
+      "Poverty"
+    ],
+    "description": "Cash incentives for childhood vaccination in northern Nigeria.",
+    "website": "https://www.newincentives.org/",
+    "donateUrl": "https://www.newincentives.org/donate",
+    "logoUrl": "https://cdn.prod.website-files.com/5f7c51bf9fac9b5ed62aa37b/63a0ad90214d45f357d4a68c_Logo.png",
+    "presence": [
+      {
+        "countryCode": "NGA",
+        "country": "Nigeria",
+        "region": null,
+        "areaCode": null,
+        "sectors": [],
+        "start": null,
+        "end": null,
+        "evidence": {
+          "label": "Official operating countries",
+          "url": "https://www.newincentives.org/our-work",
+          "date": "2026-10-28"
+        }
+      }
+    ],
+    "size": {
+      "label": "Staff (end of 2023)",
+      "value": "Almost 3,000",
+      "evidence": {
+        "label": "GiveWell program review (September 2024)",
+        "url": "https://www.givewell.org/charities/new-incentives",
+        "date": "2024-09-01"
+      }
+    },
+    "evaluations": [
+      {
+        "label": "GiveWell review: childhood vaccination",
+        "url": "https://www.givewell.org/charities/new-incentives",
+        "date": "2026-10-28"
+      }
+    ],
+    "sources": [
+      {
+        "label": "Official website",
+        "url": "https://www.newincentives.org/",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Operating countries",
+        "url": "https://www.newincentives.org/our-work",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Official donation link",
+        "url": "https://www.newincentives.org/donate",
+        "date": "2026-10-28"
+      },
+      {
+        "label": "Annual reports",
+        "url": "https://www.newincentives.org/annual-report",
+        "date": "2026-10-28"
+      }
+    ],
+    "aliases": [
+      "New Incentives"
+    ]
+  }
+]

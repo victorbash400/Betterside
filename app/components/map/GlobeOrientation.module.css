@@ -1,0 +1,33 @@
+.controls {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.north {
+  top: 10px;
+}
+.south {
+  bottom: 13px;
+}
+.controls button {
+  width: 28px;
+  height: 28px;
+}
+.controls svg {
+  width: 13px;
+  height: 13px;
+}
+@media (max-width: 600px) {
+  .north,
+  .south {
+    left: 12px;
+    transform: none;
+  }
+}

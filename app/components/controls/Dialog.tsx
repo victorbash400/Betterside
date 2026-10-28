@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import IconButton from "./IconButton";
 import styles from "./Dialog.module.css";
@@ -6,11 +6,22 @@ export default function Dialog({
   title,
   onClose,
   children,
+  animated = false,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  animated?: boolean;
 }) {
+  const [closing, setClosing] = useState(false);
+  function dismiss() {
+    if (
+      !animated ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      onClose();
+    else setClosing(true);
+  }
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     ref.current?.showModal();
@@ -20,23 +31,35 @@ export default function Dialog({
   return (
     <dialog
       ref={ref}
-      className={styles.dialog}
+      className={`${styles.dialog} ${animated ? styles.animated : ""}`}
+      data-closing={closing}
+      onAnimationEnd={(event) => {
+        if (closing && event.target === event.currentTarget) onClose();
+      }}
       aria-label={title}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        dismiss();
       }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target !== event.currentTarget) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        if (
+          event.clientX < rect.left ||
+          event.clientX > rect.right ||
+          event.clientY < rect.top ||
+          event.clientY > rect.bottom
+        )
+          dismiss();
       }}
     >
       <header>
         <span>{title}</span>
-        <IconButton label={`Close ${title.toLowerCase()}`} onClick={onClose}>
+        <IconButton label={`Close ${title.toLowerCase()}`} onClick={dismiss}>
           <X />
         </IconButton>
       </header>
-      {children}
+      <div className={styles.body}>{children}</div>
     </dialog>
   );
 }

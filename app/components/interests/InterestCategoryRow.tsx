@@ -1,4 +1,4 @@
-import { Check, ChevronRight, Folder } from "lucide-react";
+import { ChevronRight, Folder, Plus } from "lucide-react";
 import type { InterestCategory } from "../../lib/interestCategories";
 import styles from "./InterestCategoryRow.module.css";
 export default function InterestCategoryRow({
@@ -7,35 +7,50 @@ export default function InterestCategoryRow({
   saved,
   onChoose,
   onBrowse,
+  expanded,
+  controls,
 }: {
   category: InterestCategory;
   path?: string;
   saved: boolean;
   onChoose: () => void;
   onBrowse?: () => void;
+  expanded?: boolean;
+  controls?: string;
 }) {
   return (
     <div className={styles.row}>
       <button
         className={styles.choose}
-        onClick={onChoose}
-        disabled={saved}
-        aria-label={`Add ${category.name}`}
+        onClick={onBrowse ?? onChoose}
+        disabled={!onBrowse && saved}
+        aria-label={onBrowse ? category.name : `Add ${category.name}`}
+        aria-expanded={onBrowse ? expanded : undefined}
+        aria-controls={controls}
       >
-        <Folder size={20} />
+        {onBrowse ? (
+          <ChevronRight
+            size={16}
+            className={styles.chevron}
+            data-expanded={expanded}
+          />
+        ) : (
+          <Folder size={16} />
+        )}
         <span>
           {category.name}
           {path && <small>{path}</small>}
         </span>
-        {saved && <Check size={16} />}
+        {!onBrowse && saved && <small>Added</small>}
       </button>
       {onBrowse && (
         <button
-          className={styles.browse}
-          aria-label={`Browse ${category.name}`}
-          onClick={onBrowse}
+          className={styles.add}
+          aria-label={saved ? `${category.name} added` : `Add ${category.name}`}
+          disabled={saved}
+          onClick={onChoose}
         >
-          <ChevronRight size={16} />
+          {saved ? "Added" : <Plus size={15} />}
         </button>
       )}
     </div>

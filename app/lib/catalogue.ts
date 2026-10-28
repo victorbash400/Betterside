@@ -1,13 +1,9 @@
+import { concerns, matchesConcern } from "./concerns.ts";
 import { categoryPath } from "./interestCategories.ts";
 import { formatDate } from "./dates.ts";
 import type { Issue, MapItem, Filters } from "./types";
 const reviewed = "2026-10-27";
-export const issueKinds = [
-  "Water",
-  "Hunger",
-  "Displacement",
-  "Disaster response",
-] as const;
+export { issueKinds } from "./issueKinds.ts";
 export const issues: Issue[] = [
   {
     id: "somalia-water",
@@ -145,8 +141,10 @@ export function filterIssues(records: MapItem[], filters: Filters) {
           issue.location,
           issue.country,
           issue.kind,
+          ...concerns.filter((concern) => matchesConcern(issue, concern.id)).map((concern) => concern.label),
           issue.project?.name ?? "",
           issue.source.label,
+          issue.summary,
           ...(issue.categoryIds ?? []).map(categoryPath),
         ].some((value) => value.toLocaleLowerCase().includes(query))),
   );

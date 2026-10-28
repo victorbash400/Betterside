@@ -1,27 +1,26 @@
 .toolbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  min-height: 56px;
-  padding: 6px 14px;
+  gap: 16px;
+  min-height: 64px;
+  padding: 10px 14px;
   box-sizing: border-box;
   flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 .navigation {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
-  flex: 1;
+  flex: 1 0 auto;
 }
 .actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-  justify-self: end;
 }
 .group {
   display: flex;
@@ -32,27 +31,20 @@
   border-radius: 20px;
   background: transparent;
 }
-.group > button:first-child {
-  border-top-left-radius: 17px;
-  border-bottom-left-radius: 17px;
-}
-.group > button:last-child {
-  border-top-right-radius: 17px;
-  border-bottom-right-radius: 17px;
+.group > button {
+  border-radius: 17px;
 }
 .mobile {
   display: none;
 }
-@container workspace (max-width: 439px) {
-  .navigation {
-    grid-column: 1 / -1;
-    min-height: 44px;
-  }
-  .actions {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-self: end;
-  }
+.back {
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+}
+.back svg {
+  width: 16px;
+  height: 16px;
 }
 @media (max-width: 760px) {
   .mobile {
@@ -60,36 +52,13 @@
   }
   .toolbar {
     padding: 8px 12px;
+    gap: 12px;
   }
   .navigation {
     gap: 5px;
   }
 }
-
-.back {
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--surface);
-}
-.back svg {
-  width: 16px;
-  height: 16px;
-}
-
 .actionGroup > button[aria-pressed="true"] {
   background: transparent;
   color: var(--accent);
-}
-
-@container workspace (max-width: 850px) {
-  .navigation {
-    grid-column: 1 / -1;
-  }
-  .actions {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    min-width: 0;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
 }

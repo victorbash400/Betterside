@@ -5,7 +5,7 @@ import {
   type ReactNode,
   type PointerEvent,
 } from "react";
-import { Maximize2, Minimize2, X } from "lucide-react";
+import { ChartColumn, Table2, Maximize2, Minimize2, X } from "lucide-react";
 import IconButton from "../controls/IconButton";
 import WindowResizeHandle from "./WindowResizeHandle";
 import styles from "./MapWindow.module.css";
@@ -16,13 +16,25 @@ export default function MapWindow({
   children,
   onClose,
 }: {
-  title: string;
+  title: "Funding" | "Projects";
   hidden?: boolean;
   offset?: number;
   children: ReactNode;
   onClose: () => void;
 }) {
   const surface = useRef<HTMLElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!hidden) {
+      if (
+        document.activeElement instanceof HTMLElement &&
+        !surface.current?.contains(document.activeElement)
+      )
+        opener.current = document.activeElement;
+    } else if (surface.current?.contains(document.activeElement)) {
+      opener.current?.focus();
+    }
+  }, [hidden]);
   const [position, setPosition] = useState({ x: 14 + offset, y: 14 + offset });
   const [size, setSize] = useState<{ width: number; height: number }>();
   const [focused, setFocused] = useState(false);
@@ -33,8 +45,13 @@ export default function MapWindow({
     top: number;
   } | null>(null);
   useEffect(() => {
+    const node = surface.current;
     const parent = surface.current?.parentElement;
-    if (!parent) return;
+    if (!parent || !node) return;
+    setPosition({
+      x: Math.max(8, parent.clientWidth - node.clientWidth - 74 - offset),
+      y: 14 + offset,
+    });
     const observer = new ResizeObserver(() => {
       const node = surface.current;
       if (!node) return;
@@ -43,12 +60,15 @@ export default function MapWindow({
           0,
           Math.min(value.x, parent.clientWidth - node.clientWidth - 60),
         ),
-        y: Math.max(0, Math.min(value.y, parent.clientHeight - 48)),
+        y: Math.max(
+          0,
+          Math.min(value.y, parent.clientHeight - node.clientHeight - 12),
+        ),
       }));
     });
     observer.observe(parent);
     return () => observer.disconnect();
-  }, []);
+  }, [offset]);
   function start(event: PointerEvent<HTMLButtonElement>) {
     if (focused || event.pointerType === "touch") return;
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -61,17 +81,30 @@ export default function MapWindow({
   }
   return (
     <section
-      hidden={hidden}
+      id={`${title.toLowerCase()}-panel`}
+      data-hidden={Boolean(hidden)}
+      inert={hidden}
+      aria-hidden={hidden}
       ref={surface}
       className={`${styles.window} ${focused ? styles.focused : ""}`}
       style={
         focused ? undefined : { left: position.x, top: position.y, ...size }
       }
       aria-label={`${title} window`}
-      onPointerDown={() => surface.current?.focus()}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          onClose();
+        }
+      }}
       tabIndex={-1}
     >
       <header className={styles.header}>
+        {title === "Funding" ? (
+          <ChartColumn size={16} className={styles.symbol} />
+        ) : (
+          <Table2 size={16} className={styles.symbol} />
+        )}
         <button
           className={styles.handle}
           onPointerDown={start}
@@ -91,7 +124,7 @@ export default function MapWindow({
               y: Math.max(
                 0,
                 Math.min(
-                  parent.clientHeight - 48,
+                  parent.clientHeight - node.clientHeight - 12,
                   origin.top + event.clientY - origin.y,
                 ),
               ),
@@ -112,9 +145,24 @@ export default function MapWindow({
             }[event.key];
             if (!movement || focused) return;
             event.preventDefault();
+            const node = surface.current;
+            const parent = node?.parentElement;
+            if (!node || !parent) return;
             setPosition((value) => ({
-              x: Math.max(0, value.x + movement[0]),
-              y: Math.max(0, value.y + movement[1]),
+              x: Math.max(
+                0,
+                Math.min(
+                  parent.clientWidth - node.clientWidth - 60,
+                  value.x + movement[0],
+                ),
+              ),
+              y: Math.max(
+                0,
+                Math.min(
+                  parent.clientHeight - node.clientHeight - 12,
+                  value.y + movement[1],
+                ),
+              ),
             }));
           }}
           aria-label={`Move ${title} window`}

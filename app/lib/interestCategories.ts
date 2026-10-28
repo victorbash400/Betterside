@@ -7,6 +7,13 @@ export interface InterestCategory {
 }
 // Product taxonomy. Category IDs remain stable when display labels change.
 export const interestCategories: InterestCategory[] = [
+  { id: "disease", name: "Disease outbreaks", parentId: "health", issueKind: "Health" },
+  { id: "catastrophic-hunger", name: "Catastrophic hunger", parentId: "food", issueKind: "Hunger" },
+  { id: "humanitarian-needs", name: "Humanitarian needs", issueKind: "Humanitarian needs" },
+  { id: "conflict", name: "Conflict", issueKind: "Conflict" },
+  { id: "health", name: "Health", issueKind: "Health" },
+  { id: "climate", name: "Climate", issueKind: "Climate" },
+  { id: "rainfall", name: "Rainfall", parentId: "climate", issueKind: "Climate" },
   { id: "water", name: "Water", issueKind: "Water" },
   {
     id: "drinking-water",

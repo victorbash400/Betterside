@@ -1,0 +1,13 @@
+.evidence {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 12px 0;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.evidence a {
+  color: var(--accent);
+  text-decoration: none;
+}

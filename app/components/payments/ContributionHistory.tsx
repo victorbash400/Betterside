@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { RefreshCw, Download, ChevronDown, Check } from "lucide-react";
+import { RefreshCw, Download, ChevronDown } from "lucide-react";
 import IconButton from "../controls/IconButton";
 import ContextMenu from "../controls/ContextMenu";
 import ContributionRow from "./ContributionRow";
@@ -120,7 +120,7 @@ export default function ContributionHistory({
               value === "All payments"
                 ? value
                 : value.charAt(0) + value.slice(1).toLowerCase(),
-            icon: status === value ? Check : undefined,
+            selected: status === value,
             action: () => setStatus(value),
           }))}
         />

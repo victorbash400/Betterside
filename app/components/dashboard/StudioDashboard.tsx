@@ -16,17 +16,22 @@ if (license) AgStudioLicenseManager.setLicenseKey(license);
 const theme = studioTheme.withParams({
   fontFamily: "Geist, sans-serif",
   fontSize: 12,
+  studioMinWidth: 0,
+  studioMinHeight: 0,
+  studioCanvasPadding: 0,
+  studioWidgetPadding: 0,
+  studioWrapperBackgroundColor: "#f9f9f7",
   accentColor: "#cc7d5e",
-  backgroundColor: "#f9f9f8",
+  backgroundColor: "#f9f9f7",
   foregroundColor: "#30302e",
   borderColor: "#e2e1de",
   studioWidgetBorder: false,
   studioWidgetBorderRadius: 0,
-  studioWidgetBackgroundColor: "#f9f9f8",
+  studioWidgetBackgroundColor: "#f9f9f7",
   studioWidgetTitleFontSize: 12,
   studioCanvasBorder: false,
   studioCanvasShadow: false,
-  studioCanvasBackgroundColor: "#f9f9f8",
+  studioCanvasBackgroundColor: "#f9f9f7",
   chartPaletteFills1Color: "#cc7d5e",
   chartPaletteFills2Color: "#d9d8d5",
   chartPaletteStrokes1Color: "#cc7d5e",
@@ -70,8 +75,8 @@ export default function StudioDashboard({
         pagePadding: 0,
         widgetPadding: 0,
         widgetBorderRadius: 0,
-        backgroundColor: "#f9f9f8",
-        widgetBackgroundColor: "#f9f9f8",
+        backgroundColor: "#f9f9f7",
+        widgetBackgroundColor: "#f9f9f7",
       };
     }
     if (narrow) {
@@ -130,6 +135,8 @@ export default function StudioDashboard({
             type: "bar-chart-stacked",
           };
     for (const page of next.pages) {
+      if (page.widgets?.projects?.format?.title)
+        page.widgets.projects.format.title.enabled = false;
       for (const id of Object.keys(page.widgets ?? {}))
         if (id !== widget) delete page.widgets?.[id];
       page.widgetLayout = {
@@ -239,8 +246,14 @@ export default function StudioDashboard({
           {error}
         </div>
       )}
-      <div className={styles.studio}>
+      <div
+        className={styles.studio}
+        role="region"
+        aria-label={`${widget === "funding" ? "Funding chart" : "Projects table"} content`}
+        tabIndex={0}
+      >
         <AgStudio
+          style={{ width: "100%", height: "100%", minHeight: 320 }}
           key={`${analysis?.id ?? "overview"}-${narrow ? "mobile" : "desktop"}`}
           onStateUpdated={(event) =>
             setSavedStates((previous) => ({

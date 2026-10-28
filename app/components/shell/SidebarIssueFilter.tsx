@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { SlidersHorizontal, ChevronDown, Check } from "lucide-react";
+import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import { issueKinds } from "../../lib/catalogue";
 import type { IssueKind } from "../../lib/types";
 import styles from "./SidebarIssueFilter.module.css";
@@ -82,9 +82,6 @@ export default function SidebarIssueFilter({
                 )
               }
             >
-              <span className={styles.checkbox} aria-hidden="true">
-                {value.includes(kind) && <Check size={12} />}
-              </span>
               <span>{kind}</span>
             </button>
           ))}

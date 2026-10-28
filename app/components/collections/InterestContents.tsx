@@ -2,6 +2,7 @@ import ContextMenu from "../controls/ContextMenu";
 import InterestContextMenu from "../interests/InterestContextMenu";
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import RecordPagination from "./RecordPagination";
 import CollectionItemRow from "./CollectionItemRow";
 import type { Interest } from "../../lib/tracking";
 import type { MapItem } from "../../lib/types";
@@ -27,6 +28,9 @@ export default function InterestContents({
   canEdit: boolean;
 }) {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+  const [requestedPage, setPage] = useState(0);
+  const pageSize = 100, pages = Math.max(1, Math.ceil(items.length / pageSize));
+  const page = Math.min(requestedPage, pages - 1);
   const sorted = items.toSorted((a, b) => a.location.localeCompare(b.location));
 
   return (
@@ -57,7 +61,7 @@ export default function InterestContents({
           <span>Issue</span>
           <span />
         </div>
-        {sorted.map((item) => (
+        {sorted.slice(page * pageSize, (page + 1) * pageSize).map((item) => (
           <CollectionItemRow
             key={item.id}
             item={item}
@@ -73,6 +77,7 @@ export default function InterestContents({
           />
         ))}
       </div>
+      {pages > 1 && <RecordPagination page={page} pages={pages} onPage={setPage} />}
       {menu &&
         (interest ? (
           <InterestContextMenu

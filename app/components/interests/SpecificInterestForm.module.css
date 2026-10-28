@@ -1,0 +1,46 @@
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+}
+.trigger:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+}
+.form input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  font-size: 13px;
+}
+.submit {
+  border: 0;
+  border-radius: 7px;
+  padding: 8px 12px;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 12px;
+  cursor: pointer;
+}
+.submit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

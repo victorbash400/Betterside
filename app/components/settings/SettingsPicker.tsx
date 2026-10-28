@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useCallback, useState } from "react";
 import ContextMenu from "../controls/ContextMenu";
 import styles from "./SettingsPicker.module.css";
@@ -43,7 +43,7 @@ export default function SettingsPicker({
           onClose={close}
           entries={options.map((item) => ({
             label: item.label,
-            icon: item.value === value ? Check : undefined,
+            selected: item.value === value,
             action: () => onChange(item.value),
           }))}
         />

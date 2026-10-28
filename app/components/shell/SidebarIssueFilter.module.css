@@ -4,7 +4,7 @@
   flex-shrink: 0;
   margin: 2px 12px 6px;
   border: 1px solid var(--filter-outline);
-  border-radius: 20px;
+  border-radius: 8px;
   background: var(--surface);
   color: var(--icon);
 }
@@ -48,7 +48,7 @@
   padding: 4px 6px 6px;
   border: 1px solid var(--filter-outline);
   border-top: 0;
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 8px 8px;
   background: var(--surface);
 }
 .options button {
@@ -59,7 +59,7 @@
   min-height: 36px;
   padding: 8px 6px;
   border: 0;
-  border-radius: 14px;
+  border-radius: 8px;
   background: transparent;
   text-align: left;
   font-size: 13px;
@@ -69,18 +69,7 @@
 .options button:focus-visible {
   background: var(--hover);
 }
-.checkbox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  border: 1px solid var(--muted);
-  border-radius: 4px;
-  color: var(--ink);
-}
-.options button[aria-checked="true"] .checkbox {
+.options button[aria-checked="true"] {
   background: var(--selection);
-  border-color: var(--icon);
+  font-weight: 600;
 }

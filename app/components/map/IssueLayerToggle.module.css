@@ -1,0 +1,40 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+}
+.row > svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+.row > span:first-of-type {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.row[aria-pressed="true"] {
+  font-weight: 600;
+  background: var(--selection);
+}
+.row:hover {
+  background: var(--hover);
+}
+.row:focus-visible {
+  outline: 2px solid var(--icon);
+  outline-offset: -2px;
+}
