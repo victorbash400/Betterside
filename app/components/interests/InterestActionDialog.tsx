@@ -68,7 +68,11 @@ export default function InterestActionDialog({
     );
   if (action.kind === "archive")
     return (
-      <Dialog title={`Remove ${action.interest.name}?`} onClose={onClose}>
+      <Dialog
+        title={`Remove ${action.interest.name}?`}
+        onClose={onClose}
+        compact
+      >
         <div className={styles.actions}>
           <button onClick={onClose}>Cancel</button>
           <button

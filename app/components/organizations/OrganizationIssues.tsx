@@ -18,14 +18,14 @@ export default function OrganizationIssues({
     <aside
       className={styles.panel}
       data-open={open}
-      aria-label="Organization issues"
+      aria-label="Organization causes"
     >
       <button
         className={styles.heading}
         aria-expanded={open}
         onClick={() => setExpanded(!open)}
       >
-        Issues {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        Causes {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
       {open && (
         <ul className={styles.list}>

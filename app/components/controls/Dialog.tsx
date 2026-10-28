@@ -7,11 +7,13 @@ export default function Dialog({
   onClose,
   children,
   animated = false,
+  compact = false,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
   animated?: boolean;
+  compact?: boolean;
 }) {
   const [closing, setClosing] = useState(false);
   function dismiss() {
@@ -32,6 +34,7 @@ export default function Dialog({
     <dialog
       ref={ref}
       className={`${styles.dialog} ${animated ? styles.animated : ""}`}
+      data-compact={compact}
       data-closing={closing}
       onAnimationEnd={(event) => {
         if (closing && event.target === event.currentTarget) onClose();

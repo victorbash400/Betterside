@@ -37,14 +37,14 @@ export default function MapTools({
   );
   return (
     <>
-      <aside className={styles.rail} data-open={open} aria-label="Issue layers">
+      <aside className={styles.rail} data-open={open} aria-label="Cause layers">
         <button
           className={styles.header}
           aria-expanded={open}
           aria-controls="issue-layer-list"
           onClick={() => setExpanded(!open)}
         >
-          <span>Issues</span>
+          <span>Causes</span>
           <span>
             {value.concerns.length} / {concerns.length}
           </span>

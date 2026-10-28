@@ -29,7 +29,7 @@ export default function LayerControlsDialog({
       <div className={styles.content}>
         <div className={styles.layers}>
           <div className={styles.columns}>
-            <span>Issue</span>
+            <span>Cause</span>
             <span>Color</span>
           </div>
           {value.concerns.map((id) => (

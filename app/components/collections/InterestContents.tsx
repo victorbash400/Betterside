@@ -29,7 +29,8 @@ export default function InterestContents({
 }) {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const [requestedPage, setPage] = useState(0);
-  const pageSize = 100, pages = Math.max(1, Math.ceil(items.length / pageSize));
+  const pageSize = 100,
+    pages = Math.max(1, Math.ceil(items.length / pageSize));
   const page = Math.min(requestedPage, pages - 1);
   const sorted = items.toSorted((a, b) => a.location.localeCompare(b.location));
 
@@ -58,7 +59,7 @@ export default function InterestContents({
         <div className={styles.header}>
           <span>Name</span>
           <span>Date updated</span>
-          <span>Issue</span>
+          <span>Cause</span>
           <span />
         </div>
         {sorted.slice(page * pageSize, (page + 1) * pageSize).map((item) => (
@@ -77,7 +78,9 @@ export default function InterestContents({
           />
         ))}
       </div>
-      {pages > 1 && <RecordPagination page={page} pages={pages} onPage={setPage} />}
+      {pages > 1 && (
+        <RecordPagination page={page} pages={pages} onPage={setPage} />
+      )}
       {menu &&
         (interest ? (
           <InterestContextMenu

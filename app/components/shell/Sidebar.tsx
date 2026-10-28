@@ -149,7 +149,7 @@ export default function Sidebar({
                 aria-label={
                   view === "Organizations"
                     ? "Search organizations"
-                    : "Search locations, issues and projects"
+                    : "Search locations, causes and projects"
                 }
                 placeholder="Search"
                 value={query}

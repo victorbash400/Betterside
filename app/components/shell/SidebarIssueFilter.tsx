@@ -59,7 +59,7 @@ export default function SidebarIssueFilter({
         onClick={() => setOpen((value) => !value)}
       >
         <SlidersHorizontal size={18} strokeWidth={1.8} />
-        <span>Issues</span>
+        <span>Causes</span>
         <ChevronDown size={14} className={open ? styles.rotated : undefined} />
       </button>
       {open && (
@@ -67,7 +67,7 @@ export default function SidebarIssueFilter({
           id="sidebar-issue-options"
           className={styles.options}
           role="group"
-          aria-label="Visible issues"
+          aria-label="Visible causes"
         >
           {issueKinds.map((kind) => (
             <button

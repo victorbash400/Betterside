@@ -89,3 +89,16 @@
   min-height: 0;
   overflow-y: auto;
 }
+
+.dialog[data-compact="true"] {
+  width: min(340px, calc(100vw - 32px));
+  height: fit-content;
+  padding: 18px;
+}
+.dialog[data-compact="true"] > header {
+  margin-bottom: 0;
+  font-size: 13px;
+}
+.dialog[data-compact="true"] .body {
+  flex: 0 1 auto;
+}
