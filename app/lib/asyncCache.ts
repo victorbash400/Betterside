@@ -1,11 +1,13 @@
 export interface CachePolicy<T> {
   ttlMs: number | ((value: T) => number);
   errorTtlMs: number;
+  staleIfErrorMs?: number;
 }
 export interface CacheResult<T> {
   value: T;
   storedAt: number;
   expiresAt: number;
+  refreshError?: CachedLoadError;
 }
 export class CachedLoadError extends Error {
   constructor(
@@ -20,8 +22,13 @@ export class CachedLoadError extends Error {
   }
 }
 type Entry<T> =
-  | { result: CacheResult<T>; bytes: number }
-  | { error: CachedLoadError; bytes: number };
+  | { result: CacheResult<T>; bytes: number; retainUntil: number }
+  | {
+      error: CachedLoadError;
+      previous?: CacheResult<T>;
+      bytes: number;
+      retainUntil: number;
+    };
 export function createAsyncCache<T>({
   maxEntries,
   maxBytes,
@@ -45,9 +52,7 @@ export function createAsyncCache<T>({
     remove(key);
     if (entry.bytes > maxBytes) return;
     for (const [oldKey, old] of entries) {
-      const expiresAt =
-        "result" in old ? old.result.expiresAt : old.error.retryAt;
-      if (expiresAt <= now()) remove(oldKey);
+      if (old.retainUntil <= now()) remove(oldKey);
     }
     while (entries.size >= maxEntries || bytes + entry.bytes > maxBytes) {
       const oldest = entries.keys().next().value;
@@ -68,17 +73,27 @@ export function createAsyncCache<T>({
         policy.errorTtlMs < 0
       )
         throw new Error("Invalid cache lifetime.");
+      const staleWindow = policy.staleIfErrorMs ?? 0;
+      if (!Number.isFinite(staleWindow) || staleWindow < 0)
+        throw new Error("Invalid stale retention.");
       const entry = entries.get(key);
+      const previous =
+        entry && ("result" in entry ? entry.result : entry.previous);
+      const canRetain =
+        previous && staleWindow > 0 && previous.expiresAt + staleWindow > now();
       if (entry) {
         const expiresAt =
           "result" in entry ? entry.result.expiresAt : entry.error.retryAt;
         if (expiresAt > now()) {
           entries.delete(key);
           entries.set(key, entry);
-          if ("error" in entry) throw entry.error;
+          if ("error" in entry) {
+            if (canRetain) return { ...previous, refreshError: entry.error };
+            throw entry.error;
+          }
           return entry.result;
         }
-        remove(key);
+        if (!canRetain) remove(key);
       }
       const existing = pending.get(key);
       if (existing) return existing;
@@ -99,6 +114,7 @@ export function createAsyncCache<T>({
           store(key, {
             result,
             bytes: new TextEncoder().encode(serialized).byteLength,
+            retainUntil: result.expiresAt + (policy.staleIfErrorMs ?? 0),
           });
           return result;
         } catch (cause) {
@@ -115,8 +131,16 @@ export function createAsyncCache<T>({
           if (retryAt > now())
             store(key, {
               error,
-              bytes: new TextEncoder().encode(error.message).byteLength + 64,
+              previous: canRetain ? previous : undefined,
+              retainUntil: canRetain
+                ? Math.max(retryAt, previous.expiresAt + staleWindow)
+                : retryAt,
+              bytes:
+                new TextEncoder().encode(
+                  JSON.stringify(canRetain ? previous.value : error.message),
+                ).byteLength + 64,
             });
+          if (canRetain) return { ...previous, refreshError: error };
           throw error;
         } finally {
           pending.delete(key);

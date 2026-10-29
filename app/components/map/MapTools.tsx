@@ -79,6 +79,25 @@ export default function MapTools({
                   concern={concern}
                   selected={value.concerns.includes(concern.id)}
                   count={counts.get(concern.id) ?? 0}
+                  onAreas={
+                    value.mode === "Heatmap" &&
+                    value.concerns.includes(concern.id) &&
+                    (counts.get(concern.id) ?? 0) > 0 &&
+                    !items.some(
+                      (item) =>
+                        matchesConcern(item, concern.id) &&
+                        item.geographicPrecision === "Event location",
+                    )
+                      ? () =>
+                          onChange({
+                            ...value,
+                            mode: "Areas",
+                            concerns: value.concerns.includes(concern.id)
+                              ? value.concerns
+                              : [...value.concerns, concern.id],
+                          })
+                      : undefined
+                  }
                   onToggle={() =>
                     onChange({
                       ...value,

@@ -6,7 +6,10 @@ export async function GET(request: Request) {
   try {
     const result = await loadDiscovery();
     const available = result.sources.some(
-      (source) => source.state === "ready" || source.state === "partial",
+      (source) =>
+        source.state === "ready" ||
+        source.state === "partial" ||
+        source.state === "stale",
     );
     if (available) {
       const deadlines = result.sources.flatMap((source) =>

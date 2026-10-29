@@ -78,9 +78,7 @@ export function updateConcernLayers(
   map.setLayoutProperty(
     "concern-areas",
     "visibility",
-    settings.mode === "Areas" || settings.mode === "Heatmap"
-      ? "visible"
-      : "none",
+    settings.mode === "Areas" ? "visible" : "none",
   );
   map.setPaintProperty("concern-areas", "fill-opacity", [
     "case",

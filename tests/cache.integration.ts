@@ -179,6 +179,26 @@ test("discovery routes share provider requests, isolate organization lookups, an
     await organizations(orgRequest("TST", "health"));
     assert.equal(calls.get(orgKey), 3);
     assert.equal(calls.get("hapi.humdata.org/api/v2/metadata/resource"), 1);
+    const workingFetch = globalThis.fetch;
+    globalThis.fetch = async (input, init) =>
+      new URL(String(input)).hostname === "earthquake.usgs.gov"
+        ? new Response(null, { status: 503 })
+        : workingFetch(input, init);
+    time += sourceTtl.usgs;
+    const staleResponse = await discovery(request());
+    const staleData = await staleResponse.json();
+    const staleSource = staleData.sources.find(
+      (source: { id: string }) => source.id === "usgs",
+    );
+    assert.equal(staleResponse.status, 200);
+    assert.equal(staleSource.state, "stale");
+    assert.equal(staleSource.count, 1);
+    assert.ok(
+      staleData.issues.some(
+        (item: { dataset: string }) => item.dataset === "usgs",
+      ),
+    );
+    assert.ok(staleSource.message.includes("HTTP 503"));
   } finally {
     globalThis.fetch = originalFetch;
     Date.now = originalNow;

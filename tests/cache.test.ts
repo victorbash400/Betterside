@@ -241,3 +241,42 @@ test("refreshing all feeds after five minutes refetches only the fast earthquake
       .every(({ id }) => calls.get(id) === 1),
   );
 });
+
+test("opt-in stale retention preserves original data and dates while exposing refresh failures", async () => {
+  let time = 0;
+  const cache = createAsyncCache<{ records: number[] }>({
+    maxEntries: 2,
+    maxBytes: 10000,
+    now: () => time,
+  });
+  const policy = { ttlMs: 100, errorTtlMs: 50, staleIfErrorMs: 1000 };
+  const original = await cache.get(
+    "feed",
+    async () => ({ records: [1] }),
+    policy,
+  );
+  time = 101;
+  let calls = 0;
+  const fail = async () => {
+    calls++;
+    throw new Error("HTTP 503");
+  };
+  const stale = await cache.get("feed", fail, policy);
+  assert.deepEqual(stale.value, original.value);
+  assert.equal(stale.storedAt, original.storedAt);
+  assert.equal(stale.expiresAt, original.expiresAt);
+  assert.equal(stale.refreshError?.message, "HTTP 503");
+  assert.equal(stale.refreshError?.retryAt, 151);
+  const cooldown = await cache.get("feed", fail, policy);
+  assert.equal(calls, 1);
+  assert.deepEqual(cooldown.value.records, [1]);
+  time = 152;
+  const fresh = await cache.get("feed", async () => ({ records: [2] }), policy);
+  assert.equal(fresh.refreshError, undefined);
+  assert.deepEqual(fresh.value.records, [2]);
+  time = 1253;
+  await assert.rejects(
+    cache.get("feed", fail, policy),
+    (error) => error instanceof Error && error.message === "HTTP 503",
+  );
+});

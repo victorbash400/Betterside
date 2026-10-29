@@ -77,10 +77,13 @@ test("official p-code boundaries preserve Ukrainian district breakdown instead o
     assert.equal(point.value, 10);
     assert.ok(point.area);
   }
-  const geometry = overlayGeometry(points, defaultOverlaySettings);
+  const geometry = overlayGeometry(points, {
+    ...defaultOverlaySettings,
+    mode: "Areas",
+  });
   assert.equal(geometry.areas.features.length, 2);
   assert.equal(geometry.areas.features[0].properties!.area, true);
-  assert.equal(geometry.markers.features.length, 0);
+  assert.equal(geometry.markers.features.length, 2);
 });
 test("national totals use country area geometry while incident coordinates remain unchanged", () => {
   const national = {
@@ -171,7 +174,7 @@ test("a national total prevents duplicate mapped district totals within the same
   assert.equal(points.length, 1);
   assert.equal(points[0].value, 25);
 });
-test("heatmaps retain reported area coverage without turning area totals into incident kernels", () => {
+test("heatmaps show only incident kernels and reserve national and regional totals for Areas", () => {
   const code = Object.keys(geography).find(
     (code) => code.startsWith("UA") && code.length > 4,
   )!;
@@ -208,11 +211,7 @@ test("heatmaps retain reported area coverage without turning area totals into in
   });
   assert.equal(heatmap.markers.features.length, 1);
   assert.deepEqual(heatmap.markers.features[0].geometry.coordinates, [33, 49]);
-  assert.equal(heatmap.areas.features.length, 2);
-  assert.deepEqual(
-    heatmap.areas.features.map((feature) => feature.properties?.located),
-    [false, false],
-  );
+  assert.equal(heatmap.areas.features.length, 0);
   assert.equal(heatmap.columns.features.length, 0);
   const areas = overlayGeometry(points, {
     ...defaultOverlaySettings,

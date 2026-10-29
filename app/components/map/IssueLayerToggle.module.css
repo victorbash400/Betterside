@@ -38,3 +38,29 @@
   outline: 2px solid var(--icon);
   outline-offset: -2px;
 }
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.entry > .row {
+  flex: 1;
+  min-width: 0;
+}
+.area {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 5px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10px;
+  cursor: pointer;
+}
+.area:hover {
+  background: var(--hover);
+  color: var(--ink);
+}

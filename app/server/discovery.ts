@@ -111,6 +111,7 @@ export async function loadDiscovery() {
                   ? cacheLifetimes.failure
                   : sourceTtl[id],
               errorTtlMs: cacheLifetimes.failure,
+              staleIfErrorMs: 7 * 24 * 60 * 60 * 1000,
             },
           );
           return {
@@ -118,6 +119,15 @@ export async function loadDiscovery() {
             status: {
               ...cached.value.status,
               expiresAt: new Date(cached.expiresAt).toISOString(),
+              ...(cached.refreshError
+                ? {
+                    state: "stale" as const,
+                    retryAt: new Date(
+                      cached.refreshError.retryAt,
+                    ).toISOString(),
+                    message: `${label}: cached records retained. ${cached.refreshError.message}`,
+                  }
+                : {}),
             },
           };
         } catch (error) {

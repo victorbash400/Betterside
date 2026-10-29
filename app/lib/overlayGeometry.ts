@@ -21,7 +21,7 @@ export function overlayGeometry(
     const located = point.records.every(
       (record) => record.geographicPrecision === "Event location",
     );
-    if (settings.mode === "Heatmap" && !located && !point.area) continue;
+    if (settings.mode === "Heatmap" && !located) continue;
     if (settings.mode === "Areas" && !point.area) continue;
     const longitudeScale = Math.max(
       0.15,
@@ -37,7 +37,7 @@ export function overlayGeometry(
       area: Boolean(point.area),
       located,
     };
-    if (point.area)
+    if (point.area && settings.mode !== "Heatmap")
       areas.features.push({
         type: "Feature",
         geometry: point.area.geometry,

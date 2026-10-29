@@ -27,8 +27,14 @@ export function feedProblemSummary(sources: FeedStatus[]) {
   const unavailable = sources.filter(
     (source) => source.state === "error" || source.state === "unconfigured",
   ).length;
+  const cached = sources.filter((source) => source.state === "stale").length;
   const partial = sources.filter((source) => source.state === "partial").length;
   return [
+    ...(cached
+      ? [
+          `${cached} ${cached === 1 ? "source using" : "sources using"} cached records.`,
+        ]
+      : []),
     ...(unavailable
       ? [
           `${unavailable} ${unavailable === 1 ? "source" : "sources"} unavailable.`,

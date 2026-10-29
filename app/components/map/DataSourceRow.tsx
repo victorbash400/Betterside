@@ -5,6 +5,7 @@ import styles from "./DataSourceRow.module.css";
 const stateLabels = {
   ready: "Available",
   partial: "Partial download",
+  stale: "Cached · refresh failed",
   error: "Unavailable",
   unconfigured: "Setup required",
 } as const;
@@ -31,7 +32,9 @@ export default function DataSourceRow({
       </div>
       {status && (
         <div className={styles.facts}>
-          <span>{status.count.toLocaleString("en")} records</span>
+          {status.state !== "error" && status.state !== "unconfigured" && (
+            <span>{status.count.toLocaleString("en")} records</span>
+          )}
           <span
             className={status.state === "ready" ? undefined : styles.problem}
           >

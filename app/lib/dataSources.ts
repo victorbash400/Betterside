@@ -22,7 +22,7 @@ export const defaultDatasets = Object.fromEntries(
 ) as DatasetSelection;
 export interface FeedStatus {
   id: Exclude<DatasetId, "catalogue">;
-  state: "ready" | "partial" | "error" | "unconfigured";
+  state: "ready" | "partial" | "stale" | "error" | "unconfigured";
   count: number;
   fetchedAt: string;
   expiresAt?: string;

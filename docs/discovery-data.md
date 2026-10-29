@@ -1,0 +1,13 @@
+# Discovery map precision and outage recovery
+
+Heatmap renders only records with provider-supplied event coordinates. Country and administrative summaries are reserved for Areas; they are never scattered or blurred around a centroid to invent incident locations. Causes with aggregate-only data expose an Areas action when selected in Heatmap mode. Columns and spikes retain their existing geographic anchors.
+
+OCHA HAPI conflict summaries are monthly aggregates, including districts where supplied, rather than incident-level ACLED coordinates. Reference: https://hdx-hapi.readthedocs.io/en/latest/data_usage_guides/coordination_and_context/ . MapLibre heatmaps use point data: https://maplibre.org/maplibre-style-spec/layers/#heatmap . District boundaries use the existing official p-code geometry, without converting reported totals into precise events.
+
+The live validation on 2026-10-29 returned 14,663 records, including 1,673 located observations and 137 Ukrainian district conflict summaries. One provider continued to time out. Counts can vary with availability and source updates. The approximately 14.8 MB JSON response compressed losslessly to approximately 0.9 MB; large responses now negotiate gzip and retain encoding-specific ETags.
+
+Successful per-source results may be retained for seven days after freshness expiry if refresh fails. Their original dates are preserved and the status becomes Cached, never Available. Error cooldowns and ordinary source TTLs still apply. Browser IndexedDB holds one validated public discovery snapshot, restoring it before requests complete. Per-source failures merge with saved records without duplicating them; a successful empty result replaces old records. The browser discards saved records older than seven days. An unavailable provider no longer reports a misleading successful count of zero.
+
+Each initial/manual load may make one delayed recovery request, respecting returned retry deadlines. It cannot schedule another recovery request. Connectivity and focus events also attempt recovery when failed-source cooldowns allow; there is no periodic polling loop. Network intercepts used during browser QA were removed afterward.
+
+Validation covers aggregate-versus-event geometry, default fail-explicit cache behavior, opt-in stale retention and expiry, original timestamps, per-source browser merges, successful empty responses, gzip/ETag round trips, route-level upstream 503 retention, and browser recovery. A real browser injected 503 preserved record counts and then made the one automatic recovery request; reloading while the event API was held restored saved records before releasing the request. No server was started or restarted.
