@@ -8,6 +8,8 @@ import {
   mergeDirectoryOrganizations,
   organizationCountryOverview,
   reportedOrganizationId,
+  organizationCauseTopics,
+  organizationMapScope,
 } from "../app/lib/organizations.ts";
 import {
   iatiOrganizations,
@@ -301,4 +303,41 @@ test("sector filters require evidence in the selected country", () => {
     }).length,
     1,
   );
+});
+
+test("selecting an organization exposes all of its reported causes, including beyond the active cause", () => {
+  const organization = { ...base, topics: ["Water", "Health"] };
+  const candidates = filterOrganizations([organization], {
+    ...defaultOrganizationFilters,
+    topic: "Water",
+  });
+  assert.deepEqual(organizationCauseTopics(candidates[0]), ["Water", "Health"]);
+  assert.deepEqual(organizationCauseTopics({ ...base, topics: [] }), []);
+  assert.ok(organizationCauseTopics().includes("Hunger"));
+});
+
+test("selected organizations show worldwide reported coverage while unselected map results respect country filters", () => {
+  const organization = {
+    ...base,
+    presence: [
+      presence,
+      { ...presence, countryCode: "UGA", country: "Uganda" },
+    ],
+  };
+  const candidates = filterOrganizations([organization], {
+    ...defaultOrganizationFilters,
+    country: "Kenya",
+  });
+  const focused = organizationMapScope(candidates, organization, "KEN");
+  assert.deepEqual(
+    focused[0].presence.map((area) => area.countryCode),
+    ["KEN", "UGA"],
+  );
+  assert.equal(organizationMapGeometry(focused, geography).features.length, 2);
+  const overview = organizationMapScope(candidates, undefined, "KEN");
+  assert.deepEqual(
+    overview[0].presence.map((area) => area.countryCode),
+    ["KEN"],
+  );
+  assert.equal(organization.presence.length, 2);
 });

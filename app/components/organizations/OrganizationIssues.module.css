@@ -21,6 +21,22 @@
   background: transparent;
   font-size: 12px;
   cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+}
+.heading > span {
+  flex: 1;
+  text-align: left;
+}
+.heading small {
+  font-size: 10px;
+  color: var(--muted);
 }
 .list {
   margin: 0;
@@ -45,10 +61,6 @@
   color: var(--muted);
   text-align: left;
   cursor: pointer;
-}
-.issue[data-covered="true"] {
-  color: var(--ink);
-  font-weight: 500;
 }
 .issue[aria-pressed="true"] {
   background: var(--selection);

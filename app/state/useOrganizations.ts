@@ -39,7 +39,10 @@ export function useOrganizations(enabled: boolean, query: string) {
     [organizations, filters, query],
   );
   const update = (next: OrganizationFilters) => {
-    if (next.country !== filters.country) setRevision(0);
+    if (next.country !== filters.country) {
+      setRevision(0);
+      setSelected(undefined);
+    }
     setFilters(next);
     if (
       !filterOrganizations(organizations, { ...next, query }).some(

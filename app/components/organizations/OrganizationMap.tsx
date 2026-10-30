@@ -3,6 +3,7 @@ import { useGlobeMap, globeZoom } from "../map/useGlobeMap";
 import { applyMapView } from "../map/mapStyle";
 import { useMapGeography } from "../../state/useMapGeography";
 import type { DirectoryOrganization } from "../../lib/organizations";
+import { organizationMapScope } from "../../lib/organizations";
 import type { MapViewSettings } from "../../lib/mapViews";
 import { updateOrganizationLayers } from "./organizationMapLayers";
 import GlobeOrientation from "../map/GlobeOrientation";
@@ -50,16 +51,7 @@ export default function OrganizationMap({
       instance.setProjection({ type: projection });
       updateOrganizationLayers(
         instance,
-        (selected ? [selected] : organizations).map((org) =>
-          country
-            ? {
-                ...org,
-                presence: org.presence.filter(
-                  (area) => area.countryCode === country,
-                ),
-              }
-            : org,
-        ),
+        organizationMapScope(organizations, selected, country),
         geography.areas,
       );
     };
@@ -80,10 +72,10 @@ export default function OrganizationMap({
   ]);
   useEffect(() => {
     if (!ready || !map.current) return;
-    const codes = country
-      ? [country]
-      : selected
-        ? [...new Set(selected.presence.map((area) => area.countryCode))]
+    const codes = selected
+      ? [...new Set(selected.presence.map((area) => area.countryCode))]
+      : country
+        ? [country]
         : [];
     const positions = codes.flatMap(
       (code) => geography.areas[code]?.geometry.coordinates.flat(2) ?? [],
@@ -91,7 +83,6 @@ export default function OrganizationMap({
     if (!positions.length) return;
     if (
       selected &&
-      !country &&
       projection === "globe" &&
       codes.length > 1 &&
       container.current

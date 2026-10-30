@@ -1,54 +1,69 @@
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import {
-  organizationTopics,
+  organizationCauseTopics,
   type DirectoryOrganization,
 } from "../../lib/organizations";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
+import IconButton from "../controls/IconButton";
 import styles from "./OrganizationIssues.module.css";
 export default function OrganizationIssues({
   organization,
   value,
   onChange,
+  onClearOrganization,
 }: {
   organization?: DirectoryOrganization;
   value: string;
   onChange: (topic: string) => void;
+  onClearOrganization: () => void;
 }) {
   const narrow = useNarrowLayout();
   const [expanded, setExpanded] = useState<boolean>();
   const open = expanded ?? !narrow;
+  const topics = organizationCauseTopics(organization);
   return (
     <aside
       className={styles.panel}
       data-open={open}
-      aria-label="Organization causes"
+      aria-label={
+        organization ? `Causes for ${organization.name}` : "Organization causes"
+      }
     >
-      <button
-        className={styles.heading}
-        aria-expanded={open}
-        onClick={() => setExpanded(!open)}
-      >
-        Causes {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-      </button>
+      <div className={styles.header}>
+        {organization && (
+          <IconButton
+            label="All causes"
+            title="Clear organization selection"
+            onClick={onClearOrganization}
+          >
+            <ArrowLeft size={14} />
+          </IconButton>
+        )}
+        <button
+          className={styles.heading}
+          aria-expanded={open}
+          onClick={() => setExpanded(!open)}
+        >
+          <span>Causes</span>
+          <small>{topics.length}</small>
+          {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </button>
+      </div>
       {open && (
         <ul className={styles.list}>
-          {organizationTopics.map((topic) => {
-            const covered = organization?.topics.includes(topic) ?? false;
-            return (
-              <li key={topic}>
-                <button
-                  className={styles.issue}
-                  data-covered={covered}
-                  aria-pressed={value === topic}
-                  onClick={() => onChange(value === topic ? "" : topic)}
-                >
-                  {topic}
-                  {value === topic && <Check size={13} aria-hidden="true" />}
-                </button>
-              </li>
-            );
-          })}
+          {topics.map((topic) => (
+            <li key={topic}>
+              <button
+                className={styles.issue}
+                aria-pressed={value === topic}
+                onClick={() => onChange(value === topic ? "" : topic)}
+              >
+                {topic}
+                {value === topic && <Check size={13} aria-hidden="true" />}
+              </button>
+            </li>
+          ))}
         </ul>
       )}
     </aside>

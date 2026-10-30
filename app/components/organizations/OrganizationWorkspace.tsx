@@ -33,6 +33,7 @@ export default function OrganizationWorkspace({
 }) {
   const [details, setDetails] = useState<string>();
   function country(country: string) {
+    state.select(undefined);
     state.update({ ...state.filters, country });
     onMode("map");
   }
@@ -64,7 +65,7 @@ export default function OrganizationWorkspace({
             organizations={state.visible}
             selected={state.selected}
             onSelect={(id) => {
-              state.select(id);
+              state.select(state.selected === id ? undefined : id);
               setDetails(undefined);
             }}
             onDetails={(id) => {
@@ -76,6 +77,10 @@ export default function OrganizationWorkspace({
             organization={state.organization}
             value={state.filters.topic}
             onChange={(topic) => state.update({ ...state.filters, topic })}
+            onClearOrganization={() => {
+              state.select(undefined);
+              setDetails(undefined);
+            }}
           />
         </>
       )}

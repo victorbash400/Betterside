@@ -117,6 +117,22 @@ export function filterOrganizations(
       (!filters.donation || Boolean(org.donateUrl)),
   );
 }
+export function organizationCauseTopics(organization?: DirectoryOrganization) {
+  return [...new Set(organization ? organization.topics : organizationTopics)];
+}
+export function organizationMapScope(
+  organizations: DirectoryOrganization[],
+  selected?: DirectoryOrganization,
+  country?: string,
+) {
+  if (selected) return [selected];
+  return country
+    ? organizations.map((org) => ({
+        ...org,
+        presence: org.presence.filter((area) => area.countryCode === country),
+      }))
+    : organizations;
+}
 export function reportedOrganizationId(
   name: string,
   acronym: string,
