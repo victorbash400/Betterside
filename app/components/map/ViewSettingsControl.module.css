@@ -1,0 +1,32 @@
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+.tabs button {
+  border: 0;
+  border-radius: 7px;
+  padding: 8px 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.tabs button[aria-selected="true"] {
+  background: var(--selection);
+  color: var(--ink);
+}
+.tabs button:hover {
+  background: var(--hover);
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

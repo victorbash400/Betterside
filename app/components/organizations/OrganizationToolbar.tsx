@@ -1,23 +1,20 @@
-import MapViewControl from "../map/MapViewControl";
+import MapViewFields from "../map/MapViewFields";
+import ViewSettingsControl from "../map/ViewSettingsControl";
 import type { MapViewSettings } from "../../lib/mapViews";
 import OrganizationFilterFields from "./OrganizationFilterFields";
 import OrganizationSourceList from "./OrganizationSourceList";
-import { useState } from "react";
-import { Database, SlidersHorizontal } from "lucide-react";
 import OverlayModeControl from "../map/OverlayModeControl";
-import DataSourcesControl from "../map/DataSourcesControl";
+import DataSourceFields from "../map/DataSourceFields";
 import OrganizationCauseControl from "./OrganizationCauseControl";
 import type { OverlaySettings } from "../../lib/concerns";
 import type { DatasetSelection, FeedStatus } from "../../lib/dataSources";
 import CountryFilter from "../map/CountryFilter";
-import ToolbarPopover from "../map/ToolbarPopover";
 import {
   organizationCauseTopics,
   type OrganizationFilters,
   type OrganizationDirectory,
   type DirectoryOrganization,
 } from "../../lib/organizations";
-import toolbar from "../map/WorkspaceToolbar.module.css";
 import styles from "./OrganizationToolbar.module.css";
 export default function OrganizationToolbar({
   filters,
@@ -56,19 +53,6 @@ export default function OrganizationToolbar({
   crisisBusy: boolean;
   onRefreshCrisis: () => void;
 }) {
-  const [open, setOpen] = useState<{
-    kind: "filters" | "sources";
-    x: number;
-    y: number;
-  }>();
-  function toggle(kind: "filters" | "sources", button: HTMLButtonElement) {
-    const rect = button.getBoundingClientRect();
-    setOpen(
-      open?.kind === kind
-        ? undefined
-        : { kind, x: rect.left, y: rect.bottom + 6 },
-    );
-  }
   return (
     <div
       className={styles.bar}
@@ -86,69 +70,56 @@ export default function OrganizationToolbar({
         options={organizationCauseTopics(selected)}
         onChange={(topics) => onChange({ ...filters, topics })}
       />
-      <div className={toolbar.group}>
-        {showMap && (
-          <MapViewControl
-            value={mapView}
-            onChange={onMapView}
-            overlay={overlay}
-            onOverlay={onOverlay}
-          />
-        )}
-        <button
-          className={toolbar.control}
-          title="Organization filters"
-          aria-label="Organization filters"
-          aria-haspopup="dialog"
-          aria-expanded={open?.kind === "filters"}
-          onClick={(event) => toggle("filters", event.currentTarget)}
-        >
-          <SlidersHorizontal />
-        </button>
-        <button
-          className={toolbar.control}
-          title="Organization sources"
-          aria-label="Organization sources"
-          aria-haspopup="dialog"
-          aria-expanded={open?.kind === "sources"}
-          onClick={(event) => toggle("sources", event.currentTarget)}
-        >
-          <Database />
-        </button>
-      </div>
-      {showMap && (
-        <DataSourcesControl
-          label="Crisis data"
-          value={datasets}
-          statuses={crisisSources}
-          onChange={onDatasets}
-          error={crisisError}
-          busy={crisisBusy}
-          onRefresh={onRefreshCrisis}
-        />
-      )}
-      {open && (
-        <ToolbarPopover
-          x={open.x}
-          y={open.y}
-          label={
-            open.kind === "sources"
-              ? "Organization sources"
-              : "Organization filters"
-          }
-          onClose={() => setOpen(undefined)}
-        >
-          {open.kind === "filters" ? (
-            <OrganizationFilterFields
-              filters={filters}
-              onChange={onChange}
-              organizations={organizations}
-            />
-          ) : (
-            <OrganizationSourceList sources={sources} />
-          )}
-        </ToolbarPopover>
-      )}
+      <ViewSettingsControl
+        sections={[
+          {
+            id: "filters",
+            label: "Filters",
+            content: (
+              <OrganizationFilterFields
+                filters={filters}
+                onChange={onChange}
+                organizations={organizations}
+              />
+            ),
+          },
+          ...(showMap
+            ? [
+                {
+                  id: "map",
+                  label: "Map",
+                  content: (
+                    <MapViewFields
+                      value={mapView}
+                      onChange={onMapView}
+                      overlay={overlay}
+                      onOverlay={onOverlay}
+                    />
+                  ),
+                },
+              ]
+            : []),
+          {
+            id: "sources",
+            label: "Sources",
+            content: (
+              <>
+                <OrganizationSourceList sources={sources} />
+                {showMap && (
+                  <DataSourceFields
+                    value={datasets}
+                    statuses={crisisSources}
+                    onChange={onDatasets}
+                    error={crisisError}
+                    busy={crisisBusy}
+                    onRefresh={onRefreshCrisis}
+                  />
+                )}
+              </>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }

@@ -1,9 +1,10 @@
 import { Building2 } from "lucide-react";
 import OverlayModeControl from "./OverlayModeControl";
 import CountryFilter from "./CountryFilter";
-import DiscoveryFilters from "./DiscoveryFilters";
-import MapViewControl from "./MapViewControl";
-import DataSourcesControl from "./DataSourcesControl";
+import DiscoveryFilterFields from "./DiscoveryFilterFields";
+import ViewSettingsControl from "./ViewSettingsControl";
+import MapViewFields from "./MapViewFields";
+import DataSourceFields from "./DataSourceFields";
 import type { OverlaySettings } from "../../lib/concerns";
 import type { DiscoveryFilters as Filters } from "../../lib/discoveryFilters";
 import type { MapViewSettings } from "../../lib/mapViews";
@@ -54,43 +55,67 @@ export default function WorkspaceToolbar({
         value={filters.country}
         onChange={(country) => onFilters({ ...filters, country })}
       />
-      <div className={styles.group} role="group" aria-label="Discovery options">
-        <DiscoveryFilters
-          value={filters}
-          onChange={onFilters}
-          overlay={overlay}
-          onOverlay={onOverlay}
-        />
-        {showMap && (
-          <MapViewControl
-            value={mapView}
-            onChange={onMapView}
-            overlay={overlay}
-            onOverlay={onOverlay}
-          />
-        )}
-        {showSources && (
-          <DataSourcesControl
-            value={datasets}
-            statuses={sources}
-            onChange={onDatasets}
-            error={error}
-            busy={busy}
-            onRefresh={onRefresh}
-          />
-        )}
-        {onOrganizations && (
-          <button
-            className={styles.control}
-            aria-label="Country organizations"
-            title="Organizations"
-            onClick={onOrganizations}
-          >
-            <Building2 size={15} />
-            <span className={styles.optional}>Organizations</span>
-          </button>
-        )}
-      </div>
+      <ViewSettingsControl
+        sections={[
+          {
+            id: "filters",
+            label: "Filters",
+            content: (
+              <DiscoveryFilterFields
+                value={filters}
+                onChange={onFilters}
+                overlay={overlay}
+                onOverlay={onOverlay}
+              />
+            ),
+          },
+          ...(showMap
+            ? [
+                {
+                  id: "map",
+                  label: "Map",
+                  content: (
+                    <MapViewFields
+                      value={mapView}
+                      onChange={onMapView}
+                      overlay={overlay}
+                      onOverlay={onOverlay}
+                    />
+                  ),
+                },
+              ]
+            : []),
+          ...(showSources
+            ? [
+                {
+                  id: "sources",
+                  label: "Sources",
+                  content: (
+                    <DataSourceFields
+                      value={datasets}
+                      statuses={sources}
+                      onChange={onDatasets}
+                      error={error}
+                      busy={busy}
+                      onRefresh={onRefresh}
+                    />
+                  ),
+                },
+              ]
+            : []),
+        ]}
+      />
+      {onOrganizations && (
+        <button
+          className={styles.control}
+          aria-label="Country organizations"
+          title="Organizations"
+          onClick={onOrganizations}
+        >
+          <Building2 size={15} />
+          <span className={styles.optional}>Organizations</span>
+        </button>
+      )}
       {onAdd && (
         <button className={styles.control} onClick={onAdd}>
           Add items

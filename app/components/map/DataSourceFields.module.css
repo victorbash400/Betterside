@@ -1,3 +1,7 @@
+.fields {
+  display: flex;
+  flex-direction: column;
+}
 .warning {
   display: flex;
   align-items: center;

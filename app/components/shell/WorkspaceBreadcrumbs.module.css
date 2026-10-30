@@ -1,4 +1,6 @@
 .breadcrumbs {
+  font-size: 12px;
+  font-weight: 500;
   display: flex;
   align-items: center;
   overflow-x: auto;
