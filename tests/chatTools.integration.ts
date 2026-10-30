@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { workspaceTools } from "../app/server/chatTools.ts";
+import { workspaceTools } from "../app/tools/index.ts";
 import type { MapItem } from "../app/lib/types.ts";
 import { recordsResultSchema } from "../app/lib/chatWorkspace.ts";
 const record: MapItem = {
