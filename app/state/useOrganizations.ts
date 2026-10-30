@@ -51,6 +51,17 @@ export function useOrganizations(enabled: boolean, query: string) {
     )
       setSelected(undefined);
   };
+  function select(id?: string) {
+    setSelected(id);
+    const organization = organizations.find((org) => org.id === id);
+    if (organization && filters.topics.length)
+      setFilters({
+        ...filters,
+        topics: filters.topics.filter((topic) =>
+          organization.topics.includes(topic),
+        ),
+      });
+  }
   return {
     ...directory,
     filters,
@@ -58,7 +69,7 @@ export function useOrganizations(enabled: boolean, query: string) {
     countries,
     visible,
     selected,
-    select: setSelected,
+    select,
     organization: visible.find((org) => org.id === selected),
     refresh: () => setRevision((value) => value + 1),
     countryCode,

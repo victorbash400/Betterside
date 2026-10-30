@@ -80,7 +80,7 @@ export type OrganizationDirectory = z.infer<typeof organizationDirectorySchema>;
 export interface OrganizationFilters {
   query: string;
   country: string;
-  topic: string;
+  topics: string[];
   sector: string;
   type: string;
   donation: string;
@@ -88,7 +88,7 @@ export interface OrganizationFilters {
 export const defaultOrganizationFilters: OrganizationFilters = {
   query: "",
   country: "",
-  topic: "",
+  topics: [],
   sector: "",
   type: "",
   donation: "",
@@ -106,7 +106,8 @@ export function filterOrganizations(
         )) &&
       (!filters.country ||
         org.presence.some((area) => area.country === filters.country)) &&
-      (!filters.topic || org.topics.includes(filters.topic)) &&
+      (!filters.topics.length ||
+        filters.topics.some((topic) => org.topics.includes(topic))) &&
       (!filters.sector ||
         org.presence.some(
           (area) =>

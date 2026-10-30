@@ -27,6 +27,7 @@ export default function GlobeCanvas({
   overlay,
   country,
   countryCode,
+  focusAreas,
   mapViewSettings: mapView,
 }: {
   geography: ReturnType<typeof useMapGeography>;
@@ -35,12 +36,13 @@ export default function GlobeCanvas({
   focusRequest: number;
   selected?: MapItem;
   onSelect: (item: MapItem) => void;
-  metric: Filters["metric"];
+  metric?: Filters["metric"];
   projection: "globe" | "mercator";
   onProjection: (projection: "globe" | "mercator") => void;
   overlay: OverlaySettings;
   country: string;
   countryCode?: string;
+  focusAreas?: string[];
   mapViewSettings: MapViewSettings;
 }) {
   const container = useRef<HTMLDivElement>(null),
@@ -80,6 +82,7 @@ export default function GlobeCanvas({
     issues.find((item) => item.country === country),
     countryCode,
     geography.areas,
+    focusAreas,
   );
   function orient(change: OrientationChange) {
     const instance = map.current;

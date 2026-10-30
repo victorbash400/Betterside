@@ -8,7 +8,6 @@ import {
 import type { Point } from "geojson";
 import { Map, setWorkerUrl } from "maplibre-gl";
 import { cleanMapStyle } from "./mapStyle";
-import { addOrganizationLayers } from "../organizations/organizationMapLayers";
 import { addConcernLayers } from "./concernLayers";
 setWorkerUrl(
   new URL(
@@ -24,7 +23,6 @@ export function globeZoom(element: HTMLElement) {
 export function useGlobeMap(
   container: RefObject<HTMLDivElement | null>,
   onPick: (ids: string[]) => void,
-  organizations = false,
 ) {
   const map = useRef<Map | null>(null),
     [ready, setReady] = useState(false),
@@ -55,27 +53,10 @@ export function useGlobeMap(
       transformStyle: (_, style) => cleanMapStyle(style),
     });
     instance.on("load", () => {
-      if (organizations) addOrganizationLayers(instance);
-      else addConcernLayers(instance);
+      addConcernLayers(instance);
       setReady(true);
     });
     instance.on("click", (event) => {
-      if (organizations) {
-        if (!instance.getLayer("organization-areas")) return;
-        const features = instance.queryRenderedFeatures(event.point, {
-          layers: ["organization-areas"],
-        });
-        pick([
-          ...new Set(
-            features.flatMap((feature) =>
-              typeof feature.properties.id === "string"
-                ? [feature.properties.id]
-                : [],
-            ),
-          ),
-        ]);
-        return;
-      }
       if (!instance.getLayer("concern-hit")) return;
       const columns = instance.queryRenderedFeatures(event.point, {
         layers: ["concern-columns", "concern-areas"],
@@ -125,16 +106,6 @@ export function useGlobeMap(
       ]);
     });
     instance.on("mousemove", (event) => {
-      if (organizations) {
-        if (instance.getLayer("organization-areas"))
-          instance.getCanvas().style.cursor = instance.queryRenderedFeatures(
-            event.point,
-            { layers: ["organization-areas"] },
-          ).length
-            ? "pointer"
-            : "";
-        return;
-      }
       if (instance.getLayer("concern-hit"))
         instance.getCanvas().style.cursor = instance.queryRenderedFeatures(
           event.point,
@@ -150,11 +121,7 @@ export function useGlobeMap(
         event.error?.message?.includes("heat-") ||
         event.error?.message?.includes("organization-")
       )
-        setError(
-          organizations
-            ? "Organization overlay could not render."
-            : "Concern overlay could not render.",
-        );
+        setError("Concern overlay could not render.");
     });
     let previous = Math.min(element.clientWidth, element.clientHeight);
     const observer = new ResizeObserver(() => {
@@ -175,6 +142,6 @@ export function useGlobeMap(
       instance.remove();
       map.current = null;
     };
-  }, [attempt, container, organizations]);
+  }, [attempt, container]);
   return { map, ready, error, retry: () => setAttempt((value) => value + 1) };
 }

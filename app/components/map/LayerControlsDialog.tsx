@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import Dialog from "../controls/Dialog";
-import LayerSelect from "./LayerSelect";
+import OverlayAppearanceFields from "./OverlayAppearanceFields";
 import ConcernLayerRow from "./ConcernLayerRow";
 import { type OverlaySettings } from "../../lib/concerns";
 import { overlayPoints } from "../../lib/overlayData";
@@ -50,73 +50,7 @@ export default function LayerControlsDialog({
           ))}
         </div>
         {showAppearance && (
-          <div className={styles.display}>
-            <label>
-              Scale
-              <LayerSelect
-                label="Value scale"
-                value={value.scale}
-                options={[
-                  { value: "Logarithmic", label: "Logarithmic" },
-                  { value: "Linear", label: "Linear" },
-                ]}
-                onChange={(scale) =>
-                  onChange({
-                    ...value,
-                    scale: scale as OverlaySettings["scale"],
-                  })
-                }
-              />
-            </label>
-            <label>
-              Opacity
-              <input
-                className={styles.slider}
-                aria-label="Overlay opacity"
-                type="range"
-                min="0.2"
-                max="1"
-                step="0.05"
-                value={value.opacity}
-                onChange={(event) =>
-                  onChange({ ...value, opacity: Number(event.target.value) })
-                }
-              />
-            </label>
-            {value.mode === "Heatmap" ? (
-              <label>
-                Spread
-                <input
-                  className={styles.slider}
-                  aria-label="Heatmap spread"
-                  type="range"
-                  min="12"
-                  max="80"
-                  step="2"
-                  value={value.radius}
-                  onChange={(event) =>
-                    onChange({ ...value, radius: Number(event.target.value) })
-                  }
-                />
-              </label>
-            ) : value.mode !== "Areas" ? (
-              <label>
-                Height
-                <input
-                  className={styles.slider}
-                  aria-label="Extrusion height"
-                  type="range"
-                  min="250000"
-                  max="2000000"
-                  step="50000"
-                  value={value.height}
-                  onChange={(event) =>
-                    onChange({ ...value, height: Number(event.target.value) })
-                  }
-                />
-              </label>
-            ) : null}
-          </div>
+          <OverlayAppearanceFields value={value} onChange={onChange} />
         )}
       </div>
     </Dialog>

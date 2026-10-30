@@ -1,4 +1,9 @@
-import { ArrowLeft, Check, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
+} from "lucide-react";
 import { useState } from "react";
 import {
   organizationCauseTopics,
@@ -6,17 +11,20 @@ import {
 } from "../../lib/organizations";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
 import IconButton from "../controls/IconButton";
+import OrganizationCauseOptions from "./OrganizationCauseOptions";
 import styles from "./OrganizationIssues.module.css";
 export default function OrganizationIssues({
   organization,
   value,
   onChange,
   onClearOrganization,
+  onSettings,
 }: {
   organization?: DirectoryOrganization;
-  value: string;
-  onChange: (topic: string) => void;
+  value: string[];
+  onChange: (topics: string[]) => void;
   onClearOrganization: () => void;
+  onSettings: () => void;
 }) {
   const narrow = useNarrowLayout();
   const [expanded, setExpanded] = useState<boolean>();
@@ -51,20 +59,17 @@ export default function OrganizationIssues({
         </button>
       </div>
       {open && (
-        <ul className={styles.list}>
-          {topics.map((topic) => (
-            <li key={topic}>
-              <button
-                className={styles.issue}
-                aria-pressed={value === topic}
-                onClick={() => onChange(value === topic ? "" : topic)}
-              >
-                {topic}
-                {value === topic && <Check size={13} aria-hidden="true" />}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <>
+          <OrganizationCauseOptions
+            options={topics}
+            value={value}
+            onChange={onChange}
+          />
+          <button className={styles.settings} onClick={onSettings}>
+            <SlidersHorizontal size={14} />
+            Layer settings
+          </button>
+        </>
       )}
     </aside>
   );

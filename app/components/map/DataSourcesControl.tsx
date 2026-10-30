@@ -16,6 +16,7 @@ export default function DataSourcesControl({
   error,
   busy,
   onRefresh,
+  label,
 }: {
   value: DatasetSelection;
   statuses: FeedStatus[];
@@ -23,6 +24,7 @@ export default function DataSourcesControl({
   error: string;
   busy: boolean;
   onRefresh: () => void;
+  label?: string;
 }) {
   const [open, setOpen] = useState<{ x: number; y: number } | null>(null);
   const unavailable = statuses.filter(
@@ -39,8 +41,12 @@ export default function DataSourcesControl({
     <>
       <button
         className={toolbar.control}
-        aria-label={error ? `Data sources: ${error}` : "Data sources"}
-        title={error || "Data sources"}
+        aria-label={
+          error
+            ? `${label ?? "Data sources"}: ${error}`
+            : (label ?? "Data sources")
+        }
+        title={error || label || "Data sources"}
         aria-haspopup="dialog"
         aria-expanded={Boolean(open)}
         onClick={(event) => {
@@ -49,6 +55,7 @@ export default function DataSourcesControl({
         }}
       >
         <Database size={15} />
+        {label && <span>{label}</span>}
         {(problem || error) && (
           <span className={styles.warning}>{problem || "Data error"}</span>
         )}
@@ -56,7 +63,7 @@ export default function DataSourcesControl({
       {open && (
         <ToolbarPopover
           {...open}
-          label="Data sources"
+          label={label ?? "Data sources"}
           onClose={() => setOpen(null)}
         >
           <div className={styles.actions}>

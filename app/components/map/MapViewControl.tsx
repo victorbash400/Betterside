@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Map, ChevronDown } from "lucide-react";
 import SettingsPicker from "../settings/SettingsPicker";
+import OverlayAppearanceFields from "./OverlayAppearanceFields";
 import ToggleSwitch from "../controls/ToggleSwitch";
 import ToolbarPopover from "./ToolbarPopover";
 import type { MapViewSettings } from "../../lib/mapViews";
@@ -76,25 +77,8 @@ export default function MapViewControl({
                 onChange={(boundaries) => onChange({ ...value, boundaries })}
               />
             </label>
-            {overlay?.mode === "Heatmap" && onOverlay && (
-              <label>
-                Spread
-                <input
-                  className={styles.slider}
-                  type="range"
-                  aria-label="Heatmap spread"
-                  min="12"
-                  max="80"
-                  step="2"
-                  value={overlay.radius}
-                  onChange={(event) =>
-                    onOverlay({
-                      ...overlay,
-                      radius: Number(event.target.value),
-                    })
-                  }
-                />
-              </label>
+            {overlay && onOverlay && (
+              <OverlayAppearanceFields value={overlay} onChange={onOverlay} />
             )}
           </div>
         </ToolbarPopover>

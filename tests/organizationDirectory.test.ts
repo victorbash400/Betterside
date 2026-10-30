@@ -16,7 +16,7 @@ import {
   hapiOrganizationCatalogue,
   hapiOrganizationPresence,
 } from "../app/lib/organizationAdapters.ts";
-import { organizationMapGeometry } from "../app/components/organizations/organizationMapLayers.ts";
+import { organizationCoverageGeometry } from "../app/lib/organizationCoverage.ts";
 import { mapGeographySchema } from "../app/lib/mapGeography.ts";
 const evidence = {
   label: "Test source",
@@ -73,7 +73,7 @@ test("organization filtering combines verified topic, country, type, donation av
     filterOrganizations([a, b], {
       ...defaultOrganizationFilters,
       query: "example",
-      topic: "Women's rights",
+      topics: ["Women's rights"],
       country: "Kenya",
       type: "NGO",
       donation: "verified",
@@ -199,13 +199,13 @@ test("global operating overview counts countries without creating office coordin
   assert.equal(overview.presence[0].areaCode, null);
   assert.equal(overview.presence[0].region, null);
   assert.equal(org.presence.length, 2);
-  const map = organizationMapGeometry([overview], geography);
+  const map = organizationCoverageGeometry([overview], geography);
   assert.equal(map.features.length, 1);
   assert.equal(map.features[0].geometry.type, "MultiPolygon");
   assert.equal(map.features[0].properties?.count, 1);
   assert.equal(
-    organizationMapGeometry([{ ...base, presence: [] }], geography).features
-      .length,
+    organizationCoverageGeometry([{ ...base, presence: [] }], geography)
+      .features.length,
     0,
   );
 });
@@ -225,10 +225,10 @@ test("mapped p-codes use the real district polygon while unmapped region names r
       },
     ],
   };
-  const map = organizationMapGeometry([org, org], geography);
+  const map = organizationCoverageGeometry([org, org], geography);
   assert.deepEqual(map.features[0].geometry, geography[code].geometry);
   assert.equal(map.features[0].properties?.count, 1);
-  const national = organizationMapGeometry(
+  const national = organizationCoverageGeometry(
     [{ ...org, presence: [{ ...org.presence[0], areaCode: "UNKNOWN" }] }],
     geography,
   );
@@ -309,7 +309,7 @@ test("selecting an organization exposes all of its reported causes, including be
   const organization = { ...base, topics: ["Water", "Health"] };
   const candidates = filterOrganizations([organization], {
     ...defaultOrganizationFilters,
-    topic: "Water",
+    topics: ["Water"],
   });
   assert.deepEqual(organizationCauseTopics(candidates[0]), ["Water", "Health"]);
   assert.deepEqual(organizationCauseTopics({ ...base, topics: [] }), []);
@@ -333,7 +333,10 @@ test("selected organizations show worldwide reported coverage while unselected m
     focused[0].presence.map((area) => area.countryCode),
     ["KEN", "UGA"],
   );
-  assert.equal(organizationMapGeometry(focused, geography).features.length, 2);
+  assert.equal(
+    organizationCoverageGeometry(focused, geography).features.length,
+    2,
+  );
   const overview = organizationMapScope(candidates, undefined, "KEN");
   assert.deepEqual(
     overview[0].presence.map((area) => area.countryCode),

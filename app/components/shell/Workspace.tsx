@@ -21,6 +21,8 @@ import { useWorkspace } from "../../state/useWorkspace";
 import { interestPath } from "../../lib/interestTree";
 import type { InterestAction } from "../../lib/interestActions";
 import type { MapItem } from "../../lib/types";
+import type { OverlaySettings } from "../../lib/concerns";
+import { useOrganizationCrisisMap } from "../../state/useOrganizationCrisisMap";
 import styles from "./Workspace.module.css";
 const InterestContents = dynamic(
   () => import("../collections/InterestContents"),
@@ -37,6 +39,28 @@ export default function Workspace() {
     state.view === "Organizations",
     state.filters.query,
   );
+  const crisis = useOrganizationCrisisMap({
+    enabled: state.view === "Organizations",
+    records: state.allRecords,
+    organizations: organizations.visible,
+    selected: organizations.organization,
+    country: organizations.countryCode,
+    topics: organizations.filters.topics,
+    geography: state.geography.areas,
+    datasets: state.datasets,
+    overlay: state.overlay,
+  });
+  function changeOrganizationOverlay(next: OverlaySettings) {
+    state.setOverlay({ ...next, concerns: state.overlay.concerns });
+  }
+  function updateOrganizations(next: typeof organizations.filters) {
+    organizations.update(next);
+    state.setSelectedId(undefined);
+  }
+  function selectOrganization(id?: string) {
+    organizations.select(id);
+    state.setSelectedId(undefined);
+  }
   const [organizationCountry, setOrganizationCountry] = useState<{
     code: string;
     country: string;
@@ -196,11 +220,20 @@ export default function Workspace() {
           >
             {state.view === "Organizations" && (
               <OrganizationToolbar
+                selected={organizations.organization}
+                overlay={crisis.overlay}
+                onOverlay={changeOrganizationOverlay}
+                datasets={state.datasets}
+                onDatasets={state.setDatasets}
+                crisisSources={state.dataSources}
+                crisisError={state.dataError}
+                crisisBusy={state.dataBusy}
+                onRefreshCrisis={state.refreshData}
                 mapView={state.mapViewSettings}
                 onMapView={state.setMapViewSettings}
                 showMap={state.collectionMode === "map"}
                 filters={organizations.filters}
-                onChange={organizations.update}
+                onChange={updateOrganizations}
                 countries={organizations.countries.map(
                   (country) => country.name,
                 )}
@@ -254,7 +287,18 @@ export default function Workspace() {
             <div className={styles.surface}>
               {state.view === "Organizations" ? (
                 <OrganizationWorkspace
-                  state={organizations}
+                  state={{
+                    ...organizations,
+                    update: updateOrganizations,
+                    select: selectOrganization,
+                  }}
+                  geography={state.geography}
+                  crisis={crisis}
+                  onOverlay={changeOrganizationOverlay}
+                  selectedRecord={crisis.items.find(
+                    (item) => item.id === state.selected?.id,
+                  )}
+                  onSelectRecord={select}
                   query={state.filters.query}
                   onQuery={(query) =>
                     state.setFilters({ ...state.filters, query })
@@ -330,36 +374,43 @@ export default function Workspace() {
                       onClose={() => setOrganizationCountry(undefined)}
                     />
                   )}
-                  {state.selected && (
-                    <IssueDetails
-                      issue={state.selected}
-                      followed={state.following.includes(state.selected.id)}
-                      interests={state.interests}
-                      trackingReady={state.trackingReady}
-                      onTrack={(interestId) =>
-                        state.track(state.selected!.id, interestId)
-                      }
-                      onUntrack={() => state.untrack(state.selected!.id)}
-                      onCreateInterest={(choice) => {
-                        const id = state.createInterest(
-                          choice.name,
-                          state.selected!.id,
-                          choice.categoryId,
-                        );
-                        state.track(state.selected!.id, id);
-                      }}
-                      onClose={() => state.setSelectedId(undefined)}
-                      onContribute={() => state.setCheckout(state.selected)}
-                      onAsk={() => state.setChatOpen(true)}
-                    />
-                  )}
                 </div>
               )}
+              {state.selected &&
+                state.view !== "Contributions" &&
+                (state.view !== "Organizations" ||
+                  crisis.items.some(
+                    (item) => item.id === state.selected?.id,
+                  )) && (
+                  <IssueDetails
+                    issue={state.selected}
+                    followed={state.following.includes(state.selected.id)}
+                    interests={state.interests}
+                    trackingReady={state.trackingReady}
+                    onTrack={(interestId) =>
+                      state.track(state.selected!.id, interestId)
+                    }
+                    onUntrack={() => state.untrack(state.selected!.id)}
+                    onCreateInterest={(choice) => {
+                      const id = state.createInterest(
+                        choice.name,
+                        state.selected!.id,
+                        choice.categoryId,
+                      );
+                      state.track(state.selected!.id, id);
+                    }}
+                    onClose={() => state.setSelectedId(undefined)}
+                    onContribute={() => state.setCheckout(state.selected)}
+                    onAsk={() => state.setChatOpen(true)}
+                  />
+                )}
             </div>
             {state.chatOpen && (
               <ChatDrawer
                 selected={state.selected}
-                issues={state.records}
+                issues={
+                  state.view === "Organizations" ? crisis.items : state.records
+                }
                 model={state.model}
                 onAnalysis={(analysis) => {
                   state.setAnalysis(analysis);

@@ -2,6 +2,7 @@ import { useEffect, type RefObject } from "react";
 import type { Map } from "maplibre-gl";
 import type { MapItem } from "../../lib/types";
 import type { MapGeography } from "../../lib/mapGeography";
+import { globeZoom } from "./useGlobeMap";
 export function useGlobeCamera(
   map: RefObject<Map | null>,
   ready: boolean,
@@ -13,6 +14,7 @@ export function useGlobeCamera(
   countryRecord: MapItem | undefined,
   countryCode: string | undefined,
   areas: MapGeography,
+  focusAreas?: string[],
 ) {
   useEffect(() => {
     if (!ready || !map.current) return;
@@ -59,17 +61,38 @@ export function useGlobeCamera(
 
   useEffect(() => {
     const instance = map.current;
-    if (!ready || !instance || !country || selected) return;
+    if (!ready || !instance || (!country && !focusAreas?.length) || selected)
+      return;
     const record = countryRecord;
     const code = countryCode ?? record?.reportingArea?.countryCode;
     const area = code ? areas[code] : undefined;
-    if (!area && !record) return;
+    const scope = focusAreas?.length
+      ? focusAreas.flatMap((id) => areas[id] ?? [])
+      : area
+        ? [area]
+        : [];
+    if (!scope.length && !record) return;
     const duration = window.matchMedia("(prefers-reduced-motion: reduce)")
       .matches
       ? 0
       : 500;
     const focus = () => {
-      const positions = area?.geometry.coordinates.flat(2);
+      if (focusAreas && scope.length > 1 && projection === "globe") {
+        instance.easeTo({
+          center: [
+            scope.reduce((sum, entry) => sum + entry.coordinates[0], 0) /
+              scope.length,
+            scope.reduce((sum, entry) => sum + entry.coordinates[1], 0) /
+              scope.length,
+          ],
+          zoom: globeZoom(instance.getContainer()),
+          duration,
+        });
+        return;
+      }
+      const positions = scope.flatMap((entry) =>
+        entry.geometry.coordinates.flat(2),
+      );
       if (positions?.length) {
         const xs = positions.map((position) => position[0]),
           ys = positions.map((position) => position[1]);
@@ -85,7 +108,7 @@ export function useGlobeCamera(
         }
       }
       instance.flyTo({
-        center: area?.coordinates ?? record!.coordinates,
+        center: scope[0]?.coordinates ?? record!.coordinates,
         zoom: 3.5,
         duration,
       });
@@ -95,5 +118,15 @@ export function useGlobeCamera(
     return () => {
       instance.off("idle", focus);
     };
-  }, [ready, map, country, countryRecord, countryCode, areas, selected]);
+  }, [
+    ready,
+    map,
+    country,
+    countryRecord,
+    countryCode,
+    areas,
+    selected,
+    focusAreas,
+    projection,
+  ]);
 }

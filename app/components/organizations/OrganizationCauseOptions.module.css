@@ -1,0 +1,32 @@
+.list {
+  margin: 0;
+  padding: 0 6px 8px;
+  list-style: none;
+  overflow: auto;
+  min-height: 0;
+  max-height: 55dvh;
+}
+.issue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-height: 30px;
+  padding: 6px 8px;
+  margin-block: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+}
+.issue[aria-pressed="true"] {
+  background: var(--selection);
+  color: var(--ink);
+}
+.issue:hover {
+  background: var(--hover);
+}

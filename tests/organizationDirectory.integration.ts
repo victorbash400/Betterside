@@ -64,7 +64,7 @@ test("organization directory serves real snapshots, caches concurrent requests a
     const women = filterOrganizations(countryData.organizations, {
       ...defaultOrganizationFilters,
       country: "Kenya",
-      topic: "Women's rights",
+      topics: ["Women's rights"],
     });
     assert.ok(women.length > 0);
     assert.ok(women.some((org) => org.id === "profile:womankind"));

@@ -68,7 +68,7 @@ export default function OrganizationFilterFields({
       {(filters.sector ||
         filters.type ||
         filters.donation ||
-        filters.topic ||
+        filters.topics.length ||
         filters.country) && (
         <button
           className={toolbar.reset}
@@ -76,9 +76,10 @@ export default function OrganizationFilterFields({
             onChange({
               ...filters,
               type: "",
+              sector: "",
               donation: "",
               country: "",
-              topic: "",
+              topics: [],
             })
           }
         >
