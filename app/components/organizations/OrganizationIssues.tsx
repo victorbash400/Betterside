@@ -5,7 +5,7 @@ import {
 } from "../../lib/organizations";
 import drawer from "../map/MapDrawer.module.css";
 import IconButton from "../controls/IconButton";
-import OrganizationCauseOptions from "./OrganizationCauseOptions";
+import MapLayerGrid from "../map/MapLayerGrid";
 import styles from "./OrganizationIssues.module.css";
 export default function OrganizationIssues({
   open,
@@ -31,6 +31,7 @@ export default function OrganizationIssues({
       inert={!open}
       aria-hidden={!open}
       data-open={open}
+      style={{ height: Math.min(540, 114 + topics.length * 32) }}
       aria-label={
         organization ? `Causes for ${organization.name}` : "Organization causes"
       }
@@ -50,10 +51,16 @@ export default function OrganizationIssues({
           <small>{topics.length}</small>
         </div>
       </div>
-      <OrganizationCauseOptions
-        options={topics}
-        value={value}
-        onChange={onChange}
+      <MapLayerGrid
+        rows={topics.map((topic) => ({ id: topic, label: topic }))}
+        selected={value}
+        onToggle={(topic) =>
+          onChange(
+            value.includes(topic)
+              ? value.filter((entry) => entry !== topic)
+              : [...value, topic],
+          )
+        }
       />
       <button className={styles.settings} onClick={onSettings}>
         <SlidersHorizontal size={14} />

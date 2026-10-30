@@ -30,6 +30,7 @@ export default function DataGrid<T extends { id: string }>({
   columns,
   rowHeight,
   selected,
+  selectedIds,
   onOpen,
   onContextMenu,
 }: {
@@ -38,6 +39,7 @@ export default function DataGrid<T extends { id: string }>({
   columns: ColDef<T>[];
   rowHeight?: number;
   selected?: string;
+  selectedIds?: string[];
   onOpen: (row: T) => void;
   onContextMenu?: (row: T, event: MouseEvent) => void;
 }) {
@@ -74,7 +76,9 @@ export default function DataGrid<T extends { id: string }>({
           defaultColDef={defaultColDef}
           getRowId={({ data }) => data.id}
           getRowClass={({ data }) =>
-            data?.id === selected ? styles.selected : undefined
+            data?.id === selected || (data && selectedIds?.includes(data.id))
+              ? styles.selected
+              : undefined
           }
           rowSelection={rowSelection}
           pagination

@@ -3,7 +3,7 @@
   right: 10px;
   top: 12px;
   max-height: calc(100% - 84px);
-  width: 196px;
+  width: 240px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -53,12 +53,13 @@
 }
 @media (max-width: 1000px) {
   .panel {
-    width: 184px;
+    width: 240px;
   }
 }
 @media (max-width: 760px) {
   .panel {
     top: 8px;
-    width: 160px;
+    width: 240px;
+    max-width: calc(100% - 20px);
   }
 }

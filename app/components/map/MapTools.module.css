@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  width: calc(var(--sidebar-width) - 16px);
+  width: 290px;
   position: absolute;
   top: 12px;
   right: 10px;
@@ -10,7 +10,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   min-height: 0;
-  height: fit-content;
+  height: min(640px, calc(100% - 84px));
   max-height: calc(100% - 84px);
   padding: 8px;
   background: var(--panel);
@@ -48,19 +48,6 @@
   padding: 0;
   cursor: pointer;
 }
-.list {
-  overflow-y: auto;
-  min-height: 0;
-  flex: 1;
-  padding-right: 4px;
-}
-.list::-webkit-scrollbar {
-  width: 5px;
-}
-.list::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
 .settings {
   display: flex;
   align-items: center;
@@ -82,7 +69,8 @@
 @media (max-width: 760px) {
   .rail {
     top: 8px;
-    width: 196px;
+    width: 270px;
+    max-width: calc(100% - 20px);
     max-height: calc(100% - 72px);
   }
 }

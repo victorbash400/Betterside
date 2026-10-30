@@ -3,13 +3,12 @@ import { SlidersHorizontal } from "lucide-react";
 import {
   concerns,
   matchesConcern,
-  concernColor,
   type OverlaySettings,
 } from "../../lib/concerns";
 import type { MapItem } from "../../lib/types";
 import drawer from "./MapDrawer.module.css";
 import type { MapGeography } from "../../lib/mapGeography";
-import IssueLayerToggle from "./IssueLayerToggle";
+import MapLayerGrid from "./MapLayerGrid";
 import LayerControlsDialog from "./LayerControlsDialog";
 import styles from "./MapTools.module.css";
 export default function MapTools({
@@ -70,30 +69,24 @@ export default function MapTools({
             Clear
           </button>
         </div>
-        <div
-          className={styles.list}
-          id="issue-layer-list"
-          role="group"
-          aria-label="Problems"
-        >
-          {concerns.map((concern) => (
-            <IssueLayerToggle
-              key={concern.id}
-              concern={concern}
-              selected={value.concerns.includes(concern.id)}
-              count={counts.get(concern.id) ?? 0}
-              color={concernColor(concern.id, value)}
-              onToggle={() =>
-                onChange({
-                  ...value,
-                  concerns: value.concerns.includes(concern.id)
-                    ? value.concerns.filter((id) => id !== concern.id)
-                    : [...value.concerns, concern.id],
-                })
-              }
-            />
-          ))}
-        </div>
+        <MapLayerGrid
+          rows={concerns.map((concern) => ({
+            id: concern.id,
+            label: concern.label,
+            count: counts.get(concern.id) ?? 0,
+          }))}
+          selected={value.concerns}
+          onToggle={(id) =>
+            onChange({
+              ...value,
+              concerns: value.concerns.includes(
+                id as (typeof value.concerns)[number],
+              )
+                ? value.concerns.filter((entry) => entry !== id)
+                : [...value.concerns, id as (typeof value.concerns)[number]],
+            })
+          }
+        />
         <button
           className={styles.settings}
           onClick={() => setSettings(true)}
