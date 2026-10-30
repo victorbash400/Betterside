@@ -5,6 +5,9 @@ import {
   organizationCrisisSelection,
 } from "../app/lib/organizationCrisis.ts";
 import { pointInArea } from "../app/lib/pointInArea.ts";
+import { defaultOverlaySettings } from "../app/lib/concerns.ts";
+import { defaultDiscoveryFilters } from "../app/lib/discoveryFilters.ts";
+import { overlayPoints } from "../app/lib/overlayData.ts";
 import { defaultDatasets } from "../app/lib/dataSources.ts";
 import {
   defaultOrganizationFilters,
@@ -246,6 +249,29 @@ test("disabled datasets and closed observations do not silently reappear in orga
       ...options,
       records: [{ ...base, eventStatus: "Closed" }],
     }),
+    [],
+  );
+});
+
+test("map defaults to heatmap, all countries and no causes", () => {
+  assert.equal(defaultOverlaySettings.mode, "Heatmap");
+  assert.deepEqual(defaultOverlaySettings.concerns, []);
+  assert.equal(defaultDiscoveryFilters.country, "");
+  assert.equal(defaultOrganizationFilters.country, "");
+  assert.deepEqual(defaultOrganizationFilters.topics, []);
+  assert.deepEqual(
+    overlayPoints([base], defaultOverlaySettings, geography),
+    [],
+  );
+});
+
+test("clearing organization causes removes all crisis layers even with an organization selected", () => {
+  assert.deepEqual(organizationCrisisSelection([]), {
+    concerns: [],
+    unsupported: [],
+  });
+  assert.deepEqual(
+    organizationCrisisRecords({ ...options, topics: [], records: [base] }),
     [],
   );
 });

@@ -30,7 +30,7 @@ export default function OrganizationCauseControl({
           ? value[0]
           : value.length
             ? `${value.length} causes`
-            : "All causes"}
+            : "Causes"}
         <ChevronDown size={12} />
       </button>
       {open && (
@@ -39,9 +39,17 @@ export default function OrganizationCauseControl({
           label="Organization causes"
           onClose={() => setOpen(undefined)}
         >
-          <button className={styles.reset} onClick={() => onChange([])}>
-            All causes
-          </button>
+          <div className={styles.causeActions}>
+            <button
+              className={styles.reset}
+              onClick={() => onChange([...options])}
+            >
+              Select all
+            </button>
+            <button className={styles.reset} onClick={() => onChange([])}>
+              Clear
+            </button>
+          </div>
           <OrganizationCauseOptions
             options={options}
             value={value}

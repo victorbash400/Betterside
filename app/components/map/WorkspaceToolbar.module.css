@@ -100,3 +100,9 @@
   border-radius: 3px;
   background: var(--ink);
 }
+
+.causeActions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}

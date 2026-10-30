@@ -7,7 +7,6 @@ import {
 } from "./concerns.ts";
 import {
   organizationMapScope,
-  organizationCauseTopics,
   type DirectoryOrganization,
 } from "./organizations.ts";
 import type { MapGeography } from "./mapGeography.ts";
@@ -36,21 +35,15 @@ export const organizationCrisisMeasures: Record<string, ConcernId[]> = {
   ],
 };
 
-export function organizationCrisisSelection(
-  topics: string[],
-  organization?: DirectoryOrganization,
-) {
-  const selected = topics.length
-    ? topics
-    : organizationCauseTopics(organization);
+export function organizationCrisisSelection(topics: string[]) {
   const ids = new Set(
-    selected.flatMap((topic) => organizationCrisisMeasures[topic] ?? []),
+    topics.flatMap((topic) => organizationCrisisMeasures[topic] ?? []),
   );
   return {
     concerns: concerns
       .filter((concern) => ids.has(concern.id))
       .map((concern) => concern.id),
-    unsupported: selected.filter(
+    unsupported: topics.filter(
       (topic) => !organizationCrisisMeasures[topic]?.length,
     ),
   };
@@ -85,7 +78,7 @@ export function organizationCrisisRecords({
     scope.flatMap((org) => org.presence.map((area) => area.country)),
   );
   const areas = organizationCoverageGeometry(scope, geography).features;
-  const selection = organizationCrisisSelection(topics, selected);
+  const selection = organizationCrisisSelection(topics);
   return records.filter((item) => {
     if (
       datasets[item.dataset ?? "catalogue"] === false ||

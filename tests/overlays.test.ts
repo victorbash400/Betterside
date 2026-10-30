@@ -361,7 +361,7 @@ test("many co-located layers never displace source locations to avoid overlap", 
     assert.deepEqual(feature.geometry.coordinates, [31, 48]);
 });
 
-test("the default concerns render weighted heatmap anchors without polygon fills or losing aggregate precision", () => {
+test("explicitly selected concerns render weighted heatmap anchors without polygon fills or losing aggregate precision", () => {
   const rows: MapItem[] = [
     record("conflict", 12, 0),
     {
@@ -378,7 +378,11 @@ test("the default concerns render weighted heatmap anchors without polygon fills
       measurements: [{ metric: "ipc-3-plus", value: 50000 }],
     },
   ];
-  const points = overlayPoints(rows, defaultOverlaySettings, { TST: area });
+  const points = overlayPoints(
+    rows,
+    { ...defaultOverlaySettings, concerns: ["war", "disease", "hunger"] },
+    { TST: area },
+  );
   const geometry = overlayGeometry(points, defaultOverlaySettings);
   assert.equal(geometry.areas.features.length, 0);
   assert.equal(geometry.markers.features.length, 3);
@@ -444,10 +448,10 @@ test("rainfall deficits retain their sign while magnitude sets their visual weig
 });
 
 test("aggregate heatmap anchors retain their reported precision when boundaries are unavailable", () => {
-  const points = overlayPoints(
-    [record("aggregate", 12, 0)],
-    defaultOverlaySettings,
-  );
+  const points = overlayPoints([record("aggregate", 12, 0)], {
+    ...defaultOverlaySettings,
+    concerns: ["war"],
+  });
   const geometry = overlayGeometry(points, defaultOverlaySettings);
   assert.equal(geometry.areas.features.length, 0);
   assert.equal(geometry.markers.features.length, 1);

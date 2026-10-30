@@ -35,8 +35,8 @@ export function useOrganizationCrisisMap({
   overlay: OverlaySettings;
 }) {
   const selection = useMemo(
-    () => organizationCrisisSelection(topics, selected),
-    [topics, selected],
+    () => organizationCrisisSelection(topics),
+    [topics],
   );
   const display = useMemo(
     () => ({ ...overlay, concerns: selection.concerns }),

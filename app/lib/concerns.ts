@@ -148,7 +148,7 @@ export interface OverlaySettings {
   colors: Partial<Record<ConcernId, string>>;
 }
 export const defaultOverlaySettings: OverlaySettings = {
-  concerns: ["war", "disease", "hunger"],
+  concerns: [],
   mode: "Heatmap",
   period: "Latest",
   scale: "Logarithmic",
