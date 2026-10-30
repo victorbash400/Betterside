@@ -20,7 +20,6 @@
   border: 0;
   background: transparent;
   font-size: 12px;
-  cursor: pointer;
   flex: 1;
   min-width: 0;
   gap: 8px;
@@ -28,7 +27,7 @@
 .header {
   display: flex;
   align-items: center;
-  padding-left: 4px;
+  padding: 4px;
 }
 .heading > span {
   flex: 1;
@@ -66,4 +65,8 @@
     bottom: auto;
     width: auto;
   }
+}
+
+.panel[data-open="false"] {
+  width: 42px;
 }

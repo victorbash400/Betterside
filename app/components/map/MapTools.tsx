@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
+import {
+  PanelRightClose,
+  PanelRightOpen,
+  SlidersHorizontal,
+} from "lucide-react";
 import {
   concerns,
   matchesConcern,
@@ -9,6 +13,7 @@ import {
 import type { MapItem } from "../../lib/types";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
 import type { MapGeography } from "../../lib/mapGeography";
+import IconButton from "../controls/IconButton";
 import IssueLayerToggle from "./IssueLayerToggle";
 import LayerControlsDialog from "./LayerControlsDialog";
 import styles from "./MapTools.module.css";
@@ -42,18 +47,25 @@ export default function MapTools({
   return (
     <>
       <aside className={styles.rail} data-open={open} aria-label="Cause layers">
-        <button
-          className={styles.header}
-          aria-expanded={open}
-          aria-controls="issue-layer-list"
-          onClick={() => setExpanded(!open)}
-        >
-          <span>Causes</span>
-          <span>
-            {value.concerns.length} / {concerns.length}
-          </span>
-          {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </button>
+        <div className={styles.header}>
+          {open && (
+            <>
+              <span>Causes</span>
+              <span>
+                {value.concerns.length} / {concerns.length}
+              </span>
+            </>
+          )}
+          <IconButton
+            label={open ? "Close causes" : "Open causes"}
+            title={open ? "Close causes" : "Open causes"}
+            aria-expanded={open}
+            aria-controls={open ? "issue-layer-list" : undefined}
+            onClick={() => setExpanded(!open)}
+          >
+            {open ? <PanelRightClose /> : <PanelRightOpen />}
+          </IconButton>
+        </div>
         {open && (
           <>
             <div className={styles.actions}>

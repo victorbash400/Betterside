@@ -23,7 +23,6 @@
   text-align: left;
   font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
 }
 .header > span:first-child {
   flex: 1;
@@ -77,8 +76,13 @@
 .header:hover {
   background: var(--hover);
 }
+.rail[data-open="false"] .header {
+  padding: 0;
+}
 .rail[data-open="false"] {
   align-self: flex-start;
+  width: 42px;
+  padding: 4px;
 }
 @media (max-width: 760px) {
   .rail {
@@ -94,7 +98,7 @@
     background: var(--panel);
   }
   .rail[data-open="false"] {
-    width: 142px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
   }
 }

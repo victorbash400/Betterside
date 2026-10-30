@@ -1,7 +1,7 @@
 import {
   ArrowLeft,
-  ChevronDown,
-  ChevronUp,
+  PanelRightClose,
+  PanelRightOpen,
   SlidersHorizontal,
 } from "lucide-react";
 import { useState } from "react";
@@ -39,7 +39,7 @@ export default function OrganizationIssues({
       }
     >
       <div className={styles.header}>
-        {organization && (
+        {open && organization && (
           <IconButton
             label="All causes"
             title="Clear organization selection"
@@ -48,15 +48,20 @@ export default function OrganizationIssues({
             <ArrowLeft size={14} />
           </IconButton>
         )}
-        <button
-          className={styles.heading}
+        {open && (
+          <div className={styles.heading}>
+            <span>Causes</span>
+            <small>{topics.length}</small>
+          </div>
+        )}
+        <IconButton
+          label={open ? "Close causes" : "Open causes"}
+          title={open ? "Close causes" : "Open causes"}
           aria-expanded={open}
           onClick={() => setExpanded(!open)}
         >
-          <span>Causes</span>
-          <small>{topics.length}</small>
-          {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </button>
+          {open ? <PanelRightClose /> : <PanelRightOpen />}
+        </IconButton>
       </div>
       {open && (
         <>
