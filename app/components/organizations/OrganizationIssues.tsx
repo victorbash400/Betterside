@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import {
   organizationTopics,
@@ -8,8 +8,12 @@ import { useNarrowLayout } from "../../state/useNarrowLayout";
 import styles from "./OrganizationIssues.module.css";
 export default function OrganizationIssues({
   organization,
+  value,
+  onChange,
 }: {
   organization?: DirectoryOrganization;
+  value: string;
+  onChange: (topic: string) => void;
 }) {
   const narrow = useNarrowLayout();
   const [expanded, setExpanded] = useState<boolean>();
@@ -32,17 +36,16 @@ export default function OrganizationIssues({
           {organizationTopics.map((topic) => {
             const covered = organization?.topics.includes(topic) ?? false;
             return (
-              <li
-                key={topic}
-                className={styles.issue}
-                data-covered={covered}
-                aria-label={
-                  organization
-                    ? `${topic}: ${covered ? "reported focus" : "not reported"}`
-                    : topic
-                }
-              >
-                {topic}
+              <li key={topic}>
+                <button
+                  className={styles.issue}
+                  data-covered={covered}
+                  aria-pressed={value === topic}
+                  onClick={() => onChange(value === topic ? "" : topic)}
+                >
+                  {topic}
+                  {value === topic && <Check size={13} aria-hidden="true" />}
+                </button>
               </li>
             );
           })}

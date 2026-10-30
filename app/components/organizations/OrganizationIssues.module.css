@@ -30,16 +30,32 @@
   min-height: 0;
 }
 .issue {
-  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-height: 30px;
+  padding: 6px 8px;
   margin-block: 2px;
+  border: 0;
   border-radius: 6px;
+  background: transparent;
   font-size: 12px;
   color: var(--muted);
+  text-align: left;
+  cursor: pointer;
 }
 .issue[data-covered="true"] {
+  color: var(--ink);
+  font-weight: 500;
+}
+.issue[aria-pressed="true"] {
   background: var(--selection);
   color: var(--ink);
-  font-weight: 600;
+}
+.issue:hover {
+  background: var(--hover);
 }
 @media (max-width: 1000px) {
   .panel {

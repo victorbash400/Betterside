@@ -72,7 +72,11 @@ export default function OrganizationWorkspace({
               setDetails(id);
             }}
           />
-          <OrganizationIssues organization={state.organization} />
+          <OrganizationIssues
+            organization={state.organization}
+            value={state.filters.topic}
+            onChange={(topic) => state.update({ ...state.filters, topic })}
+          />
         </>
       )}
       {state.busy && (
