@@ -76,6 +76,7 @@ export default function DataGrid<T extends { id: string }>({
           rowSelection={rowSelection}
           pagination
           paginationPageSize={100}
+          scrollbarWidth={8}
           suppressPaginationPanel
           suppressNoRowsOverlay
           animateRows={false}

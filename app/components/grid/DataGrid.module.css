@@ -40,3 +40,30 @@
   color: var(--muted);
   font-size: 11px;
 }
+
+.grid :global(.ag-body-horizontal-scroll) {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  transition: none;
+}
+.grid :global(.ag-body-horizontal-scroll-viewport),
+.grid :global(.ag-body-vertical-scroll-viewport) {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+.grid :global(.ag-body-horizontal-scroll-viewport)::-webkit-scrollbar,
+.grid :global(.ag-body-vertical-scroll-viewport)::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.grid :global(.ag-body-horizontal-scroll-viewport)::-webkit-scrollbar-track,
+.grid :global(.ag-body-vertical-scroll-viewport)::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+.grid :global(.ag-body-horizontal-scroll-viewport)::-webkit-scrollbar-thumb,
+.grid :global(.ag-body-vertical-scroll-viewport)::-webkit-scrollbar-thumb {
+  border: 2px solid var(--surface);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ink) 40%, transparent);
+}
