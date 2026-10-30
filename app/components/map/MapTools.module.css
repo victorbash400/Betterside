@@ -81,6 +81,8 @@
 }
 .rail[data-open="false"] {
   align-self: flex-start;
+  border: 0;
+  background: transparent;
   width: 42px;
   padding: 4px;
 }

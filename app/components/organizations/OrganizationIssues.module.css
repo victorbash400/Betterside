@@ -68,5 +68,7 @@
 }
 
 .panel[data-open="false"] {
+  border: 0;
+  background: transparent;
   width: 42px;
 }
