@@ -2,6 +2,7 @@
 import type { SettingsSection } from "../../lib/settings";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { useNarrowLayout } from "../../state/useNarrowLayout";
 import { useOrganizations } from "../../state/useOrganizations";
 import OrganizationWorkspace from "../organizations/OrganizationWorkspace";
 import OrganizationToolbar from "../organizations/OrganizationToolbar";
@@ -35,6 +36,10 @@ const ContributionHistory = dynamic(
 const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), { ssr: false });
 export default function Workspace() {
   const state = useWorkspace();
+  const narrow = useNarrowLayout();
+  const [organizationsOpen, setOrganizationsOpen] = useState(false);
+  const [requestedCausesOpen, setCausesOpen] = useState<boolean>();
+  const causesOpen = requestedCausesOpen ?? !narrow;
   const [chatContext, setChatContext] = useState<MapItem>();
   const organizations = useOrganizations(
     state.view === "Organizations",
@@ -154,6 +159,36 @@ export default function Workspace() {
     <div className={styles.shell}>
       <Sidebar
         view={state.view}
+        organizationsOpen={
+          state.view === "Organizations" &&
+          state.collectionMode === "map" &&
+          organizationsOpen &&
+          !state.settingsOpen
+        }
+        causesOpen={
+          state.view !== "Contributions" && causesOpen && !state.settingsOpen
+        }
+        onToggleOrganizations={() => {
+          if (
+            state.view === "Organizations" &&
+            state.collectionMode === "map"
+          ) {
+            setOrganizationsOpen((open) => !open);
+          } else {
+            state.setView("Organizations");
+            state.setCollectionMode("map");
+            state.setSelectedId(undefined);
+            state.setSelectedInterestId(undefined);
+            state.setSettingsOpen(false);
+            setOrganizationsOpen(true);
+          }
+        }}
+        onToggleCauses={() => {
+          if (state.view === "Contributions") {
+            home();
+            setCausesOpen(true);
+          } else setCausesOpen(!causesOpen);
+        }}
         onView={(view) => {
           if (view === "Explore") home();
           else if (view === "Following") following();
@@ -295,31 +330,7 @@ export default function Workspace() {
           </WorkspaceHeader>
           <div className={styles.workspace}>
             <div className={styles.surface}>
-              {state.view === "Organizations" ? (
-                <OrganizationWorkspace
-                  state={{
-                    ...organizations,
-                    update: updateOrganizations,
-                    select: selectOrganization,
-                  }}
-                  geography={state.geography}
-                  crisis={crisis}
-                  onOverlay={changeOrganizationOverlay}
-                  selectedRecord={crisis.items.find(
-                    (item) => item.id === state.selected?.id,
-                  )}
-                  onSelectRecord={select}
-                  query={state.filters.query}
-                  onQuery={(query) =>
-                    state.setFilters({ ...state.filters, query })
-                  }
-                  mode={state.collectionMode}
-                  onMode={state.setCollectionMode}
-                  projection={state.projection}
-                  onProjection={state.setProjection}
-                  mapView={state.mapViewSettings}
-                />
-              ) : state.view === "Contributions" ? (
+              {state.view === "Contributions" ? (
                 <ContributionHistory
                   onExplore={home}
                   onProject={(projectId) => {
@@ -333,32 +344,63 @@ export default function Workspace() {
               ) : (
                 <div className={styles.discoveryContent}>
                   {state.collectionMode === "list" ? (
-                    <InterestContents
-                      discovery={state.view === "Explore"}
-                      interest={state.activeInterest}
-                      items={state.records}
-                      onAdd={() =>
-                        state.activeInterest
-                          ? setAction({
-                              kind: "add",
-                              interest: state.activeInterest,
-                            })
-                          : setAdding(true)
-                      }
-                      onSelect={select}
-                      onAction={handleAction}
-                      canEdit={state.trackingReady}
-                    />
+                    state.view === "Organizations" ? null : (
+                      <InterestContents
+                        discovery={state.view === "Explore"}
+                        interest={state.activeInterest}
+                        items={state.records}
+                        onAdd={() =>
+                          state.activeInterest
+                            ? setAction({
+                                kind: "add",
+                                interest: state.activeInterest,
+                              })
+                            : setAdding(true)
+                        }
+                        onSelect={select}
+                        onAction={handleAction}
+                        canEdit={state.trackingReady}
+                      />
+                    )
                   ) : (
                     <>
                       <WorkspaceMap
                         geography={state.geography}
-                        points={state.points}
-                        overlay={state.overlay}
-                        country={state.discoveryFilters.country}
-                        countryCode={organizationCode}
+                        points={
+                          state.view === "Organizations"
+                            ? crisis.points
+                            : state.points
+                        }
+                        overlay={
+                          state.view === "Organizations"
+                            ? crisis.overlay
+                            : state.overlay
+                        }
+                        country={
+                          state.view === "Organizations"
+                            ? organizations.organization
+                              ? ""
+                              : organizations.filters.country
+                            : state.discoveryFilters.country
+                        }
+                        countryCode={
+                          state.view === "Organizations"
+                            ? organizations.organization
+                              ? undefined
+                              : organizations.countryCode
+                            : organizationCode
+                        }
+                        focusAreas={
+                          state.view === "Organizations"
+                            ? crisis.focusAreas
+                            : undefined
+                        }
                         mapViewSettings={state.mapViewSettings}
-                        items={state.records}
+                        items={
+                          state.view === "Organizations"
+                            ? crisis.items
+                            : state.records
+                        }
                         selected={state.selected}
                         onSelect={select}
                         metric={state.filters.metric}
@@ -371,13 +413,36 @@ export default function Workspace() {
                       />
                     </>
                   )}
-                  <MapTools
-                    geography={state.geography.areas}
-                    value={state.overlay}
-                    items={state.availableRecords}
-                    mapView={state.collectionMode === "map"}
-                    onChange={state.setOverlay}
-                  />
+                  {state.view === "Organizations" ? (
+                    <OrganizationWorkspace
+                      state={{
+                        ...organizations,
+                        update: updateOrganizations,
+                        select: selectOrganization,
+                      }}
+                      geography={state.geography}
+                      crisis={crisis}
+                      onOverlay={changeOrganizationOverlay}
+                      query={state.filters.query}
+                      onQuery={(query) =>
+                        state.setFilters({ ...state.filters, query })
+                      }
+                      mode={state.collectionMode}
+                      onMode={state.setCollectionMode}
+                      organizationsOpen={organizationsOpen}
+                      causesOpen={causesOpen}
+                    />
+                  ) : (
+                    <MapTools
+                      open={causesOpen}
+                      geography={state.geography.areas}
+                      value={state.overlay}
+                      items={state.availableRecords}
+                      mapView={state.collectionMode === "map"}
+                      onChange={state.setOverlay}
+                    />
+                  )}
+
                   {organizationCountry && (
                     <CountryOrganizations
                       {...organizationCountry}

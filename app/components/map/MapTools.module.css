@@ -3,12 +3,15 @@
   flex-direction: column;
   flex-shrink: 0;
   width: calc(var(--sidebar-width) - 16px);
-  margin-left: 8px;
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  z-index: 5;
   border: 1px solid var(--border);
   border-radius: 14px;
   min-height: 0;
   height: fit-content;
-  max-height: 100%;
+  max-height: calc(100% - 84px);
   padding: 8px;
   background: var(--panel);
 }
@@ -76,31 +79,10 @@
 .header:hover {
   background: var(--hover);
 }
-.rail[data-open="false"] .header {
-  padding: 0;
-}
-.rail[data-open="false"] {
-  align-self: flex-start;
-  border: 0;
-  background: transparent;
-  width: 42px;
-  padding: 4px;
-}
 @media (max-width: 760px) {
   .rail {
-    position: absolute;
     top: 8px;
-    right: 8px;
-    z-index: 10;
-    width: 210px;
-    height: calc(100% - 72px);
+    width: 196px;
     max-height: calc(100% - 72px);
-    border-radius: 14px;
-    padding: 4px;
-    background: var(--panel);
-  }
-  .rail[data-open="false"] {
-    width: 42px;
-    height: 42px;
   }
 }

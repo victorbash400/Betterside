@@ -22,7 +22,6 @@
   background: transparent;
   text-align: left;
   font-size: 12px;
-  cursor: pointer;
 }
 .heading > span {
   flex: 1;
@@ -42,10 +41,6 @@
     width: 240px;
     max-width: calc(50% - 16px);
     top: 8px;
-  }
-  .rail[data-open="false"] {
-    width: auto;
-    bottom: auto;
   }
   .heading {
     gap: 14px;

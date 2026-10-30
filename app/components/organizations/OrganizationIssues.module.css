@@ -61,14 +61,4 @@
     top: 8px;
     width: 160px;
   }
-  .panel[data-open="false"] {
-    bottom: auto;
-    width: auto;
-  }
-}
-
-.panel[data-open="false"] {
-  border: 0;
-  background: transparent;
-  width: 42px;
 }

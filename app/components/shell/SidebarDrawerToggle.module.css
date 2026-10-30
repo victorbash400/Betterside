@@ -1,0 +1,28 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 34px;
+  margin: 2px 0;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+.row span {
+  flex: 1;
+}
+.row svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+.row:hover {
+  background: var(--hover);
+}
+.row[aria-expanded="true"] {
+  background: var(--selection);
+}

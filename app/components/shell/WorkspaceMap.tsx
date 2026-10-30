@@ -26,6 +26,7 @@ export default function WorkspaceMap({
   overlay,
   country,
   countryCode,
+  focusAreas,
   mapViewSettings,
 }: {
   geography: ReturnType<typeof useMapGeography>;
@@ -41,6 +42,7 @@ export default function WorkspaceMap({
   overlay: OverlaySettings;
   country: string;
   countryCode?: string;
+  focusAreas?: string[];
   mapViewSettings: MapViewSettings;
 }) {
   const [funding, setFunding] = useState(false),
@@ -65,6 +67,7 @@ export default function WorkspaceMap({
         overlay={overlay}
         country={country}
         countryCode={countryCode}
+        focusAreas={focusAreas}
         mapViewSettings={mapViewSettings}
         focusRequest={0}
         selected={selected}

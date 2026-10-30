@@ -30,3 +30,12 @@
   font-size: 12px;
   cursor: pointer;
 }
+
+.workspace[data-map="true"] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.workspace[data-map="true"] > :not([data-open="false"]) {
+  pointer-events: auto;
+}

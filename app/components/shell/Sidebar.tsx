@@ -1,3 +1,4 @@
+import SidebarDrawerToggle from "./SidebarDrawerToggle";
 import SettingsNavigation from "../settings/SettingsNavigation";
 import type { SettingsSection } from "../../lib/settings";
 import type { InterestAction } from "../../lib/interestActions";
@@ -8,6 +9,7 @@ import {
   PanelLeftClose,
   Heart,
   Building2,
+  Layers,
   CircleUserRound,
   Settings,
   Search,
@@ -25,6 +27,10 @@ import searchStyles from "./SidebarSearch.module.css";
 export default function Sidebar({
   view,
   onView,
+  organizationsOpen,
+  causesOpen,
+  onToggleOrganizations,
+  onToggleCauses,
   onSettings,
   open,
   onClose,
@@ -46,6 +52,10 @@ export default function Sidebar({
   onSettingsSection,
 }: {
   view: View;
+  organizationsOpen: boolean;
+  causesOpen: boolean;
+  onToggleOrganizations: () => void;
+  onToggleCauses: () => void;
   onView: (view: View) => void;
   onSettings: () => void;
   open: boolean;
@@ -186,16 +196,26 @@ export default function Sidebar({
                     <Heart size={24} strokeWidth={1.8} />
                     Contributions
                   </button>
-                  <button
-                    className={`${styles.home} ${view === "Organizations" ? styles.selected : ""}`}
-                    onClick={() => {
-                      onView("Organizations");
+                  <SidebarDrawerToggle
+                    label="Organizations"
+                    Icon={Building2}
+                    side="left"
+                    open={organizationsOpen}
+                    onToggle={() => {
+                      onToggleOrganizations();
                       onClose();
                     }}
-                  >
-                    <Building2 size={24} strokeWidth={1.8} />
-                    Organizations
-                  </button>
+                  />
+                  <SidebarDrawerToggle
+                    label="Causes"
+                    Icon={Layers}
+                    side="right"
+                    open={causesOpen}
+                    onToggle={() => {
+                      onToggleCauses();
+                      onClose();
+                    }}
+                  />
                   <InterestList
                     onAction={onInterestAction}
                     onTrack={onTrack}

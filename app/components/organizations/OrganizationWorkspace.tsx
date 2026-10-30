@@ -1,11 +1,9 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import type { useOrganizations } from "../../state/useOrganizations";
-import type { MapViewSettings } from "../../lib/mapViews";
 import type { useMapGeography } from "../../state/useMapGeography";
 import type { useOrganizationCrisisMap } from "../../state/useOrganizationCrisisMap";
 import type { OverlaySettings } from "../../lib/concerns";
-import type { MapItem } from "../../lib/types";
 import LayerControlsDialog from "../map/LayerControlsDialog";
 import OrganizationDetails from "./OrganizationDetails";
 import OrganizationRail from "./OrganizationRail";
@@ -14,37 +12,28 @@ import styles from "./OrganizationWorkspace.module.css";
 const OrganizationList = dynamic(() => import("./OrganizationList"), {
   ssr: false,
 });
-const OrganizationMap = dynamic(() => import("../map/GlobeCanvas"), {
-  ssr: false,
-});
 export default function OrganizationWorkspace({
   state,
   query,
   onQuery,
   mode,
   onMode,
-  projection,
-  onProjection,
-  mapView,
+  organizationsOpen,
+  causesOpen,
   geography,
   crisis,
   onOverlay,
-  selectedRecord,
-  onSelectRecord,
 }: {
   state: ReturnType<typeof useOrganizations>;
   query: string;
   onQuery: (query: string) => void;
   mode: "map" | "list";
   onMode: (value: "map" | "list") => void;
-  projection: "globe" | "mercator";
-  onProjection: (value: "globe" | "mercator") => void;
-  mapView: MapViewSettings;
+  organizationsOpen: boolean;
+  causesOpen: boolean;
   geography: ReturnType<typeof useMapGeography>;
   crisis: ReturnType<typeof useOrganizationCrisisMap>;
   onOverlay: (value: OverlaySettings) => void;
-  selectedRecord?: MapItem;
-  onSelectRecord: (item: MapItem) => void;
 }) {
   const [details, setDetails] = useState<string>();
   const [settings, setSettings] = useState(false);
@@ -54,7 +43,7 @@ export default function OrganizationWorkspace({
     onMode("map");
   }
   return (
-    <div className={styles.workspace}>
+    <div className={styles.workspace} data-map={mode === "map"}>
       {mode === "list" ? (
         <OrganizationList
           organizations={state.visible}
@@ -66,22 +55,8 @@ export default function OrganizationWorkspace({
         />
       ) : (
         <>
-          <OrganizationMap
-            geography={geography}
-            issues={crisis.items}
-            points={crisis.points}
-            overlay={crisis.overlay}
-            focusAreas={crisis.focusAreas}
-            focusRequest={0}
-            selected={selectedRecord}
-            onSelect={onSelectRecord}
-            country={state.organization ? "" : state.filters.country}
-            countryCode={state.organization ? undefined : state.countryCode}
-            projection={projection}
-            onProjection={onProjection}
-            mapViewSettings={mapView}
-          />
           <OrganizationRail
+            open={organizationsOpen}
             query={query}
             onQuery={onQuery}
             organizations={state.visible}
@@ -96,6 +71,7 @@ export default function OrganizationWorkspace({
             }}
           />
           <OrganizationIssues
+            open={causesOpen}
             organization={state.organization}
             value={state.filters.topics}
             onChange={(topics) => state.update({ ...state.filters, topics })}
