@@ -1,9 +1,9 @@
 import ContextMenu from "../controls/ContextMenu";
 import InterestContextMenu from "../interests/InterestContextMenu";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-import RecordPagination from "./RecordPagination";
-import CollectionItemRow from "./CollectionItemRow";
+import DataGrid from "../grid/DataGrid";
+import { recordColumns } from "./recordColumns";
 import type { Interest } from "../../lib/tracking";
 import type { MapItem } from "../../lib/types";
 import type { InterestAction } from "../../lib/interestActions";
@@ -11,7 +11,6 @@ import styles from "./InterestContents.module.css";
 export default function InterestContents({
   interest,
   discovery = false,
-  interests,
   items,
   onAdd,
   onSelect,
@@ -20,7 +19,6 @@ export default function InterestContents({
 }: {
   interest?: Interest;
   discovery?: boolean;
-  interests: Interest[];
   items: MapItem[];
   onAdd: () => void;
   onSelect: (item: MapItem) => void;
@@ -28,11 +26,15 @@ export default function InterestContents({
   canEdit: boolean;
 }) {
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
-  const [requestedPage, setPage] = useState(0);
-  const pageSize = 100,
-    pages = Math.max(1, Math.ceil(items.length / pageSize));
-  const page = Math.min(requestedPage, pages - 1);
-  const sorted = items.toSorted((a, b) => a.location.localeCompare(b.location));
+  const [itemMenu, setItemMenu] = useState<{
+    item: MapItem;
+    x: number;
+    y: number;
+  }>();
+  const columns = useMemo(
+    () => recordColumns((item, position) => setItemMenu({ item, ...position })),
+    [],
+  );
 
   return (
     <section
@@ -55,31 +57,22 @@ export default function InterestContents({
         setMenu({ x: event.clientX, y: event.clientY });
       }}
     >
-      <div className={styles.scroll}>
-        <div className={styles.header}>
-          <span>Name</span>
-          <span>Date updated</span>
-          <span>Cause</span>
-          <span />
-        </div>
-        {sorted.slice(page * pageSize, (page + 1) * pageSize).map((item) => (
-          <CollectionItemRow
-            key={item.id}
-            item={item}
-            interestId={interest?.id}
-            folder={
-              !interest && !discovery
-                ? interests.find((folder) => folder.issueIds.includes(item.id))
-                    ?.name
-                : undefined
-            }
-            onSelect={() => onSelect(item)}
-            onAction={onAction}
-          />
-        ))}
-      </div>
-      {pages > 1 && (
-        <RecordPagination page={page} pages={pages} onPage={setPage} />
+      <DataGrid
+        label="Cause records"
+        rows={items}
+        columns={columns}
+        onOpen={onSelect}
+        onContextMenu={(item, event) =>
+          setItemMenu({ item, x: event.clientX, y: event.clientY })
+        }
+      />
+      {itemMenu && (
+        <InterestContextMenu
+          {...itemMenu}
+          interestId={interest?.id}
+          onAction={onAction}
+          onClose={() => setItemMenu(undefined)}
+        />
       )}
       {menu &&
         (interest ? (

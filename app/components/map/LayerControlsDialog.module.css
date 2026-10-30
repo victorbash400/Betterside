@@ -1,12 +1,12 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 18px;
 }
 .layers {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
 }
 .columns {
   display: grid;
@@ -18,7 +18,7 @@
 .display {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 .display label {
   display: grid;

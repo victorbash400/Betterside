@@ -32,6 +32,9 @@ importers:
       ag-charts-react:
         specifier: ^14.2.0
         version: 14.2.0(react@19.3.1)
+      ag-grid-community:
+        specifier: ^36.2.0
+        version: 36.2.0
       ag-grid-enterprise:
         specifier: ^36.2.0
         version: 36.2.0

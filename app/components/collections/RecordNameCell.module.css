@@ -1,0 +1,23 @@
+.name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 17px;
+  min-width: 0;
+}
+.name svg {
+  flex-shrink: 0;
+  color: var(--icon);
+}
+.name > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.name small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+  font-size: 10px;
+}

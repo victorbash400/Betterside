@@ -3,7 +3,8 @@ import { useState } from "react";
 import { RefreshCw, Download, ChevronDown } from "lucide-react";
 import IconButton from "../controls/IconButton";
 import ContextMenu from "../controls/ContextMenu";
-import ContributionRow from "./ContributionRow";
+import DataGrid from "../grid/DataGrid";
+import { contributionColumns } from "./contributionColumns";
 import ContributionDetails from "./ContributionDetails";
 import { useContributions } from "../../state/useContributions";
 import type { Contribution } from "../../lib/types";
@@ -49,10 +50,6 @@ export default function ContributionHistory({
           {status === "All payments" ? status : status.toLowerCase()}
           <ChevronDown size={13} />
         </button>
-        <span>
-          {records.length}{" "}
-          {records.length === 1 ? "contribution" : "contributions"}
-        </span>
         <div className={styles.actions}>
           <IconButton
             label="Refresh contributions"
@@ -70,7 +67,7 @@ export default function ContributionHistory({
           </IconButton>
         </div>
       </div>
-      <div className={styles.scroll}>
+      <div className={styles.content}>
         {busy ? (
           <span className={styles.notice} role="status">
             Loading contributions
@@ -82,19 +79,12 @@ export default function ContributionHistory({
           </div>
         ) : (
           <>
-            <div className={styles.header}>
-              <span>Project</span>
-              <span>Date</span>
-              <span>Status</span>
-              <span>Amount</span>
-            </div>
-            {visible.map((record) => (
-              <ContributionRow
-                key={record.id}
-                record={record}
-                onOpen={() => setSelected(record)}
-              />
-            ))}
+            <DataGrid
+              label="Contribution history"
+              rows={visible}
+              columns={contributionColumns}
+              onOpen={setSelected}
+            />
             {!visible.length && (
               <button className={styles.explore} onClick={onExplore}>
                 Explore projects

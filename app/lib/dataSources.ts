@@ -18,7 +18,7 @@ export type DatasetId = (typeof dataSources)[number]["id"];
 export const datasetIds = dataSources.map((source) => source.id);
 export type DatasetSelection = Record<DatasetId, boolean>;
 export const defaultDatasets = Object.fromEntries(
-  datasetIds.map((id) => [id, true]),
+  datasetIds.map((id) => [id, id !== "catalogue"]),
 ) as DatasetSelection;
 export interface FeedStatus {
   id: Exclude<DatasetId, "catalogue">;

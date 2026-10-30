@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
 import type { MapItem, Filters } from "../../lib/types";
 import type { OverlaySettings } from "../../lib/concerns";
-import { useMapGeography } from "../../state/useMapGeography";
-import { overlayPoints } from "../../lib/overlayData";
+import type { useMapGeography } from "../../state/useMapGeography";
+import type { OverlayPoint } from "../../lib/overlayData";
 import { updateConcernLayers } from "./concernLayers";
 import { useGlobeCamera } from "./useGlobeCamera";
 import { useGlobeMap, globeZoom } from "./useGlobeMap";
@@ -16,6 +16,8 @@ import GlobeOrientation, { type OrientationChange } from "./GlobeOrientation";
 import ConcernDetails from "./ConcernDetails";
 import styles from "./GlobeCanvas.module.css";
 export default function GlobeCanvas({
+  geography,
+  points,
   issues,
   focusRequest,
   selected,
@@ -27,6 +29,8 @@ export default function GlobeCanvas({
   countryCode,
   mapViewSettings: mapView,
 }: {
+  geography: ReturnType<typeof useMapGeography>;
+  points: OverlayPoint[];
   issues: MapItem[];
   focusRequest: number;
   selected?: MapItem;
@@ -41,18 +45,8 @@ export default function GlobeCanvas({
 }) {
   const container = useRef<HTMLDivElement>(null),
     narrow = useNarrowLayout();
-  const geography = useMapGeography();
   const [pickedIds, setPickedIds] = useState<string[]>([]);
   const { map, ready, error, retry } = useGlobeMap(container, setPickedIds);
-  const points = useMemo(
-    () =>
-      overlayPoints(
-        issues,
-        { concerns: overlay.concerns, scale: overlay.scale },
-        geography.areas,
-      ),
-    [issues, overlay.concerns, overlay.scale, geography.areas],
-  );
   useEffect(() => {
     const instance = map.current;
     if (!ready || !instance) return;

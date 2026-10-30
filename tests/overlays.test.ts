@@ -9,8 +9,29 @@ import {
 import { overlayGeometry } from "../app/lib/overlayGeometry.ts";
 import { hapiIndicators } from "../app/lib/feeds/hapi.ts";
 import type { MapItem } from "../app/lib/types.ts";
+import type { MapArea } from "../app/lib/mapGeography.ts";
 const settings = { ...defaultOverlaySettings, concerns: ["war"] as const };
 const month = { start: "2026-10-01T00:00:00Z", end: "2026-10-31T23:59:59Z" };
+const area: MapArea = {
+  name: "Test country",
+  coordinates: [31, 48],
+  geometry: {
+    type: "MultiPolygon",
+    coordinates: [
+      [
+        [
+          [30, 47],
+          [32, 47],
+          [32, 49],
+          [30, 49],
+          [30, 47],
+        ],
+      ],
+    ],
+  },
+  source: "Test boundaries",
+  url: "https://example.org/boundaries",
+};
 function record(id: string, value: number, adminLevel = 2): MapItem {
   return {
     id,
@@ -338,4 +359,124 @@ test("many co-located layers never displace source locations to avoid overlap", 
   });
   for (const feature of geometry.markers.features)
     assert.deepEqual(feature.geometry.coordinates, [31, 48]);
+});
+
+test("the default concerns render weighted heatmap anchors without polygon fills or losing aggregate precision", () => {
+  const rows: MapItem[] = [
+    record("conflict", 12, 0),
+    {
+      ...record("disease", 0, 0),
+      kind: "Health",
+      dataset: "ifrc",
+      categoryIds: ["disease"],
+      measurements: [],
+    },
+    {
+      ...record("food", 0, 0),
+      kind: "Hunger",
+      dataset: "hapi-food",
+      measurements: [{ metric: "ipc-3-plus", value: 50000 }],
+    },
+  ];
+  const points = overlayPoints(rows, defaultOverlaySettings, { TST: area });
+  const geometry = overlayGeometry(points, defaultOverlaySettings);
+  assert.equal(geometry.areas.features.length, 0);
+  assert.equal(geometry.markers.features.length, 3);
+  assert.equal(geometry.columns.features.length, 0);
+  assert.deepEqual(
+    new Set(
+      geometry.markers.features.map((feature) => feature.properties!.concern),
+    ),
+    new Set(["war", "disease", "hunger"]),
+  );
+  assert.ok(
+    geometry.markers.features.every(
+      (feature) => feature.properties!.located === false,
+    ),
+  );
+});
+
+test("heatmap and areas modes keep their geometry separate for mixed precision data", () => {
+  const rows: MapItem[] = [
+    record("aggregate", 12, 0),
+    {
+      ...record("event", 0),
+      dataset: "usgs",
+      kind: "Disaster response",
+      categoryIds: ["earthquake-response"],
+      geographicPrecision: "Event location",
+      measurements: [],
+      reportingArea: undefined,
+    },
+  ];
+  const settings = {
+    ...defaultOverlaySettings,
+    concerns: ["war", "earthquakes"] as typeof defaultOverlaySettings.concerns,
+  };
+  const points = overlayPoints(rows, settings, { TST: area });
+  for (const mode of ["Heatmap", "Areas"] as const) {
+    const geometry = overlayGeometry(points, { ...settings, mode });
+    assert.equal(geometry.areas.features.length, mode === "Areas" ? 1 : 0);
+    assert.equal(geometry.markers.features.length, 2);
+    const events = geometry.markers.features.filter(
+      (feature) => feature.properties!.located,
+    );
+    assert.equal(events.length, 1);
+    assert.equal(events[0].properties!.value, null);
+  }
+});
+
+test("rainfall deficits retain their sign while magnitude sets their visual weight", () => {
+  const rows: MapItem[] = [
+    {
+      ...record("rain", 0, 0),
+      kind: "Climate",
+      dataset: "hapi-rainfall",
+      measurements: [{ metric: "rainfall-departure", value: -42 }],
+    },
+  ];
+  const [point] = overlayPoints(rows, {
+    ...defaultOverlaySettings,
+    concerns: ["rainfall"],
+  });
+  assert.equal(point.value, -42);
+  assert.equal(point.weight, 1);
+});
+
+test("aggregate heatmap anchors retain their reported precision when boundaries are unavailable", () => {
+  const points = overlayPoints(
+    [record("aggregate", 12, 0)],
+    defaultOverlaySettings,
+  );
+  const geometry = overlayGeometry(points, defaultOverlaySettings);
+  assert.equal(geometry.areas.features.length, 0);
+  assert.equal(geometry.markers.features.length, 1);
+  assert.equal(geometry.markers.features[0].properties!.located, false);
+});
+
+test("IPC hunger and food-assistance needs keep their own values and units", () => {
+  const ipc: MapItem = {
+    ...record("ipc", 0, 0),
+    kind: "Hunger",
+    dataset: "hapi-food",
+    measurements: [{ metric: "ipc-3-plus", value: 12000 }],
+  };
+  const assistance: MapItem = {
+    ...record("assistance", 0, 0),
+    kind: "Hunger",
+    dataset: "hapi-needs",
+    measurements: [{ metric: "people-in-need", value: 40000 }],
+  };
+  assert.equal(matchesConcern(assistance, "hunger"), false);
+  assert.equal(matchesConcern(assistance, "needs"), true);
+  const points = overlayPoints(
+    [ipc, assistance],
+    { ...defaultOverlaySettings, concerns: ["hunger", "needs"] },
+    { TST: area },
+  );
+  assert.equal(
+    points.find((point) => point.concern === "hunger")?.value,
+    12000,
+  );
+  assert.equal(points.find((point) => point.concern === "needs")?.value, 40000);
 });

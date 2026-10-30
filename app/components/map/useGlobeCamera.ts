@@ -38,11 +38,11 @@ export function useGlobeCamera(
     map.current.flyTo({
       center:
         (selected.reportingArea
-          ? areas[
-              selected.reportingArea.admin2Code ??
-                selected.reportingArea.admin1Code ??
-                selected.reportingArea.countryCode
-            ]?.coordinates
+          ? (
+              areas[selected.reportingArea.admin2Code ?? ""] ??
+              areas[selected.reportingArea.admin1Code ?? ""] ??
+              areas[selected.reportingArea.countryCode]
+            )?.coordinates
           : undefined) ?? selected.coordinates,
       zoom: 4.5,
       padding: {

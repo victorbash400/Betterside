@@ -34,6 +34,23 @@
 .group > button {
   border-radius: 17px;
 }
+.tableView {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+}
+.tableView[aria-pressed="true"] {
+  background: var(--selection);
+}
+.tableView:hover {
+  background: var(--hover);
+}
 .mobile {
   display: none;
 }

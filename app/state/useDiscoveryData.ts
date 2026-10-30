@@ -25,20 +25,17 @@ export function useDiscoveryData() {
   const latest = useRef<DiscoverySnapshot | undefined>(undefined);
   useEffect(() => {
     const controller = new AbortController();
-    let retry: ReturnType<typeof setTimeout> | undefined;
     let loading = false;
-    let requestFailed = false;
     function apply(snapshot: DiscoverySnapshot) {
       latest.current = snapshot;
       setEvents(snapshot.issues);
       setSources(snapshot.sources);
       setEventError(feedProblemSummary(snapshot.sources));
     }
-    async function loadEvents(allowRetry: boolean) {
+    async function loadEvents() {
       if (loading || controller.signal.aborted) return;
       loading = true;
       setBusy(true);
-      clearTimeout(retry);
       try {
         const response = await fetch("/api/events", {
           signal: controller.signal,
@@ -47,7 +44,6 @@ export function useDiscoveryData() {
         const parsed = discoverySnapshotSchema.safeParse(raw);
         if (!parsed.success) throw new Error("Invalid event response. Retry.");
         const incoming = parsed.data;
-        requestFailed = false;
         if (!response.ok && response.status !== 503)
           throw new Error("Event data request failed.");
         const snapshot = mergeDiscoverySnapshot(latest.current, incoming);
@@ -67,19 +63,12 @@ export function useDiscoveryData() {
           }
         }
         if (controller.signal.aborted) return;
-        const delay = discoveryRetryDelay(snapshot);
-        // One recovery attempt per load; further recovery is driven by focus or connectivity.
-        if (allowRetry && delay !== undefined)
-          retry = setTimeout(() => void loadEvents(false), delay);
       } catch (error) {
-        requestFailed = true;
         if (!controller.signal.aborted) {
           if (latest.current) apply(cachedDiscoverySnapshot(latest.current));
           setEventError(
             error instanceof Error ? error.message : "Event data unavailable.",
           );
-          if (allowRetry)
-            retry = setTimeout(() => void loadEvents(false), 10000);
         }
       } finally {
         loading = false;
@@ -101,7 +90,7 @@ export function useDiscoveryData() {
               : "Local data cache unavailable.",
           );
       }
-      if (!controller.signal.aborted) await loadEvents(true);
+      if (!controller.signal.aborted) await loadEvents();
     }
     void start();
     void fetch("/api/catalogue", { signal: controller.signal })
@@ -129,13 +118,12 @@ export function useDiscoveryData() {
         )
       )
         return;
-      void loadEvents(false);
+      void loadEvents();
     }
     window.addEventListener("online", recover);
     window.addEventListener("focus", recover);
     return () => {
       controller.abort();
-      clearTimeout(retry);
       window.removeEventListener("online", recover);
       window.removeEventListener("focus", recover);
     };

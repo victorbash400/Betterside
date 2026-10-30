@@ -29,7 +29,11 @@ export default function ConcernLayerRow({
 }) {
   const concern = concerns.find((item) => item.id === id)!,
     layer = points.filter((point) => point.concern === id);
-  const maximum = Math.max(0, ...layer.map((point) => point.value ?? 0));
+  const values = layer.flatMap((point) =>
+    point.value === null ? [] : [point.value],
+  );
+  const minimum = Math.min(0, ...values);
+  const maximum = Math.max(0, ...values);
   const ends = layer
     .flatMap((point) => (point.period?.end ? [point.period.end] : []))
     .sort();
@@ -57,10 +61,13 @@ export default function ConcernLayerRow({
             ? concern.unit
             : "Reported locations · impact unquantified"}
         </dd>
-        {maximum > 0 && (
+        {values.length > 0 && (
           <>
             <dt>Range</dt>
-            <dd>0 – {new Intl.NumberFormat("en").format(maximum)}</dd>
+            <dd>
+              {new Intl.NumberFormat("en").format(minimum)} –{" "}
+              {new Intl.NumberFormat("en").format(maximum)}
+            </dd>
           </>
         )}
         {ends.at(-1) && (

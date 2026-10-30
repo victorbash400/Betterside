@@ -169,7 +169,11 @@ export function matchesConcern(item: MapItem, id: ConcernId) {
     case "disease":
       return categories.includes("disease");
     case "hunger":
-      return item.kind === "Hunger" && item.dataset !== "hapi-famine";
+      return (
+        item.kind === "Hunger" &&
+        item.dataset !== "hapi-famine" &&
+        item.dataset !== "hapi-needs"
+      );
     case "famine":
       return item.dataset === "hapi-famine";
     case "displacement":
@@ -201,7 +205,8 @@ export function matchesConcern(item: MapItem, id: ConcernId) {
       return categories.includes("volcano-response");
     case "needs":
       return (
-        item.kind === "Humanitarian needs" &&
+        (item.kind === "Humanitarian needs" ||
+          (item.dataset === "hapi-needs" && item.kind === "Hunger")) &&
         item.dataset !== "hapi-funding" &&
         item.dataset !== "hapi-risk"
       );

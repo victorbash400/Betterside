@@ -12,19 +12,24 @@ import CountryOrganizations from "../issues/CountryOrganizations";
 import WorkspaceToolbar from "../map/WorkspaceToolbar";
 import MapTools from "../map/MapTools";
 import IssueDetails from "../issues/IssueDetails";
-import InterestContents from "../collections/InterestContents";
 import InterestActionDialog from "../interests/InterestActionDialog";
 import AddItemsDialog from "../interests/AddItemsDialog";
 import NewInterestDialog from "../interests/NewInterestDialog";
 import SettingsDialog from "../settings/SettingsDialog";
 import ContributionDialog from "../payments/ContributionDialog";
-import ContributionHistory from "../payments/ContributionHistory";
 import { useWorkspace } from "../../state/useWorkspace";
-import { issueKinds } from "../../lib/catalogue";
 import { interestPath } from "../../lib/interestTree";
 import type { InterestAction } from "../../lib/interestActions";
 import type { MapItem } from "../../lib/types";
 import styles from "./Workspace.module.css";
+const InterestContents = dynamic(
+  () => import("../collections/InterestContents"),
+  { ssr: false },
+);
+const ContributionHistory = dynamic(
+  () => import("../payments/ContributionHistory"),
+  { ssr: false },
+);
 const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), { ssr: false });
 export default function Workspace() {
   const state = useWorkspace();
@@ -111,20 +116,6 @@ export default function Workspace() {
     state.interests,
     state.view === "Following" ? state.selectedInterestId : undefined,
   );
-  const collectionFilters = {
-    ...state.filters,
-    kinds: state.activeInterest
-      ? issueKinds.filter(
-          (kind) => !state.activeInterest!.hiddenKinds.includes(kind),
-        )
-      : state.filters.kinds,
-  };
-  function onFilters(filters: typeof state.filters) {
-    if (state.activeInterest) {
-      state.filterInterest(state.activeInterest.id, filters.kinds);
-      state.setFilters({ ...state.filters, query: filters.query });
-    } else state.setFilters(filters);
-  }
   return (
     <div className={styles.shell}>
       <Sidebar
@@ -156,8 +147,6 @@ export default function Workspace() {
         onTrack={state.track}
         selected={state.selected?.id}
         onSelect={select}
-        issueKinds={collectionFilters.kinds}
-        onIssueKinds={(kinds) => onFilters({ ...collectionFilters, kinds })}
         query={state.filters.query}
         onQuery={(query) => state.setFilters({ ...state.filters, query })}
         settings={state.settingsOpen}
@@ -293,7 +282,6 @@ export default function Workspace() {
                     <InterestContents
                       discovery={state.view === "Explore"}
                       interest={state.activeInterest}
-                      interests={state.interests}
                       items={state.records}
                       onAdd={() =>
                         state.activeInterest
@@ -310,6 +298,8 @@ export default function Workspace() {
                   ) : (
                     <>
                       <WorkspaceMap
+                        geography={state.geography}
+                        points={state.points}
                         overlay={state.overlay}
                         country={state.discoveryFilters.country}
                         countryCode={organizationCode}
@@ -328,6 +318,7 @@ export default function Workspace() {
                     </>
                   )}
                   <MapTools
+                    geography={state.geography.areas}
                     value={state.overlay}
                     items={state.availableRecords}
                     mapView={state.collectionMode === "map"}

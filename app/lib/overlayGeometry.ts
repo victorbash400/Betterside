@@ -21,8 +21,7 @@ export function overlayGeometry(
     const located = point.records.every(
       (record) => record.geographicPrecision === "Event location",
     );
-    if (settings.mode === "Heatmap" && !located) continue;
-    if (settings.mode === "Areas" && !point.area) continue;
+    if (settings.mode === "Areas" && !point.area && !located) continue;
     const longitudeScale = Math.max(
       0.15,
       Math.cos((point.coordinates[1] * Math.PI) / 180),
@@ -37,19 +36,24 @@ export function overlayGeometry(
       area: Boolean(point.area),
       located,
     };
-    if (point.area && settings.mode !== "Heatmap")
+    if (point.area && !located && settings.mode === "Areas")
       areas.features.push({
         type: "Feature",
         geometry: point.area.geometry,
         properties,
       });
-    if (settings.mode !== "Heatmap" || located)
-      markers.features.push({
-        type: "Feature",
-        id: point.id,
-        geometry: { type: "Point", coordinates },
-        properties,
-      });
+    markers.features.push({
+      type: "Feature",
+      id: point.id,
+      geometry: { type: "Point", coordinates },
+      properties: {
+        ...properties,
+        precision:
+          point.precision ??
+          point.records[0].geographicPrecision ??
+          "Reported location",
+      },
+    });
     if (settings.mode === "Heatmap" || settings.mode === "Areas") continue;
     let footprint = 43000;
     if (point.area) {

@@ -4,12 +4,14 @@ import type { View } from "../../lib/types";
 import styles from "./WorkspaceBreadcrumbs.module.css";
 export default function WorkspaceBreadcrumbs({
   view,
+  mode,
   path,
   onHome,
   onFollowing,
   onInterest,
 }: {
   view: View;
+  mode: "map" | "list";
   path: Interest[];
   onHome: () => void;
   onFollowing: () => void;
@@ -32,7 +34,9 @@ export default function WorkspaceBreadcrumbs({
           ))}
         </>
       ) : (
-        <span>{view === "Explore" ? "Map" : view}</span>
+        <span>
+          {view === "Explore" ? (mode === "map" ? "Map" : "Table") : view}
+        </span>
       )}
     </nav>
   );

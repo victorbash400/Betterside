@@ -8,8 +8,7 @@
   flex-direction: column;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  backdrop-filter: blur(12px);
+  background: var(--surface);
   z-index: 5;
   overflow: hidden;
 }

@@ -52,7 +52,7 @@ export default function IssueDetails({
   return (
     <aside className={styles.card} aria-label={`${issue.location} details`}>
       <DataCardHeader
-        title={issue.country || issue.location}
+        title={issue.location}
         label={concern?.label ?? issue.kind}
         Icon={concern ? concernIcons[concern.id] : FileText}
         value={

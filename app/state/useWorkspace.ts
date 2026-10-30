@@ -16,6 +16,8 @@ import { deduplicateRecords } from "../lib/feeds/deduplicate";
 import { useDiscoveryData } from "./useDiscoveryData";
 import { useAppearance } from "./useAppearance";
 import { useTracking } from "./useTracking";
+import { useMapGeography } from "./useMapGeography";
+import { overlayPoints } from "../lib/overlayData";
 import { filterIssues, issueKinds } from "../lib/catalogue";
 import type { Analysis } from "../lib/analysis";
 import type { Filters, MapItem as Issue, View } from "../lib/types";
@@ -25,6 +27,7 @@ export function useWorkspace() {
   const following = tracking.following;
   const [selectedInterestId, setSelectedInterestId] = useState<string>();
   const discovery = useDiscoveryData();
+  const geography = useMapGeography();
   const [overlay, setOverlay] = useState<OverlaySettings>(
     defaultOverlaySettings,
   );
@@ -100,15 +103,7 @@ export function useWorkspace() {
                 (item) => datasets[item.dataset ?? "catalogue"] !== false,
               ),
             ),
-        {
-          ...filters,
-          kinds:
-            view === "Following" && activeInterest
-              ? issueKinds.filter(
-                  (kind) => !activeInterest.hiddenKinds.includes(kind),
-                )
-              : filters.kinds,
-        },
+        filters,
       ).filter(
         (item) =>
           inOverlayPeriod(item, overlay.period, Date.now()) &&
@@ -137,7 +132,18 @@ export function useWorkspace() {
   const selected =
     records.find((issue) => issue.id === selectedId) ??
     catalogue.find((issue) => issue.id === selectedId);
+  const points = useMemo(
+    () =>
+      overlayPoints(
+        records,
+        { concerns: overlay.concerns, scale: overlay.scale },
+        geography.areas,
+      ),
+    [records, overlay.concerns, overlay.scale, geography.areas],
+  );
   return {
+    geography,
+    points,
     appearance,
     mapViewSettings,
     setMapViewSettings,

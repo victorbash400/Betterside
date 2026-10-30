@@ -96,15 +96,21 @@ export function overlayPoints(
             (item) => (item.reportingArea?.adminLevel ?? 0) === level,
           );
         }
-        const values = measured.map((item) =>
-          Math.abs(concernMeasurement(item, concern)!.value),
+        const values = measured.map(
+          (item) => concernMeasurement(item, concern)!.value,
         );
         // Only disjoint districts within one period/category, or refugee origins,
         // can be added. Overlapping assessments and sectors use one maximum.
         value =
           concern === "war" || concern === "refugees"
             ? values.reduce((sum, current) => sum + current, 0)
-            : Math.max(...values);
+            : concern === "rainfall"
+              ? values.reduce(
+                  (largest, current) =>
+                    Math.abs(current) > Math.abs(largest) ? current : largest,
+                  0,
+                )
+              : Math.max(...values);
         evidence = measured;
         if (value === 0) continue;
       } else if (
@@ -145,14 +151,17 @@ export function overlayPoints(
         period: first.referencePeriod,
       });
     }
-    const maximum = Math.max(0, ...layer.map((point) => point.value ?? 0));
+    const maximum = Math.max(
+      0,
+      ...layer.map((point) => Math.abs(point.value ?? 0)),
+    );
     for (const point of layer) {
       point.weight =
         point.value === null
           ? 0.18
           : settings.scale === "Linear"
-            ? point.value / maximum
-            : Math.log1p(point.value) / Math.log1p(maximum);
+            ? Math.abs(point.value) / maximum
+            : Math.log1p(Math.abs(point.value)) / Math.log1p(maximum);
       points.push(point);
     }
   }

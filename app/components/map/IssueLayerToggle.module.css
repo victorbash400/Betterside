@@ -3,8 +3,8 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  min-height: 34px;
-  padding: 7px 8px;
+  min-height: 30px;
+  padding: 5px 6px;
   border: 0;
   border-radius: 7px;
   background: transparent;
@@ -28,8 +28,13 @@
   color: var(--muted);
 }
 .row[aria-pressed="true"] {
-  font-weight: 600;
-  background: var(--selection);
+  font-weight: 500;
+}
+.row > .check {
+  opacity: 0;
+}
+.row[aria-pressed="true"] > .check {
+  opacity: 1;
 }
 .row:hover {
   background: var(--hover);
@@ -47,20 +52,4 @@
 .entry > .row {
   flex: 1;
   min-width: 0;
-}
-.area {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 7px 5px;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 10px;
-  cursor: pointer;
-}
-.area:hover {
-  background: var(--hover);
-  color: var(--ink);
 }

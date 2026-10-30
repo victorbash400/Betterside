@@ -20,16 +20,22 @@ export function addConcernLayers(map: Map) {
       "fill-opacity": ["*", ["get", "weight"], 0.5],
     },
   });
+  map.addLayer({
+    id: "concern-area-boundaries",
+    type: "line",
+    source: "concern-areas",
+    paint: {
+      "line-color": ["get", "color"],
+      "line-width": 0.7,
+      "line-opacity": 0.65,
+    },
+  });
   for (const concern of concerns)
     map.addLayer({
       id: `heat-${concern.id}`,
       type: "heatmap",
       source: "concern-points",
-      filter: [
-        "all",
-        ["==", ["get", "concern"], concern.id],
-        ["==", ["get", "located"], true],
-      ],
+      filter: ["==", ["get", "concern"], concern.id],
       paint: {
         "heatmap-weight": [
           "case",
@@ -52,6 +58,17 @@ export function addConcernLayers(map: Map) {
       "fill-extrusion-base": ["get", "base"],
       "fill-extrusion-opacity": 0.85,
       "fill-extrusion-vertical-gradient": true,
+    },
+  });
+  map.addLayer({
+    id: "concern-events",
+    type: "circle",
+    source: "concern-points",
+    filter: ["==", ["get", "located"], true],
+    paint: {
+      "circle-radius": 3,
+      "circle-color": ["get", "color"],
+      "circle-opacity": 0.8,
     },
   });
   map.addLayer({
@@ -80,11 +97,16 @@ export function updateConcernLayers(
     "visibility",
     settings.mode === "Areas" ? "visible" : "none",
   );
+  map.setLayoutProperty(
+    "concern-area-boundaries",
+    "visibility",
+    settings.mode === "Areas" ? "visible" : "none",
+  );
   map.setPaintProperty("concern-areas", "fill-opacity", [
     "case",
     ["==", ["get", "value"], null],
-    settings.opacity * 0.45,
-    ["*", ["max", 0.2, ["get", "weight"]], settings.opacity * 0.8],
+    settings.opacity * 0.3,
+    ["*", ["max", 0.2, ["get", "weight"]], settings.opacity * 0.6],
   ]);
   for (const concern of concerns) {
     const visible =
@@ -122,6 +144,11 @@ export function updateConcernLayers(
       settings.radius,
     );
   }
+  map.setLayoutProperty(
+    "concern-events",
+    "visibility",
+    settings.mode === "Areas" ? "visible" : "none",
+  );
   map.setLayoutProperty(
     "concern-columns",
     "visibility",

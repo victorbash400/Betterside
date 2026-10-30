@@ -10,6 +10,7 @@ export default function Dialog({
   compact = false,
   size = "standard",
   footer,
+  modal = true,
 }: {
   title: string;
   onClose: () => void;
@@ -18,6 +19,7 @@ export default function Dialog({
   compact?: boolean;
   size?: "standard" | "profile";
   footer?: ReactNode;
+  modal?: boolean;
 }) {
   const [closing, setClosing] = useState(false);
   function dismiss() {
@@ -30,21 +32,31 @@ export default function Dialog({
   }
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    ref.current?.showModal();
+    if (modal) ref.current?.showModal();
+    else ref.current?.show();
     const dialog = ref.current;
     return () => dialog?.close();
-  }, []);
+  }, [modal]);
   return (
     <dialog
       ref={ref}
       className={`${styles.dialog} ${animated ? styles.animated : ""}`}
       data-size={size}
+      data-modal={modal}
       data-compact={compact}
       data-closing={closing}
       onAnimationEnd={(event) => {
         if (closing && event.target === event.currentTarget) onClose();
       }}
       aria-label={title}
+      aria-modal={modal}
+      onKeyDown={(event) => {
+        if (!modal && event.key === "Escape" && !event.defaultPrevented) {
+          event.preventDefault();
+          event.stopPropagation();
+          dismiss();
+        }
+      }}
       onCancel={(event) => {
         event.preventDefault();
         dismiss();

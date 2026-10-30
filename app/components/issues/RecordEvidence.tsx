@@ -1,6 +1,7 @@
 import type { MapItem } from "../../lib/types";
 import { formatDate } from "../../lib/dates";
 import { measurementLabels } from "../../lib/measurementLabels";
+import { recordPrecision } from "../../lib/recordValues";
 import CardFacts from "./CardFacts";
 import styles from "./RecordEvidence.module.css";
 export default function RecordEvidence({ issue }: { issue: MapItem }) {
@@ -19,7 +20,7 @@ export default function RecordEvidence({ issue }: { issue: MapItem }) {
             ? [{ label: "Record", value: issue.recordType }]
             : []),
           ...(issue.geographicPrecision
-            ? [{ label: "Map position", value: issue.geographicPrecision }]
+            ? [{ label: "Reporting geography", value: recordPrecision(issue) }]
             : []),
           ...(issue.sourceAlert
             ? [{ label: "Source alert", value: issue.sourceAlert }]

@@ -17,6 +17,7 @@ export default function OrganizationDetails({
     <Dialog
       title={organization.name}
       size="profile"
+      modal={false}
       onClose={onClose}
       footer={
         <>

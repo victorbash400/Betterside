@@ -3,19 +3,23 @@ import { ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
 import {
   concerns,
   matchesConcern,
+  concernColor,
   type OverlaySettings,
 } from "../../lib/concerns";
 import type { MapItem } from "../../lib/types";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
+import type { MapGeography } from "../../lib/mapGeography";
 import IssueLayerToggle from "./IssueLayerToggle";
 import LayerControlsDialog from "./LayerControlsDialog";
 import styles from "./MapTools.module.css";
 export default function MapTools({
+  geography,
   value,
   items,
   mapView,
   onChange,
 }: {
+  geography: MapGeography;
   value: OverlaySettings;
   items: MapItem[];
   mapView: boolean;
@@ -79,25 +83,7 @@ export default function MapTools({
                   concern={concern}
                   selected={value.concerns.includes(concern.id)}
                   count={counts.get(concern.id) ?? 0}
-                  onAreas={
-                    value.mode === "Heatmap" &&
-                    value.concerns.includes(concern.id) &&
-                    (counts.get(concern.id) ?? 0) > 0 &&
-                    !items.some(
-                      (item) =>
-                        matchesConcern(item, concern.id) &&
-                        item.geographicPrecision === "Event location",
-                    )
-                      ? () =>
-                          onChange({
-                            ...value,
-                            mode: "Areas",
-                            concerns: value.concerns.includes(concern.id)
-                              ? value.concerns
-                              : [...value.concerns, concern.id],
-                          })
-                      : undefined
-                  }
+                  color={concernColor(concern.id, value)}
                   onToggle={() =>
                     onChange({
                       ...value,
@@ -122,6 +108,7 @@ export default function MapTools({
       </aside>
       {settings && (
         <LayerControlsDialog
+          geography={geography}
           value={value}
           items={items}
           showAppearance={mapView}

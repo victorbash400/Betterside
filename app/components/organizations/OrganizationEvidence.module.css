@@ -1,7 +1,7 @@
 .evidence {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 .evidence > a {
   display: flex;

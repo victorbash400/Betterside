@@ -5,12 +5,16 @@ import type { MapItem, Filters } from "../../lib/types";
 import type { OverlaySettings } from "../../lib/concerns";
 import type { MapViewSettings } from "../../lib/mapViews";
 import type { Analysis } from "../../lib/analysis";
+import type { OverlayPoint } from "../../lib/overlayData";
+import type { useMapGeography } from "../../state/useMapGeography";
 import styles from "./Workspace.module.css";
 const GlobeCanvas = dynamic(() => import("../map/GlobeCanvas"), { ssr: false });
 const StudioDashboard = dynamic(() => import("../dashboard/StudioDashboard"), {
   ssr: false,
 });
 export default function WorkspaceMap({
+  geography,
+  points,
   items,
   selected,
   onSelect,
@@ -24,6 +28,8 @@ export default function WorkspaceMap({
   countryCode,
   mapViewSettings,
 }: {
+  geography: ReturnType<typeof useMapGeography>;
+  points: OverlayPoint[];
   items: MapItem[];
   selected?: MapItem;
   onSelect: (item: MapItem) => void;
@@ -53,6 +59,8 @@ export default function WorkspaceMap({
   return (
     <div className={styles.mapWorkspace}>
       <GlobeCanvas
+        geography={geography}
+        points={points}
         issues={items}
         overlay={overlay}
         country={country}

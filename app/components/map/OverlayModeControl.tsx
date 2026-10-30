@@ -38,7 +38,7 @@ export default function OverlayModeControl({
         }}
       >
         <Icon size={15} />
-        {value.mode}
+        {modes.find((mode) => mode.name === value.mode)!.label}
         <ChevronDown size={12} />
       </button>
       {menu && (

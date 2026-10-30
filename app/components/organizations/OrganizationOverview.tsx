@@ -1,5 +1,5 @@
 import type { DirectoryOrganization } from "../../lib/organizations";
-import card from "../issues/DataCard.module.css";
+import { Fragment } from "react";
 import styles from "./OrganizationOverview.module.css";
 export default function OrganizationOverview({
   organization,
@@ -11,9 +11,7 @@ export default function OrganizationOverview({
   ).size;
   return (
     <>
-      {organization.description && (
-        <p className={card.summary}>{organization.description}</p>
-      )}
+      {organization.description && <p>{organization.description}</p>}
       <dl className={styles.facts}>
         {organization.topics.length > 0 && (
           <>
@@ -47,10 +45,10 @@ export default function OrganizationOverview({
         {organization.identifiers
           .filter((id) => id.scheme !== "BetterSide reviewed profile")
           .map((id) => (
-            <div key={JSON.stringify(id)}>
+            <Fragment key={JSON.stringify(id)}>
               <dt>{id.scheme}</dt>
               <dd>{id.value}</dd>
-            </div>
+            </Fragment>
           ))}
       </dl>
     </>

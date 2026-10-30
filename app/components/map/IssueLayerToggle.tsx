@@ -1,5 +1,5 @@
-import { Map } from "lucide-react";
 import { concernIcons } from "./concernIcons";
+import { Check } from "lucide-react";
 import type { concerns } from "../../lib/concerns";
 import styles from "./IssueLayerToggle.module.css";
 export default function IssueLayerToggle({
@@ -7,13 +7,13 @@ export default function IssueLayerToggle({
   selected,
   count,
   onToggle,
-  onAreas,
+  color,
 }: {
   concern: (typeof concerns)[number];
   selected: boolean;
   count: number;
   onToggle: () => void;
-  onAreas?: () => void;
+  color: string;
 }) {
   const Icon = concernIcons[concern.id];
   return (
@@ -21,27 +21,20 @@ export default function IssueLayerToggle({
       <button
         type="button"
         className={styles.row}
-        title={concern.label}
         aria-pressed={selected}
         onClick={onToggle}
       >
-        <Icon size={16} aria-hidden="true" />
+        <Icon
+          size={16}
+          aria-hidden="true"
+          style={selected ? { color } : undefined}
+        />
         <span>{concern.label}</span>
-        <small aria-label={`${count} reports`}>
+        <small aria-label={`${count} ${count === 1 ? "report" : "reports"}`}>
           {new Intl.NumberFormat("en", { notation: "compact" }).format(count)}
         </small>
+        <Check size={13} className={styles.check} aria-hidden="true" />
       </button>
-      {onAreas && (
-        <button
-          className={styles.area}
-          onClick={onAreas}
-          title={`View ${concern.label} as reported areas`}
-          aria-label={`View ${concern.label} as reported areas`}
-        >
-          <Map size={14} />
-          <span>Areas</span>
-        </button>
-      )}
     </div>
   );
 }

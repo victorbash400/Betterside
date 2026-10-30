@@ -1,6 +1,5 @@
 import SettingsNavigation from "../settings/SettingsNavigation";
 import type { SettingsSection } from "../../lib/settings";
-import SidebarIssueFilter from "./SidebarIssueFilter";
 import type { InterestAction } from "../../lib/interestActions";
 import type { InterestChoice } from "../../lib/interestCategories";
 import { useEffect, useRef, useState } from "react";
@@ -20,7 +19,7 @@ import IconButton from "../controls/IconButton";
 import AppIcon from "../controls/AppIcon";
 import ContextMenu from "../controls/ContextMenu";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
-import type { MapItem as Issue, IssueKind, View } from "../../lib/types";
+import type { MapItem as Issue, View } from "../../lib/types";
 import styles from "./Sidebar.module.css";
 import searchStyles from "./SidebarSearch.module.css";
 export default function Sidebar({
@@ -41,8 +40,6 @@ export default function Sidebar({
   selected,
   onSelect,
   query,
-  issueKinds,
-  onIssueKinds,
   onQuery,
   settings,
   settingsSection,
@@ -65,8 +62,6 @@ export default function Sidebar({
   selected?: string;
   onSelect: (issue: Issue) => void;
   query: string;
-  issueKinds: IssueKind[];
-  onIssueKinds: (kinds: IssueKind[]) => void;
   onQuery: (query: string) => void;
   settings: boolean;
   settingsSection: SettingsSection;
@@ -166,11 +161,6 @@ export default function Sidebar({
               )}
             </label>
           )}
-          {!settings &&
-            view !== "Contributions" &&
-            view !== "Organizations" && (
-              <SidebarIssueFilter value={issueKinds} onChange={onIssueKinds} />
-            )}
           <nav className={styles.navigation}>
             <div className={styles.entries}>
               {settings ? (

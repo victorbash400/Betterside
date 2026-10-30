@@ -174,7 +174,7 @@ test("a national total prevents duplicate mapped district totals within the same
   assert.equal(points.length, 1);
   assert.equal(points[0].value, 25);
 });
-test("heatmaps show only incident kernels and reserve national and regional totals for Areas", () => {
+test("heatmap uses weighted geographic anchors while Areas alone uses reporting polygons", () => {
   const code = Object.keys(geography).find(
     (code) => code.startsWith("UA") && code.length > 4,
   )!;
@@ -209,8 +209,12 @@ test("heatmaps show only incident kernels and reserve national and regional tota
     ...defaultOverlaySettings,
     mode: "Heatmap",
   });
-  assert.equal(heatmap.markers.features.length, 1);
-  assert.deepEqual(heatmap.markers.features[0].geometry.coordinates, [33, 49]);
+  assert.equal(heatmap.markers.features.length, 3);
+  assert.deepEqual(
+    heatmap.markers.features.find((feature) => feature.properties!.located)!
+      .geometry.coordinates,
+    [33, 49],
+  );
   assert.equal(heatmap.areas.features.length, 0);
   assert.equal(heatmap.columns.features.length, 0);
   const areas = overlayGeometry(points, {
@@ -221,7 +225,7 @@ test("heatmaps show only incident kernels and reserve national and regional tota
   assert.equal(areas.columns.features.length, 0);
 });
 
-test("unmapped country centroids never become incident heat kernels", () => {
+test("aggregate kernels preserve their non-incident classification", () => {
   const points = overlayPoints([base], {
     ...defaultOverlaySettings,
     concerns: ["war"],
@@ -230,6 +234,7 @@ test("unmapped country centroids never become incident heat kernels", () => {
     ...defaultOverlaySettings,
     mode: "Heatmap",
   });
-  assert.equal(geometry.markers.features.length, 0);
+  assert.equal(geometry.markers.features.length, 1);
+  assert.equal(geometry.markers.features[0].properties!.located, false);
   assert.equal(geometry.areas.features.length, 0);
 });

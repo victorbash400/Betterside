@@ -4,7 +4,7 @@ import {
   ArrowLeft,
   MessageCircle,
   Map,
-  List,
+  Table2,
   FolderPlus,
   RefreshCw,
 } from "lucide-react";
@@ -63,6 +63,7 @@ export default function WorkspaceHeader({
         </IconButton>
         <WorkspaceBreadcrumbs
           view={view}
+          mode={mode}
           path={path}
           onHome={onHome}
           onFollowing={onFollowing}
@@ -91,14 +92,16 @@ export default function WorkspaceHeader({
             >
               <Map />
             </IconButton>
-            <IconButton
-              label="List view"
-              title="List view"
-              selected={mode === "list"}
+            <button
+              className={styles.tableView}
+              aria-label="Table view"
+              title="Table view"
+              aria-pressed={mode === "list"}
               onClick={() => onMode("list")}
             >
-              <List />
-            </IconButton>
+              <Table2 size={16} />
+              Table
+            </button>
           </div>
         )}
         <div className={styles.group}>

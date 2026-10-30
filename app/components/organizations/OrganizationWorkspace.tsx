@@ -2,11 +2,13 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import type { useOrganizations } from "../../state/useOrganizations";
 import type { MapViewSettings } from "../../lib/mapViews";
-import OrganizationList from "./OrganizationList";
 import OrganizationDetails from "./OrganizationDetails";
 import OrganizationRail from "./OrganizationRail";
 import OrganizationIssues from "./OrganizationIssues";
 import styles from "./OrganizationWorkspace.module.css";
+const OrganizationList = dynamic(() => import("./OrganizationList"), {
+  ssr: false,
+});
 const OrganizationMap = dynamic(() => import("./OrganizationMap"), {
   ssr: false,
 });

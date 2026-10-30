@@ -4,15 +4,18 @@ import LayerSelect from "./LayerSelect";
 import ConcernLayerRow from "./ConcernLayerRow";
 import { type OverlaySettings } from "../../lib/concerns";
 import { overlayPoints } from "../../lib/overlayData";
+import type { MapGeography } from "../../lib/mapGeography";
 import type { MapItem } from "../../lib/types";
 import styles from "./LayerControlsDialog.module.css";
 export default function LayerControlsDialog({
+  geography,
   value,
   items,
   onChange,
   onClose,
   showAppearance,
 }: {
+  geography: MapGeography;
   value: OverlaySettings;
   showAppearance: boolean;
   items: MapItem[];
@@ -21,11 +24,15 @@ export default function LayerControlsDialog({
 }) {
   const points = useMemo(
     () =>
-      overlayPoints(items, { concerns: value.concerns, scale: value.scale }),
-    [items, value.concerns, value.scale],
+      overlayPoints(
+        items,
+        { concerns: value.concerns, scale: value.scale },
+        geography,
+      ),
+    [items, value.concerns, value.scale, geography],
   );
   return (
-    <Dialog title="Layer settings" onClose={onClose}>
+    <Dialog title="Layer settings" onClose={onClose} modal={false}>
       <div className={styles.content}>
         <div className={styles.layers}>
           <div className={styles.columns}>
