@@ -1,20 +1,15 @@
 .profile {
   display: flex;
   flex-direction: column;
-  min-height: 0;
-}
-.content {
+  gap: 14px;
   min-height: 0;
   font-size: 12px;
 }
 .type {
-  display: block;
-  margin-bottom: 10px;
   color: var(--muted);
   font-size: 11px;
 }
-.content p {
-  margin: 0 0 14px;
-  font-size: 12px;
+.profile p {
+  margin: 0;
   line-height: 1.55;
 }

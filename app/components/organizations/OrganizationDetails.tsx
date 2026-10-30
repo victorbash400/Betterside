@@ -17,26 +17,31 @@ export default function OrganizationDetails({
     <Dialog
       title={organization.name}
       size="profile"
+      centered
       modal={false}
       onClose={onClose}
       footer={
-        <>
-          {organization.website && (
-            <a
-              className={styles.website}
-              href={organization.website}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Website <ArrowUpRight size={13} />
-            </a>
-          )}
-          <OrganizationDonate
-            url={organization.donateUrl}
-            name={organization.name}
-            prominent
-          />
-        </>
+        organization.website || organization.donateUrl ? (
+          <>
+            {organization.website && (
+              <a
+                className={styles.website}
+                href={organization.website}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Website <ArrowUpRight size={13} />
+              </a>
+            )}
+            {organization.donateUrl && (
+              <OrganizationDonate
+                url={organization.donateUrl}
+                name={organization.name}
+                prominent
+              />
+            )}
+          </>
+        ) : undefined
       }
     >
       <OrganizationProfile

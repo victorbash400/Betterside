@@ -23,8 +23,8 @@
 }
 
 .action[data-prominent="true"] {
-  background: #ffe339;
-  color: #191919;
+  background: var(--hover);
+  color: var(--ink);
   border: 0;
   border-radius: 18px;
   min-width: 112px;
