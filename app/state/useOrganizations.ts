@@ -5,7 +5,10 @@ import {
   type OrganizationFilters,
 } from "../lib/organizations";
 import { useMapGeography } from "./useMapGeography";
-import { useOrganizationDirectory } from "./useOrganizationDirectory";
+import {
+  fetchOrganizationDirectory,
+  useOrganizationDirectory,
+} from "./useOrganizationDirectory";
 export function useOrganizations(enabled: boolean, query: string) {
   const [filters, setFilters] = useState(defaultOrganizationFilters);
   const [selected, setSelected] = useState<string>();
@@ -64,6 +67,20 @@ export function useOrganizations(enabled: boolean, query: string) {
   }
   return {
     ...directory,
+    focus: async (id: string, topics: string[]) => {
+      const result = await fetchOrganizationDirectory();
+      const organization = result.value.organizations.find(
+        (org) => org.id === id,
+      );
+      if (!organization)
+        throw new Error("Organization unavailable. Search again.");
+      if (topics.some((topic) => !organization.topics.includes(topic)))
+        throw new Error("Cause is not reported by this organization.");
+      setFilters({ ...defaultOrganizationFilters, topics });
+      setRevision(0);
+      setSelected(id);
+      return organization;
+    },
     filters,
     update,
     countries,

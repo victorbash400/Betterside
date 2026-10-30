@@ -202,6 +202,7 @@ export function useWorkspace() {
         catalogue.find((item) => item.id === id),
       ),
     addItems: tracking.addMany,
+    saveFromChat: tracking.saveFromChat,
     renameInterest: tracking.rename,
     moveInterest: tracking.moveFolder,
     archiveInterest: tracking.archive,

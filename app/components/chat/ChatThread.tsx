@@ -1,3 +1,7 @@
+import type {
+  ChatWorkspaceActions,
+  WorkspaceChatContext,
+} from "../../lib/chatWorkspace";
 import { useEffect, useMemo, useRef } from "react";
 import { useConversation } from "../../state/useConversation";
 import ChatComposer from "./ChatComposer";
@@ -6,6 +10,8 @@ import type { Analysis } from "../../lib/analysis";
 import type { MapItem as Issue } from "../../lib/types";
 import styles from "./ChatDrawer.module.css";
 export default function ChatThread({
+  actions,
+  context,
   conversationId,
   selected,
   issues,
@@ -14,6 +20,8 @@ export default function ChatThread({
   onSelect,
   onTitle,
 }: {
+  actions: ChatWorkspaceActions;
+  context: WorkspaceChatContext;
   conversationId: string;
   selected?: Issue;
   issues: Issue[];
@@ -29,6 +37,8 @@ export default function ChatThread({
       areaId: selected?.id,
       model,
       onAnalysis,
+      actions,
+      context,
     }),
     thread = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -36,7 +46,15 @@ export default function ChatThread({
   }, []);
   return (
     <div ref={thread} className={styles.thread}>
-      <MessageList messages={chat.messages} busy={chat.busy} />
+      <MessageList
+        messages={chat.messages}
+        busy={chat.busy}
+        onSelect={onSelect}
+        actions={actions}
+        onMessage={(text) => {
+          if (!chat.busy) void chat.sendMessage({ text });
+        }}
+      />
       {(chat.error || chat.storageError) && (
         <div className={styles.error} role="alert">
           {chat.storageError || chat.error?.message}

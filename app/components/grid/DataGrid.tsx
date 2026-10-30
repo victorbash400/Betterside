@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {
   AllCommunityModule,
   type ColDef,
   type GridOptions,
+  type GridApi,
 } from "ag-grid-community";
 import RecordPagination from "../collections/RecordPagination";
 import { gridTheme } from "./gridTheme";
@@ -23,6 +24,18 @@ const rowSelection = {
   checkboxes: false,
   enableClickSelection: false,
 };
+
+const multipleSelection = {
+  mode: "multiRow" as const,
+  checkboxes: false,
+  headerCheckbox: false,
+  enableClickSelection: false,
+};
+function syncSelection<T>(api: GridApi<T> | undefined, ids: Set<string>) {
+  api?.forEachNode((node) =>
+    node.setSelected(Boolean(node.id && ids.has(node.id))),
+  );
+}
 
 export default function DataGrid<T extends { id: string }>({
   label,
@@ -44,6 +57,12 @@ export default function DataGrid<T extends { id: string }>({
   onContextMenu?: (row: T, event: MouseEvent) => void;
 }) {
   const grid = useRef<AgGridReact<T>>(null);
+  useEffect(() => {
+    syncSelection(
+      grid.current?.api,
+      new Set(selectedIds ?? (selected ? [selected] : [])),
+    );
+  }, [selected, selectedIds]);
   const [pagination, setPagination] = useState({
     page: 0,
     pages: 1,
@@ -75,12 +94,7 @@ export default function DataGrid<T extends { id: string }>({
           columnDefs={columns}
           defaultColDef={defaultColDef}
           getRowId={({ data }) => data.id}
-          getRowClass={({ data }) =>
-            data?.id === selected || (data && selectedIds?.includes(data.id))
-              ? styles.selected
-              : undefined
-          }
-          rowSelection={rowSelection}
+          rowSelection={selectedIds ? multipleSelection : rowSelection}
           pagination
           paginationPageSize={100}
           scrollbarWidth={8}
@@ -89,7 +103,19 @@ export default function DataGrid<T extends { id: string }>({
           animateRows={false}
           tooltipShowDelay={400}
           ensureDomOrder
-          onGridReady={({ api }) => api.setGridAriaProperty("label", label)}
+          onGridReady={({ api }) => {
+            api.setGridAriaProperty("label", label);
+            syncSelection(
+              api,
+              new Set(selectedIds ?? (selected ? [selected] : [])),
+            );
+          }}
+          onRowDataUpdated={({ api }) =>
+            syncSelection(
+              api,
+              new Set(selectedIds ?? (selected ? [selected] : [])),
+            )
+          }
           onPaginationChanged={syncPagination}
           onRowClicked={({ data, event }) => {
             if (
@@ -105,8 +131,14 @@ export default function DataGrid<T extends { id: string }>({
               event.target.closest("button,a,input")
             )
               return;
-            if (data && event instanceof KeyboardEvent && event.key === "Enter")
+            if (
+              data &&
+              event instanceof KeyboardEvent &&
+              (event.key === "Enter" || event.key === " ")
+            ) {
+              event.preventDefault();
               onOpen(data);
+            }
           }}
           onCellContextMenu={({ data, event }) => {
             if (!data || !onContextMenu || !(event instanceof MouseEvent))

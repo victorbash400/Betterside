@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import type { ColDef } from "ag-grid-community";
 import type { DirectoryOrganization } from "../../lib/organizations";
 import DataGrid from "../grid/DataGrid";
@@ -14,6 +14,8 @@ export default function OrganizationMapGrid({
   onSelect: (id: string) => void;
   onDetails: (id: string) => void;
 }) {
+  const details = useRef(onDetails);
+  details.current = onDetails;
   const columns = useMemo<ColDef<DirectoryOrganization>[]>(
     () => [
       {
@@ -27,8 +29,8 @@ export default function OrganizationMapGrid({
       {
         colId: "countries",
         headerName: "Countries",
-        width: 86,
-        minWidth: 86,
+        width: 96,
+        minWidth: 96,
         type: "numericColumn",
         filter: "agNumberColumnFilter",
         valueGetter: ({ data }) =>
@@ -44,11 +46,12 @@ export default function OrganizationMapGrid({
         sortable: false,
         filter: false,
         resizable: false,
+        cellStyle: { padding: "0 4px" },
         cellRenderer: OrganizationMapInfoCell,
-        cellRendererParams: { onDetails },
+        cellRendererParams: { onDetails: (id: string) => details.current(id) },
       },
     ],
-    [onDetails],
+    [],
   );
   return (
     <DataGrid

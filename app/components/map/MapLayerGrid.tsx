@@ -16,6 +16,7 @@ export default function MapLayerGrid({
   selected: string[];
   onToggle: (id: string) => void;
 }) {
+  const hasCounts = rows.some((row) => row.count !== undefined);
   const columns = useMemo<ColDef<MapLayerRow>[]>(
     () => [
       {
@@ -25,20 +26,20 @@ export default function MapLayerGrid({
         minWidth: 130,
         tooltipField: "label",
       },
-      ...(rows.some((row) => row.count !== undefined)
+      ...(hasCounts
         ? [
             {
               field: "count" as const,
               headerName: "Records",
-              width: 82,
-              minWidth: 82,
+              width: 96,
+              minWidth: 96,
               type: "numericColumn",
               filter: "agNumberColumnFilter",
             },
           ]
         : []),
     ],
-    [rows],
+    [hasCounts],
   );
   return (
     <DataGrid

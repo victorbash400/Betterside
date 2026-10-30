@@ -8,6 +8,26 @@ const cache = createAsyncCache<OrganizationDirectory>({
   maxEntries: 16,
   maxBytes: 32 * 1024 * 1024,
 });
+export async function fetchOrganizationDirectory(
+  country?: string,
+  refresh = false,
+) {
+  const parameters = new URLSearchParams();
+  if (country) parameters.set("country", country);
+  if (refresh) parameters.set("refresh", "1");
+  const path = `/api/organization-directory?${parameters}`;
+  return cache.get(
+    path,
+    async () => {
+      const response = await fetch(path);
+      const raw = await response.json();
+      if (!response.ok)
+        throw new Error(raw.error ?? "Organization catalogue unavailable.");
+      return organizationDirectorySchema.parse(raw);
+    },
+    { ttlMs: 60000, errorTtlMs: 0 },
+  );
+}
 export function useOrganizationDirectory(
   enabled: boolean,
   country?: string,
@@ -22,22 +42,7 @@ export function useOrganizationDirectory(
     setBusy(true);
     setError("");
     setData(undefined);
-    const parameters = new URLSearchParams();
-    if (country) parameters.set("country", country);
-    if (revision > 0) parameters.set("refresh", "1");
-    const path = `/api/organization-directory?${parameters}`;
-    void cache
-      .get(
-        path,
-        async () => {
-          const response = await fetch(path);
-          const raw = await response.json();
-          if (!response.ok)
-            throw new Error(raw.error ?? "Organization catalogue unavailable.");
-          return organizationDirectorySchema.parse(raw);
-        },
-        { ttlMs: 60000, errorTtlMs: 0 },
-      )
+    void fetchOrganizationDirectory(country, revision > 0)
       .then((result) => {
         if (active) setData(result.value);
       })

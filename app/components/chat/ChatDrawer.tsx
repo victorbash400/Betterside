@@ -1,4 +1,8 @@
 "use client";
+import type {
+  ChatWorkspaceActions,
+  WorkspaceChatContext,
+} from "../../lib/chatWorkspace";
 import { useState } from "react";
 import { useChatSessions } from "../../state/useChatSessions";
 import ChatHeader from "./ChatHeader";
@@ -9,6 +13,8 @@ import type { Analysis } from "../../lib/analysis";
 import type { MapItem as Issue } from "../../lib/types";
 import styles from "./ChatDrawer.module.css";
 export default function ChatDrawer({
+  actions,
+  context,
   selected,
   issues,
   model,
@@ -16,6 +22,8 @@ export default function ChatDrawer({
   onSelect,
   onClose,
 }: {
+  actions: ChatWorkspaceActions;
+  context: WorkspaceChatContext;
   selected?: Issue;
   issues: Issue[];
   model: "fast" | "reasoning";
@@ -54,6 +62,8 @@ export default function ChatDrawer({
           <ChatThread
             key={sessions.activeId}
             conversationId={sessions.activeId}
+            actions={actions}
+            context={context}
             selected={selected}
             issues={issues}
             model={model}

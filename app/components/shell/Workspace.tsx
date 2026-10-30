@@ -2,6 +2,7 @@
 import type { SettingsSection } from "../../lib/settings";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { useChatWorkspaceActions } from "../../state/useChatWorkspaceActions";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
 import { useOrganizations } from "../../state/useOrganizations";
 import OrganizationWorkspace from "../organizations/OrganizationWorkspace";
@@ -44,6 +45,9 @@ export default function Workspace() {
   const organizations = useOrganizations(
     state.view === "Organizations",
     state.filters.query,
+  );
+  const chatActions = useChatWorkspaceActions(state, organizations, () =>
+    setOrganizationsOpen(true),
   );
   const crisis = useOrganizationCrisisMap({
     enabled: state.view === "Organizations",
@@ -466,6 +470,24 @@ export default function Workspace() {
             </div>
             {state.chatOpen && (
               <ChatDrawer
+                actions={chatActions}
+                context={{
+                  view: state.view,
+                  mode: state.collectionMode,
+                  country:
+                    state.view === "Organizations"
+                      ? organizations.filters.country
+                      : state.discoveryFilters.country,
+                  causes:
+                    state.view === "Organizations"
+                      ? crisis.overlay.concerns
+                      : state.overlay.concerns,
+                  visualization: state.overlay.mode,
+                  organizationId:
+                    state.view === "Organizations"
+                      ? organizations.organization?.id
+                      : undefined,
+                }}
                 selected={chatContext ?? state.selected}
                 issues={
                   state.view === "Organizations" ? crisis.items : state.records

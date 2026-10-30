@@ -9,6 +9,7 @@ export function searchRecords(
     kind?: IssueKind;
     dataset?: DatasetId;
     offset?: number;
+    sort?: "recent" | "name" | "country" | "funding-gap";
   },
 ) {
   const words = (input.query ?? "")
@@ -19,7 +20,8 @@ export function searchRecords(
   const matches = records
     .filter((item) => {
       if (input.kind && item.kind !== input.kind) return false;
-      if (input.dataset && item.dataset !== input.dataset) return false;
+      if (input.dataset && (item.dataset ?? "catalogue") !== input.dataset)
+        return false;
       if (country && !item.country.toLocaleLowerCase().includes(country))
         return false;
       const text = [
@@ -36,11 +38,26 @@ export function searchRecords(
         .toLocaleLowerCase();
       return words.every((word) => text.includes(word));
     })
-    .toSorted((a, b) =>
-      (b.referencePeriod?.start ?? b.source.published ?? "").localeCompare(
-        a.referencePeriod?.start ?? a.source.published ?? "",
-      ),
-    );
+    .toSorted((a, b) => {
+      if (input.sort === "name")
+        return (a.project?.name ?? a.location).localeCompare(
+          b.project?.name ?? b.location,
+        );
+      if (input.sort === "country")
+        return a.country.localeCompare(b.country) || a.id.localeCompare(b.id);
+      if (input.sort === "funding-gap") {
+        const gap = (record: MapItem) =>
+          record.project
+            ? Math.max(0, record.project.target - record.project.raised)
+            : -1;
+        return gap(b) - gap(a) || a.id.localeCompare(b.id);
+      }
+      return (
+        b.referencePeriod?.start ??
+        b.source.published ??
+        ""
+      ).localeCompare(a.referencePeriod?.start ?? a.source.published ?? "");
+    });
   const offset = input.offset ?? 0;
   return {
     total: matches.length,

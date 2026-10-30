@@ -11,3 +11,11 @@ Successful per-source results may be retained for seven days after freshness exp
 Initial and manual loads make one request. Connectivity and focus events can attempt recovery when failed-source cooldowns allow. No delayed retry timers or polling are used.
 
 Validation covers aggregate-versus-event geometry, all three default cause selections, signed rainfall deficits, zero versus missing values, sandbox exclusion, cache retention and expiry, original timestamps, per-source browser merges, successful empty responses, and gzip/ETag round trips. On 30 October 2026 the live snapshot contained 14,669 records; the three default causes produced 276 weighted reporting anchors. Heatmap retains those anchors and their original precision metadata; Areas uses only available matching polygons. Three aggregate locations lacked matching boundaries. GDACS timed out and remained an error. Counts and provider availability can change. No server was started or restarted.
+
+## Workspace chat tools
+
+Chat renders structured tool outputs as inline grids, calculations, save confirmations and sandbox payment cards. Search defaults to the full available source catalogue; `scope: selection` explicitly limits research to visible record IDs. An empty cause selection still draws no layers and does not mean the source catalogue is empty. Map filters and organization focus use the same client state as the manual controls.
+
+`save_records` resolves IDs against server catalogue/discovery records and this visitor's saved records, validates a single tracking snapshot, and waits for revision-checked persistence before returning success. Restoring conversation history does not replay workspace mutations. Calculations use structured operations, never evaluated code; USD splits preserve cents.
+
+`prepare_payment` supports existing BetterSide Sandbox projects only. It creates a real sandbox order through the same service as manual checkout, with a validated PayPal approval URL. The user approves in PayPal; chat has no capture tool. Inline cards read donor-scoped ledger status on mount, window focus, or an explicit check, without polling. `list_contributions` reads this visitor's recorded order states and renders a grid; prepared orders are not completed contributions. Public organizations retain their own verified external donation URLs.

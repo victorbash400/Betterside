@@ -20,7 +20,7 @@ export function useTrackingStorage() {
   const revision = useRef(0),
     desired = useRef<Tracking>(emptyTracking),
     persisted = useRef<Tracking>(emptyTracking),
-    saving = useRef(false),
+    writing = useRef<Promise<void> | undefined>(undefined),
     live = useRef(true),
     conflict = useRef(false);
   useEffect(() => {
@@ -76,7 +76,7 @@ export function useTrackingStorage() {
         desired.current = snapshot;
         setState(snapshot);
         setReady(true);
-        if (snapshot !== persisted.current) void flush();
+        if (snapshot !== persisted.current) void flush().catch(() => {});
       } catch (error) {
         if (!controller.signal.aborted)
           setError(
@@ -92,9 +92,15 @@ export function useTrackingStorage() {
       controller.abort();
     };
   }, []);
-  async function flush() {
-    if (saving.current) return;
-    saving.current = true;
+  function flush(): Promise<void> {
+    if (writing.current) return writing.current;
+    const operation = drain().finally(() => {
+      writing.current = undefined;
+    });
+    writing.current = operation;
+    return operation;
+  }
+  async function drain() {
     try {
       // Drain changes triggered by user actions; failures wait for explicit retry.
       while (desired.current !== persisted.current) {
@@ -116,8 +122,7 @@ export function useTrackingStorage() {
         setError(
           error instanceof Error ? error.message : "Could not save interests.",
         );
-    } finally {
-      saving.current = false;
+      throw error;
     }
   }
   function update(transform: (previous: Tracking) => Tracking) {
@@ -126,7 +131,7 @@ export function useTrackingStorage() {
       const next = trackingSchema.parse(transform(desired.current));
       desired.current = next;
       setState(next);
-      void flush();
+      void flush().catch(() => {});
     } catch {
       setError("Could not update interests.");
     }
@@ -136,7 +141,15 @@ export function useTrackingStorage() {
       window.location.reload();
       return;
     }
-    void flush();
+    void flush().catch(() => {});
   }
-  return { state, update, ready, error, retry };
+  async function commit(transform: (previous: Tracking) => Tracking) {
+    if (!ready || error)
+      throw new Error(error || "Saved interests unavailable.");
+    const next = trackingSchema.parse(transform(desired.current));
+    desired.current = next;
+    setState(next);
+    await flush();
+  }
+  return { state, update, commit, ready, error, retry };
 }

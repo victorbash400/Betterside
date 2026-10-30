@@ -1,3 +1,5 @@
+import { saveChatRecords } from "../lib/saveChatRecords";
+import type { SaveRecordsAction } from "../lib/chatWorkspace";
 import { issueKinds } from "../lib/catalogue";
 import { interestPath } from "../lib/interestTree";
 import type { MapItem, IssueKind } from "../lib/types";
@@ -86,6 +88,20 @@ export function useTracking() {
   }
   return {
     ...storage.state,
+    saveFromChat: async (
+      records: MapItem[],
+      input: SaveRecordsAction,
+      callId: string,
+    ) => {
+      let result: ReturnType<typeof saveChatRecords>["result"] | undefined;
+      await storage.commit((previous) => {
+        const saved = saveChatRecords(previous, records, input, callId);
+        result = saved.result;
+        return saved.snapshot;
+      });
+      if (!result) throw new Error("Could not save records.");
+      return result;
+    },
     ready: storage.ready,
     error: storage.error,
     retry: storage.retry,

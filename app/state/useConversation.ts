@@ -1,8 +1,19 @@
 "use client";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, validateUIMessages } from "ai";
+import {
+  DefaultChatTransport,
+  validateUIMessages,
+  lastAssistantMessageIsCompleteWithToolCalls,
+} from "ai";
 import { z } from "zod";
+import {
+  mapFilterSchema,
+  saveRecordsSchema,
+  focusOrganizationSchema,
+  type ChatWorkspaceActions,
+  type WorkspaceChatContext,
+} from "../lib/chatWorkspace";
 import { analysisSchema, type Analysis } from "../lib/analysis";
 const storedConversation = z.object({
   version: z.literal(1),
@@ -14,19 +25,23 @@ export function useConversation({
   areaId,
   model,
   onAnalysis,
+  actions,
+  context,
 }: {
   conversationId: string;
   recordIds: string[];
   areaId?: string;
   model: "fast" | "reasoning";
   onAnalysis: (analysis: Analysis) => void;
+  actions: ChatWorkspaceActions;
+  context: WorkspaceChatContext;
 }) {
   const [draft, setDraft] = useState("");
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: { areaId, model, recordIds },
+        body: { areaId, model, recordIds, context },
         fetch: async (input, init) => {
           const response = await fetch(input, init);
           if (!response.ok) {
@@ -38,9 +53,57 @@ export function useConversation({
           return response;
         },
       }),
-    [areaId, model, recordIds],
+    [areaId, model, recordIds, context],
   );
-  const chat = useChat({ id: conversationId, transport });
+  const executeAction = useEffectEvent(
+    async (name: string, input: unknown, callId: string) => {
+      switch (name) {
+        case "filter_map":
+          return actions.filterMap(mapFilterSchema.parse(input));
+        case "save_records":
+          return actions.saveRecords(saveRecordsSchema.parse(input), callId);
+        case "focus_organization":
+          return actions.focusOrganization(
+            focusOrganizationSchema.parse(input),
+          );
+        default:
+          throw new Error("Unknown workspace action.");
+      }
+    },
+  );
+  const chat = useChat({
+    id: conversationId,
+    transport,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    onToolCall: async ({ toolCall }) => {
+      if (
+        !["filter_map", "save_records", "focus_organization"].includes(
+          toolCall.toolName,
+        )
+      )
+        return;
+      try {
+        const output = await executeAction(
+          toolCall.toolName,
+          toolCall.input,
+          toolCall.toolCallId,
+        );
+        void chat.addToolOutput({
+          tool: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          output,
+        });
+      } catch (error) {
+        void chat.addToolOutput({
+          tool: toolCall.toolName,
+          toolCallId: toolCall.toolCallId,
+          state: "output-error",
+          errorText:
+            error instanceof Error ? error.message : "Workspace action failed.",
+        });
+      }
+    },
+  });
   const seen = useRef(new Set<string>()),
     applyAnalysis = useEffectEvent(onAnalysis);
   useEffect(() => {

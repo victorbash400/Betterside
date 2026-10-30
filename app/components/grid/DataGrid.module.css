@@ -32,9 +32,6 @@
   justify-content: flex-end;
   font-variant-numeric: tabular-nums;
 }
-.grid :global(.ag-row).selected {
-  background: var(--selection);
-}
 .footer {
   display: flex;
   align-items: center;
