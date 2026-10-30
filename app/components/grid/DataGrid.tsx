@@ -28,6 +28,7 @@ export default function DataGrid<T extends { id: string }>({
   label,
   rows,
   columns,
+  rowHeight,
   selected,
   onOpen,
   onContextMenu,
@@ -35,6 +36,7 @@ export default function DataGrid<T extends { id: string }>({
   label: string;
   rows: T[];
   columns: ColDef<T>[];
+  rowHeight?: number;
   selected?: string;
   onOpen: (row: T) => void;
   onContextMenu?: (row: T, event: MouseEvent) => void;
@@ -67,6 +69,7 @@ export default function DataGrid<T extends { id: string }>({
           modules={modules}
           theme={gridTheme}
           rowData={rows}
+          rowHeight={rowHeight}
           columnDefs={columns}
           defaultColDef={defaultColDef}
           getRowId={({ data }) => data.id}

@@ -5,7 +5,7 @@ import OrganizationDonate from "./OrganizationDonate";
 export default function OrganizationDonateCell({
   data,
 }: CustomCellRendererProps<DirectoryOrganization>) {
-  return data ? (
-    <OrganizationDonate url={data.donateUrl} name={data.name} />
+  return data?.donateUrl ? (
+    <OrganizationDonate url={data.donateUrl} name={data.name} compact />
   ) : null;
 }

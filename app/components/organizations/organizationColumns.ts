@@ -1,29 +1,30 @@
 import type { ColDef } from "ag-grid-community";
 import type { DirectoryOrganization } from "../../lib/organizations";
-import OrganizationNameCell from "./OrganizationNameCell";
 import OrganizationDonateCell from "./OrganizationDonateCell";
 
 export const organizationColumns: ColDef<DirectoryOrganization>[] = [
   {
     field: "name",
     headerName: "Organization",
-    flex: 2,
-    minWidth: 280,
-    cellRenderer: OrganizationNameCell,
+    flex: 1.6,
+    minWidth: 220,
     tooltipField: "name",
     sort: "asc",
   },
   {
     field: "topics",
     headerName: "Focus",
-    width: 210,
+    flex: 1.2,
+    minWidth: 160,
     valueFormatter: ({ value }) => value?.join(", ") || "—",
+    tooltipValueGetter: ({ value }) => value?.join(", "),
     filterValueGetter: ({ data }) => data?.topics.join(", ") ?? "",
   },
   {
     colId: "countries",
-    headerName: "Operating countries",
-    width: 220,
+    headerName: "Countries",
+    flex: 1.1,
+    minWidth: 160,
     valueGetter: ({ data }) =>
       data
         ? [...new Set(data.presence.map((area) => area.country))]
@@ -33,22 +34,16 @@ export const organizationColumns: ColDef<DirectoryOrganization>[] = [
     tooltipValueGetter: ({ value }) => value,
   },
   {
-    colId: "countryCount",
-    headerName: "Countries",
-    width: 120,
-    type: "numericColumn",
-    filter: "agNumberColumnFilter",
-    valueGetter: ({ data }) =>
-      data?.presence.length
-        ? new Set(data.presence.map((area) => area.countryCode)).size
-        : null,
-    valueFormatter: ({ value }) => value ?? "—",
+    field: "type",
+    headerName: "Type",
+    width: 140,
+    tooltipField: "type",
+    valueFormatter: ({ value }) => value || "—",
   },
-  { field: "type", headerName: "Type", width: 185 },
   {
     colId: "sources",
     headerName: "Sources",
-    width: 200,
+    width: 140,
     valueGetter: ({ data }) =>
       data
         ? [...new Set(data.sources.map((source) => source.label))].join(", ")
@@ -57,9 +52,8 @@ export const organizationColumns: ColDef<DirectoryOrganization>[] = [
   {
     colId: "donate",
     headerName: "Donate",
-    width: 110,
-    minWidth: 110,
-    pinned: "right",
+    width: 90,
+    minWidth: 90,
     sortable: false,
     filter: false,
     resizable: false,

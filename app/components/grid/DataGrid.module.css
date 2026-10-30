@@ -14,6 +14,11 @@
 .grid :global(.ag-cell) {
   display: flex;
   align-items: center;
+  line-height: 1.4;
+}
+.grid :global(.ag-cell-wrapper) {
+  width: 100%;
+  min-width: 0;
 }
 .grid :global(.ag-cell-value) {
   min-width: 0;

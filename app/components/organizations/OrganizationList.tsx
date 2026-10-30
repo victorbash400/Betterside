@@ -14,6 +14,7 @@ export default function OrganizationList({
   return (
     <DataGrid
       label="Organization directory"
+      rowHeight={36}
       rows={organizations}
       columns={organizationColumns}
       selected={selected}
