@@ -8,6 +8,7 @@ export default function Dialog({
   children,
   animated = false,
   compact = false,
+  centered = false,
   size = "standard",
   footer,
   modal = true,
@@ -17,6 +18,7 @@ export default function Dialog({
   children: ReactNode;
   animated?: boolean;
   compact?: boolean;
+  centered?: boolean;
   size?: "standard" | "profile";
   footer?: ReactNode;
   modal?: boolean;
@@ -42,6 +44,7 @@ export default function Dialog({
       ref={ref}
       className={`${styles.dialog} ${animated ? styles.animated : ""}`}
       data-size={size}
+      data-centered={centered}
       data-modal={modal}
       data-compact={compact}
       data-closing={closing}

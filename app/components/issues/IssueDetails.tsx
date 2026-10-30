@@ -1,162 +1,101 @@
-import type { InterestChoice } from "../../lib/interestCategories";
-import { useState } from "react";
-import { ArrowUpRight, X, MessageCircle } from "lucide-react";
-import TrackingButton from "../interests/TrackingButton";
-import type { Interest } from "../../state/useTracking";
-import IconButton from "../controls/IconButton";
+import { ArrowUpRight } from "lucide-react";
+import Dialog from "../controls/Dialog";
 import ProjectFunding from "./ProjectFunding";
-import RecordEvidence from "./RecordEvidence";
-import ResponseOrganizations from "./ResponseOrganizations";
 import { concerns, matchesConcern } from "../../lib/concerns";
-import DataCardHeader from "./DataCardHeader";
-import CardFacts from "./CardFacts";
-import SourceEvidence from "./SourceEvidence";
-import { concernIcons } from "../map/concernIcons";
-import { FileText } from "lucide-react";
 import { measurementLabels } from "../../lib/measurementLabels";
 import { formatDate } from "../../lib/dates";
-import type { MapItem as Issue } from "../../lib/types";
-import styles from "./DataCard.module.css";
+import { recordPrecision } from "../../lib/recordValues";
+import type { MapItem } from "../../lib/types";
+import styles from "./IssueDetails.module.css";
+
 export default function IssueDetails({
   issue,
-  followed,
-  interests,
-  trackingReady,
-  onTrack,
-  onUntrack,
-  onCreateInterest,
   onClose,
   onContribute,
-  onAsk,
 }: {
-  issue: Issue;
-  followed: boolean;
-  interests: Interest[];
-  trackingReady: boolean;
-  onTrack: (interestId?: string) => void;
-  onUntrack: () => void;
-  onCreateInterest: (choice: InterestChoice) => void;
+  issue: MapItem;
   onClose: () => void;
   onContribute: () => void;
-  onAsk: () => void;
 }) {
-  const [view, setView] = useState("Overview");
   const concern = concerns.find((entry) => matchesConcern(issue, entry.id));
-  const measurement = issue.measurements?.[0];
-  const country = issue.reportingArea?.countryCode;
-  const views = [
-    "Overview",
-    ...(concern && country ? ["Organizations"] : []),
-    "Evidence",
-  ];
-  return (
-    <aside className={styles.card} aria-label={`${issue.location} details`}>
-      <DataCardHeader
-        title={issue.location}
-        label={concern?.label ?? issue.kind}
-        Icon={concern ? concernIcons[concern.id] : FileText}
-        value={
-          measurement
-            ? new Intl.NumberFormat("en", { maximumFractionDigits: 1 }).format(
-                measurement.value,
-              )
-            : undefined
-        }
-        unit={
-          measurement
-            ? measurementLabels[measurement.metric]
-            : issue.eventStatus
-        }
-        action={
-          <IconButton label="Close area details" onClick={onClose}>
-            <X />
-          </IconButton>
-        }
-      />
-      <div className={styles.tabs} role="group" aria-label="Report views">
-        {views.map((item) => (
-          <button
-            key={item}
-            aria-pressed={view === item}
-            onClick={() => setView(item)}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
-      <div className={styles.body}>
-        {view === "Organizations" && concern && country ? (
-          <ResponseOrganizations
-            key={issue.id}
-            embedded
-            country={country}
-            countryName={issue.country}
-            concern={concern.id}
-          />
-        ) : view === "Evidence" ? (
-          <>
-            {issue.summary && <p className={styles.summary}>{issue.summary}</p>}
-            <RecordEvidence issue={issue} />
-            <SourceEvidence source={issue.source} />
-          </>
-        ) : (
-          <>
-            <CardFacts
-              entries={[
-                { label: "Location", value: issue.location },
+  const facts = [
+    { label: "Country", value: issue.country },
+    ...(issue.measurements ?? []).map((measurement) => ({
+      label: measurementLabels[measurement.metric],
+      value: new Intl.NumberFormat("en", { maximumFractionDigits: 1 }).format(
+        measurement.value,
+      ),
+    })),
+    ...(issue.eventStatus
+      ? [{ label: "Status", value: issue.eventStatus }]
+      : []),
+    {
+      label: "Source updated",
+      value: formatDate(issue.source.published, "UTC"),
+    },
+    ...(issue.referencePeriod
+      ? [
+          {
+            label: "Reference from",
+            value: formatDate(issue.referencePeriod.start, "UTC"),
+          },
+          ...(issue.referencePeriod.end
+            ? [
                 {
-                  label: "Source updated",
-                  value: formatDate(issue.source.published, "UTC"),
+                  label: "Reference through",
+                  value: formatDate(issue.referencePeriod.end, "UTC"),
                 },
-                ...(issue.referencePeriod
-                  ? [
-                      {
-                        label: "Reference from",
-                        value: formatDate(issue.referencePeriod.start, "UTC"),
-                      },
-                      {
-                        label: "Reference through",
-                        value: issue.referencePeriod.end
-                          ? formatDate(issue.referencePeriod.end, "UTC")
-                          : "Not reported",
-                      },
-                    ]
-                  : []),
-              ]}
-            />
-            <div className={styles.actions}>
-              <TrackingButton
-                disabled={!trackingReady}
-                issueId={issue.id}
-                followed={followed}
-                interests={interests}
-                onTrack={onTrack}
-                onUntrack={onUntrack}
-                onCreate={onCreateInterest}
-              />
-              <button onClick={onAsk}>
-                <MessageCircle size={14} />
-                Ask
-              </button>
+              ]
+            : []),
+        ]
+      : []),
+    ...(issue.geographicPrecision
+      ? [{ label: "Reporting geography", value: recordPrecision(issue) }]
+      : []),
+    ...(issue.sourceAlert
+      ? [{ label: "Source alert", value: issue.sourceAlert }]
+      : []),
+  ];
+  const sources = [issue.source, ...(issue.relatedSources ?? [])].filter(
+    (source, index, all) =>
+      all.findIndex((entry) => entry.url === source.url) === index,
+  );
+  return (
+    <Dialog
+      title={issue.location}
+      size="profile"
+      centered
+      modal={false}
+      onClose={onClose}
+    >
+      <div className={styles.content}>
+        <span className={styles.type}>{concern?.label ?? issue.kind}</span>
+        {issue.summary && <p>{issue.summary}</p>}
+        <dl className={styles.facts}>
+          {facts.map((fact) => (
+            <div key={fact.label}>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
             </div>
-            {concern && country && (
-              <button
-                className={styles.primary}
-                onClick={() => setView("Organizations")}
-              >
-                Organizations
-                <ArrowUpRight size={14} />
-              </button>
-            )}
-            {issue.project && (
-              <ProjectFunding
-                project={issue.project}
-                onContribute={onContribute}
-              />
-            )}
-          </>
+          ))}
+        </dl>
+        <div className={styles.sources}>
+          {sources.map((source) => (
+            <a
+              key={source.url}
+              href={source.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {source.label}
+              <ArrowUpRight size={13} />
+            </a>
+          ))}
+        </div>
+        {issue.project && (
+          <ProjectFunding project={issue.project} onContribute={onContribute} />
         )}
       </div>
-    </aside>
+    </Dialog>
   );
 }

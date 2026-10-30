@@ -35,6 +35,7 @@ const ContributionHistory = dynamic(
 const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), { ssr: false });
 export default function Workspace() {
   const state = useWorkspace();
+  const [chatContext, setChatContext] = useState<MapItem>();
   const organizations = useOrganizations(
     state.view === "Organizations",
     state.filters.query,
@@ -105,8 +106,18 @@ export default function Workspace() {
     state.setSettingsOpen(false);
   }
   function select(item: MapItem) {
+    setChatContext(undefined);
     state.setSelectedId(item.id);
     state.setSettingsOpen(false);
+  }
+  function openChat(item = state.selected) {
+    setChatContext(item);
+    state.setSelectedId(undefined);
+    state.setChatOpen(true);
+  }
+  function closeChat() {
+    state.setChatOpen(false);
+    setChatContext(undefined);
   }
   function handleAction(next: InterestAction) {
     if (next.kind === "open-item") {
@@ -120,8 +131,7 @@ export default function Workspace() {
       return;
     }
     if (next.kind === "chat-item") {
-      select(next.item);
-      state.setChatOpen(true);
+      openChat(next.item);
       return;
     }
     if (next.kind === "remove-item") {
@@ -193,7 +203,7 @@ export default function Workspace() {
             view={state.view}
             path={path}
             onMenu={() => state.setNavigationOpen(true)}
-            onChat={() => state.setChatOpen((value) => !value)}
+            onChat={() => (state.chatOpen ? closeChat() : openChat())}
             chatOpen={state.chatOpen}
             onHome={home}
             onBack={() => {
@@ -384,30 +394,14 @@ export default function Workspace() {
                   )) && (
                   <IssueDetails
                     issue={state.selected}
-                    followed={state.following.includes(state.selected.id)}
-                    interests={state.interests}
-                    trackingReady={state.trackingReady}
-                    onTrack={(interestId) =>
-                      state.track(state.selected!.id, interestId)
-                    }
-                    onUntrack={() => state.untrack(state.selected!.id)}
-                    onCreateInterest={(choice) => {
-                      const id = state.createInterest(
-                        choice.name,
-                        state.selected!.id,
-                        choice.categoryId,
-                      );
-                      state.track(state.selected!.id, id);
-                    }}
                     onClose={() => state.setSelectedId(undefined)}
                     onContribute={() => state.setCheckout(state.selected)}
-                    onAsk={() => state.setChatOpen(true)}
                   />
                 )}
             </div>
             {state.chatOpen && (
               <ChatDrawer
-                selected={state.selected}
+                selected={chatContext ?? state.selected}
                 issues={
                   state.view === "Organizations" ? crisis.items : state.records
                 }
@@ -416,8 +410,8 @@ export default function Workspace() {
                   state.setAnalysis(analysis);
                   state.setCollectionMode("map");
                 }}
-                onSelect={select}
-                onClose={() => state.setChatOpen(false)}
+                onSelect={setChatContext}
+                onClose={closeChat}
               />
             )}
           </div>

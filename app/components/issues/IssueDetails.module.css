@@ -1,0 +1,46 @@
+.content {
+  font-size: 12px;
+}
+.type {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.content p {
+  margin: 0 0 14px;
+  line-height: 1.55;
+}
+.facts {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+}
+.facts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 16px;
+  align-items: baseline;
+}
+.facts dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+.facts dd {
+  margin: 0;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 14px;
+}
+.sources a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
