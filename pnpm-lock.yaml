@@ -26,6 +26,9 @@ importers:
       '@aws/bedrock-token-generator':
         specifier: ^1.1.0
         version: 1.1.0
+      '@paypal/paypal-js':
+        specifier: ^11.3.0
+        version: 11.3.0
       ag-charts-enterprise:
         specifier: ^14.2.0
         version: 14.2.0
@@ -484,6 +487,9 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
+
+  '@paypal/paypal-js@11.3.0':
+    resolution: {integrity: sha512-Sn0M20QICbV8AeVcMvwQ1QWDX/JaxPgLsxrUFUshYC/W3gMVUZXlpmO/6z3JOhrhk9PU4HZLTYb/F0A/xMwHVw==}
 
   '@smithy/config-resolver@4.7.2':
     resolution: {integrity: sha512-Y1XfSefHIOub9762qm3ShafdlEE/Va8h3kLUeMq765fNeWeNLcOP2YUPr86H1SlyGwZTOqQ67RlBZPZ3k9Djgg==}
@@ -1150,6 +1156,9 @@ packages:
   progress@2.0.3:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
+
+  promise-polyfill@8.3.0:
+    resolution: {integrity: sha512-H5oELycFml5yto/atYqmjyigJoAo3+OXwolYiH7OfQuYlAqhxNvTfiNMbV9hsC6Yp83yE5r2KTVmtrG6R9i6Pg==}
 
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
@@ -1835,6 +1844,10 @@ snapshots:
 
   '@next/swc-win32-x64-msvc@16.4.3':
     optional: true
+
+  '@paypal/paypal-js@11.3.0':
+    dependencies:
+      promise-polyfill: 8.3.0
 
   '@smithy/config-resolver@4.7.2':
     dependencies:
@@ -2689,6 +2702,8 @@ snapshots:
   potpack@2.1.0: {}
 
   progress@2.0.3: {}
+
+  promise-polyfill@8.3.0: {}
 
   prop-types@15.8.1:
     dependencies:

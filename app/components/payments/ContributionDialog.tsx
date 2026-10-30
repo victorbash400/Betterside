@@ -1,11 +1,13 @@
-import { useId, useState } from "react";
+import { useState } from "react";
+import { Check, HeartHandshake, LockKeyhole } from "lucide-react";
 import Dialog from "../controls/Dialog";
-import ChatPaymentCard from "../chat/ChatPaymentCard";
-import {
-  paymentResultSchema,
-  type CheckoutInput,
-} from "../../lib/chatWorkspace";
-import type { z } from "zod";
+import ContributionAmount from "./ContributionAmount";
+import PaymentProjectPicker from "./PaymentProjectPicker";
+import PayPalCheckoutButton, {
+  type PaymentCompletion,
+} from "./PayPalCheckoutButton";
+import { amountInCents, decimalAmount } from "../../lib/payment";
+import type { CheckoutInput } from "../../lib/chatWorkspace";
 import type { MapItem } from "../../lib/types";
 import styles from "./ContributionDialog.module.css";
 export default function ContributionDialog({
@@ -17,7 +19,6 @@ export default function ContributionDialog({
   initial: CheckoutInput;
   onClose: () => void;
 }) {
-  const formId = useId();
   const projects = Array.from(
     new Map(
       records.flatMap((record) =>
@@ -29,125 +30,95 @@ export default function ContributionDialog({
   const [amount, setAmount] = useState(initial.amount ?? "25");
   const [choosing, setChoosing] = useState(!initial.projectId);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [order, setOrder] = useState<z.infer<typeof paymentResultSchema>>();
-  const project = projects.find((item) => item.id === projectId);
-  async function checkout() {
-    setBusy(true);
-    setError("");
-    try {
-      const response = await fetch("/api/paypal/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, amount }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Checkout failed.");
-      setOrder(paymentResultSchema.parse(data));
-    } catch (failure) {
-      setError(failure instanceof Error ? failure.message : "Checkout failed.");
-    } finally {
-      setBusy(false);
-    }
+  const [result, setResult] = useState<PaymentCompletion>();
+  let total = "—",
+    amountError = "";
+  try {
+    total = decimalAmount(amountInCents(amount));
+  } catch (failure) {
+    amountError =
+      failure instanceof Error ? failure.message : "Enter a valid amount.";
   }
+  const valid =
+    projects.some((project) => project.id === projectId) && !amountError;
   return (
     <Dialog
       title="PayPal checkout"
-      size="profile"
-      onClose={onClose}
+      size="payment"
+      onClose={() => {
+        if (!busy) onClose();
+      }}
       footer={
-        !order && (
-          <button
-            type="submit"
-            form={formId}
-            className={styles.checkout}
-            disabled={busy || !project}
-          >
-            {busy ? "Creating order" : "Create sandbox order"}
+        result ? (
+          <button className={styles.done} onClick={onClose}>
+            Done
           </button>
+        ) : (
+          <div className={styles.footer}>
+            <div className={styles.total}>
+              <span>Total</span>
+              <strong>
+                <small>USD</small> {total}
+              </strong>
+            </div>
+            <PayPalCheckoutButton
+              projectId={projectId}
+              amount={amount}
+              disabled={!valid || busy}
+              onBusy={setBusy}
+              onComplete={setResult}
+            />
+            <span className={styles.security}>
+              <LockKeyhole size={12} aria-hidden="true" />
+              Sandbox · No real money
+            </span>
+          </div>
         )
       }
     >
-      {order ? (
-        <ChatPaymentCard order={order} />
+      {result ? (
+        <div className={styles.confirmation}>
+          <Check size={24} aria-hidden="true" />
+          <strong>Contribution confirmed</strong>
+          <span>{result.projectName}</span>
+          <b>USD {result.amount}</b>
+        </div>
       ) : (
-        <form
-          id={formId}
-          className={styles.form}
-          onSubmit={(event) => {
-            event.preventDefault();
-            void checkout();
-          }}
-        >
-          <button
-            type="button"
-            className={styles.project}
-            aria-expanded={choosing}
-            onClick={() => setChoosing(!choosing)}
-          >
-            <span>Project</span>
-            <strong>{project?.name ?? "Choose project"}</strong>
-          </button>
-          {choosing && (
-            <div
-              className={styles.projects}
-              role="group"
-              aria-label="Demonstration projects"
-            >
-              {projects.map((item) => (
-                <button
-                  type="button"
-                  key={item.id}
-                  aria-pressed={projectId === item.id}
-                  onClick={() => {
-                    setProjectId(item.id);
-                    setChoosing(false);
-                  }}
-                >
-                  {item.name}
-                </button>
-              ))}
+        <div className={styles.sheet}>
+          <div className={styles.merchant}>
+            <HeartHandshake size={24} strokeWidth={1.5} aria-hidden="true" />
+            <div>
+              <strong>BetterSide</strong>
+              <span>Sandbox contribution</span>
             </div>
-          )}
-          <div
-            className={styles.amounts}
-            role="group"
-            aria-label="Contribution amount"
-          >
-            {["10", "25", "50", "100"].map((value) => (
-              <button
-                type="button"
-                key={value}
-                aria-pressed={amount === value}
-                onClick={() => setAmount(value)}
-              >
-                ${value}
-              </button>
-            ))}
           </div>
-          <label className={styles.custom}>
-            <span>USD</span>
-            <input
-              type="number"
-              inputMode="decimal"
-              min="1"
-              max="10000"
-              step="0.01"
-              required
-              aria-label="Custom contribution amount"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value)}
-            />
-          </label>
-          <span className={styles.test}>
-            BetterSide Sandbox · No real money
-          </span>
-          {error && (
-            <span className={styles.error} role="alert">
-              {error}
+          <PaymentProjectPicker
+            projects={projects}
+            selectedId={projectId}
+            open={choosing}
+            disabled={busy}
+            onToggle={() => setChoosing(!choosing)}
+            onSelect={(id) => {
+              setProjectId(id);
+              setChoosing(false);
+            }}
+          />
+          <ContributionAmount
+            amount={amount}
+            disabled={busy}
+            onChange={setAmount}
+          />
+          {amountError && (
+            <span role="alert" className={styles.error}>
+              {amountError}
             </span>
           )}
-        </form>
+          {busy && (
+            <span role="status" className={styles.status}>
+              Complete checkout in PayPal
+            </span>
+          )}
+        </div>
       )}
     </Dialog>
   );

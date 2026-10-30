@@ -179,3 +179,24 @@
   transform: translate(-50%, -50%);
   max-height: min(480px, calc(100dvh - 40px));
 }
+
+.dialog[data-size="payment"] {
+  width: min(400px, calc(100vw - 32px));
+  height: fit-content;
+  max-height: calc(100dvh - 40px);
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: 0 16px 64px #00000018;
+}
+.dialog[data-size="payment"] > header {
+  font-size: 15px;
+  margin: 0 0 18px;
+}
+.dialog[data-size="payment"] .body {
+  flex: 0 1 auto;
+}
+.dialog[data-size="payment"] .footer {
+  display: block;
+  padding-top: 20px;
+}

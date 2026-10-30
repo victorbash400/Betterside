@@ -1,92 +1,91 @@
-.form {
+.sheet {
   display: grid;
+  gap: 20px;
+}
+.merchant {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
-.project {
-  display: grid;
-  gap: 5px;
-  text-align: left;
-  background: none;
-  border: 0;
-  padding: 0;
+.merchant > svg {
+  flex-shrink: 0;
 }
-.project span,
-.test,
-.custom span {
+.merchant > div {
+  display: grid;
+  gap: 3px;
+}
+.merchant strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+.merchant span {
   font-size: 11px;
   color: var(--muted);
 }
-.project strong {
-  font-size: 14px;
-  font-weight: 500;
-}
-.projects {
+.footer {
   display: grid;
-  gap: 2px;
-  max-height: 138px;
-  overflow-y: auto;
+  gap: 14px;
 }
-.projects button {
-  text-align: left;
-  border: 0;
-  background: var(--panel);
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 12px;
-}
-.projects button:hover,
-.projects button[aria-pressed="true"] {
-  background: var(--selection);
-}
-.amounts {
+.total {
   display: flex;
-  gap: 6px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
 }
-.amounts button {
-  flex: 1;
-  padding: 8px;
-  background: var(--panel);
-  border: 0;
-  border-radius: 7px;
+.total > span {
+  font-size: 13px;
 }
-.amounts button[aria-pressed="true"] {
-  background: var(--selection);
-  color: var(--accent);
+.total strong {
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
-.custom {
+.total small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.security {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  justify-content: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 10px;
 }
-.custom:focus-within {
-  border-color: var(--ink);
+.confirmation {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 12px;
+  padding-block: 12px;
 }
-.custom input {
+.confirmation strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.confirmation span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.confirmation b {
+  font-size: 28px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.done {
   width: 100%;
+  padding: 12px;
   border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
-  appearance: textfield;
-}
-.custom input::-webkit-inner-spin-button {
-  appearance: none;
-}
-.checkout {
-  background: var(--ink);
+  border-radius: 10px;
   color: var(--surface);
-  border: 0;
-  border-radius: 8px;
-  padding: 10px;
+  background: var(--ink);
 }
-.checkout:disabled {
-  opacity: 0.5;
+.status {
+  font-size: 11px;
+  color: var(--muted);
 }
 .error {
-  color: var(--danger);
   font-size: 12px;
+  color: var(--danger);
 }

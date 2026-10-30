@@ -19,7 +19,7 @@ export default function Dialog({
   animated?: boolean;
   compact?: boolean;
   centered?: boolean;
-  size?: "standard" | "profile";
+  size?: "standard" | "profile" | "payment";
   footer?: ReactNode;
   modal?: boolean;
 }) {
