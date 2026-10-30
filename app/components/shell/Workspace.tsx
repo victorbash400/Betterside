@@ -1,4 +1,5 @@
 "use client";
+import type { CheckoutInput } from "../../lib/chatWorkspace";
 import type { SettingsSection } from "../../lib/settings";
 import { useState } from "react";
 import dynamic from "next/dynamic";
@@ -37,6 +38,7 @@ const ContributionHistory = dynamic(
 const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), { ssr: false });
 export default function Workspace() {
   const state = useWorkspace();
+  const [chatCheckout, setChatCheckout] = useState<CheckoutInput>();
   const narrow = useNarrowLayout();
   const [organizationsOpen, setOrganizationsOpen] = useState(false);
   const [requestedCausesOpen, setCausesOpen] = useState<boolean>();
@@ -46,8 +48,11 @@ export default function Workspace() {
     state.view === "Organizations",
     state.filters.query,
   );
-  const chatActions = useChatWorkspaceActions(state, organizations, () =>
-    setOrganizationsOpen(true),
+  const chatActions = useChatWorkspaceActions(
+    state,
+    organizations,
+    () => setOrganizationsOpen(true),
+    setChatCheckout,
   );
   const crisis = useOrganizationCrisisMap({
     enabled: state.view === "Organizations",
@@ -504,10 +509,14 @@ export default function Workspace() {
           </div>
         </main>
       )}
-      {state.checkout?.project && (
+      {(state.checkout?.project || chatCheckout) && (
         <ContributionDialog
-          issue={{ ...state.checkout, project: state.checkout.project }}
-          onClose={() => state.setCheckout(undefined)}
+          records={state.allRecords}
+          initial={chatCheckout ?? { projectId: state.checkout?.project?.id }}
+          onClose={() => {
+            state.setCheckout(undefined);
+            setChatCheckout(undefined);
+          }}
         />
       )}
       {action && (

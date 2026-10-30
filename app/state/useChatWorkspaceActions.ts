@@ -2,6 +2,8 @@ import { z } from "zod";
 import { chatRecordSchema } from "../lib/chatWorkspace";
 import type { ChatWorkspaceActions } from "../lib/chatWorkspace";
 import {
+  checkoutInputSchema,
+  type CheckoutInput,
   mapFilterSchema,
   saveRecordsSchema,
   focusOrganizationSchema,
@@ -16,8 +18,21 @@ export function useChatWorkspaceActions(
   state: ReturnType<typeof useWorkspace>,
   organizations: ReturnType<typeof useOrganizations>,
   onOrganizationDrawer: () => void,
+  onCheckout: (input: CheckoutInput) => void,
 ): ChatWorkspaceActions {
   return {
+    openCheckout: async (raw) => {
+      const input = checkoutInputSchema.parse(raw);
+      if (
+        input.projectId &&
+        !state.allRecords.some(
+          (record) => record.project?.id === input.projectId,
+        )
+      )
+        throw new Error("Project unavailable. Search demonstration projects.");
+      onCheckout(input);
+      return { kind: "checkout", ...input };
+    },
     filterMap: async (raw) => {
       const input = mapFilterSchema.parse(raw);
       const country = input.country

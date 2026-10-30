@@ -54,7 +54,16 @@ test("non-project sources cannot prepare sandbox payments", async () => {
   );
 });
 test("workspace mutations are delegated to the live client, not replayed on the server", () => {
+  assert.equal(tools.open_checkout.execute, undefined);
   assert.equal(tools.save_records.execute, undefined);
   assert.equal(tools.filter_map.execute, undefined);
   assert.equal(tools.focus_organization.execute, undefined);
+});
+
+test("chart tool derives widgets from authoritative records", async () => {
+  const output = await tools.show_chart.execute!(
+    { type: "bar", metric: "records", groupBy: "country" },
+    options,
+  );
+  assert.equal((output as { kind: string }).kind, "chart");
 });

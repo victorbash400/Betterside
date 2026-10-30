@@ -8,6 +8,7 @@ import {
 } from "ai";
 import { z } from "zod";
 import {
+  checkoutInputSchema,
   mapFilterSchema,
   saveRecordsSchema,
   focusOrganizationSchema,
@@ -58,6 +59,8 @@ export function useConversation({
   const executeAction = useEffectEvent(
     async (name: string, input: unknown, callId: string) => {
       switch (name) {
+        case "open_checkout":
+          return actions.openCheckout(checkoutInputSchema.parse(input));
         case "filter_map":
           return actions.filterMap(mapFilterSchema.parse(input));
         case "save_records":
@@ -77,9 +80,12 @@ export function useConversation({
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onToolCall: async ({ toolCall }) => {
       if (
-        !["filter_map", "save_records", "focus_organization"].includes(
-          toolCall.toolName,
-        )
+        ![
+          "filter_map",
+          "save_records",
+          "focus_organization",
+          "open_checkout",
+        ].includes(toolCall.toolName)
       )
         return;
       try {

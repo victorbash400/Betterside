@@ -99,6 +99,9 @@ export type MapFilterAction = z.infer<typeof mapFilterSchema>;
 export type SaveRecordsAction = z.infer<typeof saveRecordsSchema>;
 export type FocusOrganizationAction = z.infer<typeof focusOrganizationSchema>;
 export interface ChatWorkspaceActions {
+  openCheckout: (
+    input: CheckoutInput,
+  ) => Promise<z.infer<typeof checkoutResultSchema>>;
   filterMap: (
     input: MapFilterAction,
   ) => Promise<z.infer<typeof mapResultSchema>>;
@@ -133,4 +136,13 @@ export const contributionsResultSchema = z.object({
   records: z.array(contributionRecordSchema).max(20),
   total: z.number().int().nonnegative(),
   nextOffset: z.number().nullable(),
+});
+
+export const checkoutInputSchema = z.object({
+  projectId: z.string().min(1).max(160).optional(),
+  amount: z.string().max(12).optional(),
+});
+export type CheckoutInput = z.infer<typeof checkoutInputSchema>;
+export const checkoutResultSchema = checkoutInputSchema.extend({
+  kind: z.literal("checkout"),
 });

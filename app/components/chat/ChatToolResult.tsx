@@ -1,6 +1,9 @@
+import dynamic from "next/dynamic";
+import { chartResultSchema } from "../../lib/chatCharts";
 import { useState } from "react";
 import type { UIMessage } from "ai";
 import {
+  checkoutResultSchema,
   recordsResultSchema,
   contributionsResultSchema,
   organizationsResultSchema,
@@ -14,9 +17,13 @@ import type { MapItem } from "../../lib/types";
 import ChatContributionGrid from "./ChatContributionGrid";
 import ChatRecordGrid from "./ChatRecordGrid";
 import ChatOrganizationGrid from "./ChatOrganizationGrid";
+import ChatCheckoutCard from "./ChatCheckoutCard";
 import ChatPaymentCard from "./ChatPaymentCard";
 import ChatCalculationCard from "./ChatCalculationCard";
 import styles from "./ChatResult.module.css";
+const ChatChartWidget = dynamic(() => import("./ChatChartWidget"), {
+  ssr: false,
+});
 export default function ChatToolResult({
   part,
   onSelect,
@@ -52,6 +59,9 @@ export default function ChatToolResult({
       "tool-save_records": "Saving records",
       "tool-focus_organization": "Selecting organization",
       "tool-calculate": "Calculating",
+      "tool-show_summary": "Preparing summary",
+      "tool-show_chart": "Preparing chart",
+      "tool-open_checkout": "Opening checkout",
       "tool-prepare_payment": "Creating sandbox order",
       "tool-list_contributions": "Reading contribution records",
       "tool-show_analysis": "Preparing analysis",
@@ -64,6 +74,23 @@ export default function ChatToolResult({
   }
   const output = part.output;
   switch (part.type) {
+    case "tool-show_summary":
+    case "tool-show_chart": {
+      const parsed = chartResultSchema.safeParse(output);
+      return parsed.success ? (
+        <ChatChartWidget chart={parsed.data} />
+      ) : (
+        <span role="alert">Chart unavailable.</span>
+      );
+    }
+    case "tool-open_checkout": {
+      const parsed = checkoutResultSchema.safeParse(output);
+      return parsed.success ? (
+        <ChatCheckoutCard input={parsed.data} actions={actions} />
+      ) : (
+        <span role="alert">Checkout unavailable.</span>
+      );
+    }
     case "tool-search_records": {
       const parsed = recordsResultSchema.safeParse(output);
       return parsed.success ? (

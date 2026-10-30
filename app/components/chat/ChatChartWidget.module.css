@@ -1,0 +1,59 @@
+.widget {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin-block: 12px;
+}
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+.heading strong {
+  font-weight: 500;
+}
+.heading button {
+  border: 0;
+  border-radius: 6px;
+  background: var(--hover);
+  color: var(--ink);
+  padding: 5px 8px;
+  font-size: 11px;
+}
+.chart {
+  width: 100%;
+  height: 260px;
+}
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.summary div {
+  display: grid;
+  gap: 5px;
+}
+.summary dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+.summary dd {
+  margin: 0;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.sources {
+  font-size: 11px;
+  color: var(--muted);
+}
+.sources summary {
+  cursor: pointer;
+}
+.sources a {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink);
+}

@@ -9,6 +9,9 @@ import { calculateTool } from "./calculate.ts";
 import { listContributionsTool } from "./list-contributions.ts";
 import { preparePaymentTool } from "./prepare-payment.ts";
 import { showAnalysisTool } from "./show-analysis.ts";
+import { openCheckoutTool } from "./open-checkout.ts";
+import { showChartTool } from "./show-chart.ts";
+import { showSummaryTool } from "./show-summary.ts";
 export function workspaceTools(context: WorkspaceToolContext) {
   return {
     search_records: searchRecordsTool(context),
@@ -18,6 +21,9 @@ export function workspaceTools(context: WorkspaceToolContext) {
     save_records: saveRecordsTool,
     calculate: calculateTool,
     list_contributions: listContributionsTool(context),
+    show_summary: showSummaryTool(context),
+    show_chart: showChartTool(context),
+    open_checkout: openCheckoutTool,
     prepare_payment: preparePaymentTool(context),
     show_analysis: showAnalysisTool(context),
   };
