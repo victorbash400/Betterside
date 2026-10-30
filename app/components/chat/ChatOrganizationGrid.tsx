@@ -18,7 +18,7 @@ export default function ChatOrganizationGrid({
   busy: boolean;
 }) {
   return (
-    <div className={styles.result}>
+    <div className={`${styles.result} ${styles.tableResult}`}>
       <div className={styles.heading}>
         <span>{total.toLocaleString("en")} matching organizations</span>
         {nextOffset !== null && (

@@ -27,7 +27,7 @@ export default function ChatContributionGrid({
 }) {
   const [selected, setSelected] = useState<string>();
   return (
-    <div className={styles.result}>
+    <div className={`${styles.result} ${styles.tableResult}`}>
       <div className={styles.heading}>
         <span>{total.toLocaleString("en")} sandbox orders</span>
         {nextOffset !== null && (

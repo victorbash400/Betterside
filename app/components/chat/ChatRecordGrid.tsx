@@ -105,7 +105,7 @@ export default function ChatRecordGrid({
     [hasMeasurements, hasProjects, onlyProjects],
   );
   return (
-    <div className={styles.result}>
+    <div className={`${styles.result} ${styles.tableResult}`}>
       <div className={styles.heading}>
         <span>{total.toLocaleString("en")} matching records</span>
         {nextOffset !== null && (

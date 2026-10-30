@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import type { calculationResultSchema } from "../../lib/chatWorkspace";
+import ChatTable from "./ChatTable";
 import styles from "./ChatResult.module.css";
 export default function ChatCalculationCard({
   calculation,
@@ -34,13 +35,24 @@ export default function ChatCalculationCard({
         </strong>
       </div>
       {calculation.shares ? (
-        <ol className={styles.shares}>
-          {calculation.shares.map((value, index) => (
-            <li key={index}>
-              {format(value)} {calculation.unit}
-            </li>
-          ))}
-        </ol>
+        <ChatTable label="Budget allocations">
+          <thead>
+            <tr>
+              <th scope="col">Allocation</th>
+              <th scope="col" style={{ textAlign: "right" }}>
+                Amount{calculation.unit ? ` · ${calculation.unit}` : ""}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {calculation.shares.map((value, index) => (
+              <tr key={index}>
+                <td>{index + 1}</td>
+                <td style={{ textAlign: "right" }}>{format(value)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </ChatTable>
       ) : (
         <span className={styles.muted}>
           {calculation.values.map(format).join(" · ")}
