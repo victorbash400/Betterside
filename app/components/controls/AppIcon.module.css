@@ -3,6 +3,5 @@
   width: 24px;
   height: 24px;
   flex-shrink: 0;
-  background: currentColor;
-  mask: url("/screen-users-svgrepo-com.svg") center / contain no-repeat;
+  background: url("/betterside.svg") center / contain no-repeat;
 }

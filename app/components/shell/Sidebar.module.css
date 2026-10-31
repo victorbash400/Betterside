@@ -27,9 +27,6 @@
   font-size: 14px;
   font-weight: 600;
 }
-.brand > :first-child {
-  opacity: 0.78;
-}
 .navigation {
   flex: 1;
   overflow-y: auto;
