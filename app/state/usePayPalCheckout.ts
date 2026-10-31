@@ -68,14 +68,13 @@ export function usePayPalCheckout({
   }
   useEffect(() => {
     let active = true;
-    let expired = false;
+    let loadingStep = "configuration";
     let session: OneTimePaymentSession | undefined;
     let pendingOrder: string | undefined;
     let cancelled = false;
     const timeout = window.setTimeout(() => {
-      expired = true;
       if (active)
-        setError("PayPal button could not load. Retry or continue in PayPal.");
+        setError(`PayPal ${loadingStep} timed out. Retry or continue in PayPal.`);
     }, 15000);
     setReady(false);
     setError("");
@@ -120,22 +119,25 @@ export function usePayPalCheckout({
       if (!response.ok)
         throw new Error(z.object({ error: z.string() }).parse(body).error);
       const config = configSchema.parse(body);
-      if (!active || expired) return;
+      if (!active) return;
+      loadingStep = "SDK load";
       const sdk = await loadCoreSdkScript({
         environment: config.environment,
         dataNamespace: "betterSidePayPal",
       });
-      if (!active || expired) return;
+      if (!active) return;
       if (!sdk) throw new Error("PayPal SDK unavailable.");
+      loadingStep = "initialization";
       const instance = await sdk.createInstance({
         clientId: config.clientId,
         components: ["paypal-payments"],
         pageType: "checkout",
       });
+      loadingStep = "eligibility check";
       const methods = await instance.findEligibleMethods({
         currencyCode: config.currency,
       });
-      if (!active || expired || !container.current) return;
+      if (!active || !container.current) return;
       if (!methods.isEligible("paypal"))
         throw new Error("PayPal checkout unavailable in this browser.");
       session = instance.createPayPalOneTimePaymentSession({
