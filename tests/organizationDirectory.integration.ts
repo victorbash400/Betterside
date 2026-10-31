@@ -37,7 +37,7 @@ test("organization directory serves real snapshots, caches concurrent requests a
         (source) => source.id === "hapi-presence" && source.state === "error",
       ),
     );
-    assert.equal(calls, 4);
+    assert.equal(calls, 5);
     const initialCalls = calls;
     const repeat = await GET(request());
     assert.equal(calls, initialCalls);

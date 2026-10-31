@@ -34,6 +34,7 @@ export function overlayPoints(
       matching
         .filter(
           (item) =>
+            item.recordType !== "Observation" &&
             item.reportingArea?.adminLevel === 0 &&
             concernMeasurement(item, concern) !== undefined,
         )
@@ -61,11 +62,13 @@ export function overlayPoints(
           ? item.reportingArea.admin2Code
           : item.reportingArea?.admin1Code;
       const key =
-        item.geographicPrecision === "Event location"
-          ? item.id
-          : areaCode && geography[areaCode]
-            ? areaCode
-            : (item.reportingArea?.countryCode ?? (item.country || item.id));
+        item.dataset === "ucdp" && item.geographicPrecision !== "Event location"
+          ? `ucdp-unlocated:${item.country}`
+          : item.geographicPrecision === "Event location"
+            ? item.id
+            : areaCode && geography[areaCode]
+              ? areaCode
+              : (item.reportingArea?.countryCode ?? (item.country || item.id));
       const group = groups.get(key) ?? [];
       group.push(item);
       groups.set(key, group);
@@ -85,9 +88,10 @@ export function overlayPoints(
               : date,
           "",
         );
-        measured = measured.filter(
-          (item) => (item.referencePeriod?.start ?? "") === latest,
-        );
+        if (!measured.every((item) => item.recordType === "Observation"))
+          measured = measured.filter(
+            (item) => (item.referencePeriod?.start ?? "") === latest,
+          );
         if (concern === "war") {
           const level = Math.min(
             ...measured.map((item) => item.reportingArea?.adminLevel ?? 0),
@@ -120,24 +124,42 @@ export function overlayPoints(
         continue;
       const first = evidence[0];
       const area =
+        first.recordType === "Observation" ||
         first.geographicPrecision === "Event location"
           ? undefined
           : (geography[key] ??
             (first.reportingArea
               ? geography[first.reportingArea.countryCode]
               : undefined));
+      const starts = evidence
+        .flatMap((record) =>
+          record.referencePeriod ? [record.referencePeriod.start] : [],
+        )
+        .sort();
+      const ends = evidence
+        .flatMap((record) =>
+          record.referencePeriod?.end ? [record.referencePeriod.end] : [],
+        )
+        .sort();
+      const period =
+        evidence.every((record) => record.recordType === "Observation") &&
+        starts.length
+          ? { start: starts[0], end: ends.at(-1) ?? null }
+          : first.referencePeriod;
       layer.push({
         id: `${concern}:${key}`,
         concern,
         area,
-        precision: area
-          ? first.reportingArea?.admin2Code === key ||
-            first.reportingArea?.admin1Code === key
-            ? "Administrative area"
-            : (first.reportingArea?.adminLevel ?? 0) > 0
-              ? "Country aggregate · regional boundaries unavailable"
-              : "Country total"
-          : first.geographicPrecision,
+        precision:
+          first.locationPrecision?.label ??
+          (area
+            ? first.reportingArea?.admin2Code === key ||
+              first.reportingArea?.admin1Code === key
+              ? "Administrative area"
+              : (first.reportingArea?.adminLevel ?? 0) > 0
+                ? "Country aggregate · regional boundaries unavailable"
+                : "Country total"
+            : first.geographicPrecision),
         location:
           area && key !== first.reportingArea?.countryCode
             ? `${area.name}, ${first.country}`
@@ -148,20 +170,35 @@ export function overlayPoints(
         value,
         weight: 0,
         records: evidence,
-        period: first.referencePeriod,
+        period,
       });
     }
     const maximum = Math.max(
       0,
       ...layer.map((point) => Math.abs(point.value ?? 0)),
     );
+    const eventMaximum = Math.max(
+      0,
+      ...layer
+        .filter((point) =>
+          point.records.every(
+            (record) => record.geographicPrecision === "Event location",
+          ),
+        )
+        .map((point) => Math.abs(point.value ?? 0)),
+    );
     for (const point of layer) {
+      const comparableMaximum = point.records.every(
+        (record) => record.geographicPrecision === "Event location",
+      )
+        ? eventMaximum
+        : maximum;
       point.weight =
         point.value === null
           ? 0.18
           : settings.scale === "Linear"
-            ? Math.abs(point.value) / maximum
-            : Math.log1p(Math.abs(point.value)) / Math.log1p(maximum);
+            ? Math.abs(point.value) / comparableMaximum
+            : Math.log1p(Math.abs(point.value)) / Math.log1p(comparableMaximum);
       points.push(point);
     }
   }

@@ -2,6 +2,7 @@ import type { DatasetId } from "./dataSources.ts";
 const minute = 60_000;
 const hour = 60 * minute;
 export const sourceTtl: Record<Exclude<DatasetId, "catalogue">, number> = {
+  ucdp: 24 * hour,
   usgs: 5 * minute,
   gdacs: 15 * minute,
   eonet: 30 * minute,

@@ -13,6 +13,7 @@ export function recordUnit(item: MapItem) {
 }
 
 export function recordPrecision(item: MapItem) {
+  if (item.locationPrecision) return item.locationPrecision.label;
   if (item.geographicPrecision === "Event location") return "Event location";
   if ((item.reportingArea?.adminLevel ?? 0) > 0) return "Administrative area";
   return item.geographicPrecision === "Country centroid"

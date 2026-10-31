@@ -3,6 +3,12 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import hapiSnapshot from "../data/hapiOrganizations.json";
 import iatiSnapshot from "../data/iatiOrganizations.json";
+import ftsSnapshot from "../data/ftsOrganizations.json";
+import {
+  ftsOrganizations,
+  ftsOrganizationsSchema,
+  ftsSourceUrl,
+} from "../lib/ftsOrganizations";
 import profiles from "../data/organizationProfiles.json";
 import { createAsyncCache } from "../lib/asyncCache";
 import { cacheLifetimes } from "../lib/feedCachePolicy";
@@ -39,12 +45,15 @@ const profileNames = new Map(
 );
 function linkProfiles(records: DirectoryOrganization[]) {
   return records.map((record) => {
-    const id = profileNames.get(record.name.trim().toLocaleLowerCase());
+    const id =
+      profileNames.get(record.name.trim().toLocaleLowerCase()) ??
+      profileNames.get(record.acronym.trim().toLocaleLowerCase());
     return id ? { ...record, id } : record;
   });
 }
 const snapshotOrganizations = mergeDirectoryOrganizations([
   ...reviewed,
+  ...linkProfiles(ftsOrganizations(ftsSnapshot, ftsSnapshot.retrievedAt)),
   ...linkProfiles(iatiOrganizations(iatiSnapshot)),
   ...linkProfiles(
     hapiSnapshot.organizations.map((org) =>
@@ -60,6 +69,20 @@ async function buildOrganizationDirectory(
     .update(process.env.HDX_HAPI_APP_IDENTIFIER ?? "")
     .digest("hex");
   const definitions = [
+    {
+      id: "fts",
+      label: "OCHA FTS organizations",
+      url: ftsSourceUrl,
+      load: async () => {
+        const raw = await feedJson(ftsSourceUrl, undefined, 86400000, (raw) =>
+          ftsOrganizationsSchema.parse(raw),
+        );
+        return {
+          records: ftsOrganizations(raw, new Date().toISOString()),
+          truncated: false,
+        };
+      },
+    },
     {
       id: "iati",
       label: "IATI publishers",
@@ -206,6 +229,14 @@ async function buildOrganizationDirectory(
     state: hapiSnapshot.truncated ? "partial" : "ready",
     url: hapiSnapshot.source,
     message: `Retrieved ${hapiSnapshot.retrievedAt.slice(0, 10)}. ${hapiSnapshot.records.toLocaleString("en")} presence records.`,
+  });
+  sources.push({
+    id: "fts-snapshot",
+    label: "OCHA FTS directory snapshot",
+    count: ftsSnapshot.data.length,
+    state: "ready",
+    url: ftsSnapshot.source,
+    message: `Retrieved ${ftsSnapshot.retrievedAt.slice(0, 10)}. Directory locations do not establish operating presence.`,
   });
   sources.push(...results.map((result) => result.source));
   return {

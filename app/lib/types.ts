@@ -48,6 +48,7 @@ export type MapItem = Omit<Issue, "project"> & {
   measurements?: import("./measurements").Measurement[];
   reportingArea?: import("./measurements").ReportingArea;
   eventType?: string;
+  locationPrecision?: { label: string; uncertaintyKm?: number };
 };
 export interface Contribution {
   id: string;

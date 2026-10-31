@@ -2,6 +2,9 @@ import { z } from "zod";
 export const measurementSchema = z.object({
   metric: z.enum([
     "conflict-events",
+    "conflict-incidents",
+    "conflict-fatalities-low",
+    "conflict-fatalities-high",
     "conflict-fatalities",
     "ipc-3-plus",
     "ipc-5",
@@ -21,3 +24,8 @@ export const reportingAreaSchema = z.object({
 });
 export type Measurement = z.infer<typeof measurementSchema>;
 export type ReportingArea = z.infer<typeof reportingAreaSchema>;
+
+export const locationPrecisionSchema = z.object({
+  label: z.string(),
+  uncertaintyKm: z.number().nonnegative().optional(),
+});

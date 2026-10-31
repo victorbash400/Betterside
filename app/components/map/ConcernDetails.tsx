@@ -65,7 +65,9 @@ export default function ConcernDetails({
         unit={
           point.value === null
             ? "Reported location · impact unquantified"
-            : concern.unit
+            : point.records.every((record) => record.dataset === "ucdp")
+              ? "Reported incidents"
+              : concern.unit
         }
         action={
           <>

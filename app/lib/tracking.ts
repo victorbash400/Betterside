@@ -2,7 +2,11 @@ import { interestCategories } from "./interestCategories.ts";
 import { issueSchema } from "./catalogueSchema.ts";
 import { datasetIds } from "./dataSources.ts";
 import { issueKinds } from "./issueKinds.ts";
-import { measurementSchema, reportingAreaSchema } from "./measurements.ts";
+import {
+  measurementSchema,
+  reportingAreaSchema,
+  locationPrecisionSchema,
+} from "./measurements.ts";
 import { z } from "zod";
 const ids = z
   .array(z.string().min(1).max(160))
@@ -22,9 +26,15 @@ export const trackingSchema = z
           dataset: z.enum(datasetIds).optional(),
           categoryIds: z.array(z.string()).optional(),
           eventStatus: z.enum(["Open", "Closed"]).optional(),
-          recordType: z.enum(["Observation", "Emergency", "Indicator"]).optional(),
-          geographicPrecision: z.enum(["Event location", "Country centroid"]).optional(),
-          referencePeriod: z.object({ start: z.string(), end: z.string().nullable() }).optional(),
+          recordType: z
+            .enum(["Observation", "Emergency", "Indicator"])
+            .optional(),
+          geographicPrecision: z
+            .enum(["Event location", "Country centroid"])
+            .optional(),
+          referencePeriod: z
+            .object({ start: z.string(), end: z.string().nullable() })
+            .optional(),
           sourceAlert: z.string().optional(),
           identities: z.array(z.string()).optional(),
           relatedSources: z.array(issueSchema.shape.source).optional(),
@@ -32,6 +42,7 @@ export const trackingSchema = z
           measurements: z.array(measurementSchema).optional(),
           reportingArea: reportingAreaSchema.optional(),
           eventType: z.string().optional(),
+          locationPrecision: locationPrecisionSchema.optional(),
         }),
       )
       .max(1000)
@@ -51,11 +62,7 @@ export const trackingSchema = z
           issueIds: ids,
           parentId: z.string().optional(),
           archived: z.boolean().optional(),
-          hiddenKinds: z
-            .array(
-              z.enum(issueKinds),
-            )
-            .default([]),
+          hiddenKinds: z.array(z.enum(issueKinds)).default([]),
         }),
       )
       .max(100),

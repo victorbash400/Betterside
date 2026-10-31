@@ -247,6 +247,10 @@ export function concernColor(id: ConcernId, settings: OverlaySettings) {
 export function concernMeasurement(item: MapItem, id: ConcernId) {
   const metric = concerns.find((concern) => concern.id === id)!.metric;
   if (id === "war" && item.eventType !== "political_violence") return undefined;
+  if (id === "war" && item.dataset === "ucdp")
+    return item.measurements?.find(
+      (measurement) => measurement.metric === "conflict-incidents",
+    );
   return item.measurements?.find(
     (measurement: Measurement) => measurement.metric === metric,
   );

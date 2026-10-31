@@ -27,6 +27,16 @@ export default function OrganizationOverview({
             </dd>
           </>
         )}
+        {Boolean(organization.directoryLocations?.length) && (
+          <>
+            <dt>Directory locations</dt>
+            <dd>
+              {organization
+                .directoryLocations!.map((location) => location.name)
+                .join(", ")}
+            </dd>
+          </>
+        )}
         {organization.size && (
           <>
             <dt>{organization.size.label}</dt>

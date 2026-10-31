@@ -9,6 +9,7 @@ export const dataSources = [
   { id: "hapi-famine", label: "IPC Phase 5 catastrophe" },
   { id: "hapi-idps", label: "IOM displacement" },
   { id: "hapi-refugees", label: "UNHCR refugees" },
+  { id: "ucdp", label: "UCDP conflict events" },
   { id: "hapi-conflict", label: "ACLED conflict summaries" },
   { id: "hapi-rainfall", label: "WFP rainfall" },
   { id: "hapi-funding", label: "OCHA response funding" },

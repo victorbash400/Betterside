@@ -50,6 +50,15 @@ export const directoryOrganizationSchema = z.object({
   logoUrl: safeUrl.nullable(),
   logoTone: z.enum(["light", "standard"]).optional(),
   presence: z.array(organizationPresenceSchema),
+  directoryLocations: z
+    .array(
+      z.object({
+        name: z.string(),
+        code: z.string().nullable(),
+        adminLevel: z.number().int(),
+      }),
+    )
+    .optional(),
   size: z
     .object({
       label: z.string(),
@@ -203,6 +212,15 @@ export function mergeDirectoryOrganizations(records: DirectoryOrganization[]) {
       );
     }
     previous.presence = [...presence.values()];
+    if (record.directoryLocations?.length)
+      previous.directoryLocations = [
+        ...new Map(
+          [
+            ...(previous.directoryLocations ?? []),
+            ...record.directoryLocations,
+          ].map((location) => [JSON.stringify(location), location]),
+        ).values(),
+      ];
     previous.sources = [
       ...new Map(
         [...previous.sources, ...record.sources].map((source) => [

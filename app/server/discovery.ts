@@ -1,4 +1,6 @@
 import "server-only";
+import ucdpSnapshot from "../data/ucdpEvents.json";
+import { ucdpEvents } from "../lib/feeds/ucdp";
 import { createHash } from "node:crypto";
 import { createAsyncCache, CachedLoadError } from "../lib/asyncCache";
 import { cacheLifetimes, sourceTtl } from "../lib/feedCachePolicy";
@@ -14,7 +16,13 @@ import { loadCountries } from "./feeds/geography";
 import { loadGdacs, loadIfrc } from "./feeds/disasters";
 import { loadHapi, loadHapiResources } from "./feeds/hapi";
 import { feedJson } from "./feeds/request";
-type FeedResult = { issues: MapItem[]; skipped: number; truncated: boolean };
+type FeedResult = {
+  issues: MapItem[];
+  skipped: number;
+  truncated: boolean;
+  warnings?: number;
+  message?: string;
+};
 const feeds = createAsyncCache<{ issues: MapItem[]; status: FeedStatus }>({
   maxEntries: 32,
   maxBytes: 48 * 1024 * 1024,
@@ -60,7 +68,9 @@ export async function loadDiscovery() {
                 fetchedAt,
               };
               let result: FeedResult;
-              if (id === "eonet") {
+              if (id === "ucdp")
+                result = ucdpEvents(ucdpSnapshot, await countries());
+              else if (id === "eonet") {
                 const issues = await loadNaturalEvents();
                 result = {
                   issues,
@@ -101,6 +111,12 @@ export async function loadDiscovery() {
                 ...result,
                 count: issues.length,
               });
+              if (result.warnings) {
+                completed.state = "partial";
+                completed.message = [completed.message, result.message]
+                  .filter(Boolean)
+                  .join(" ");
+              }
               if (completed.state === "error")
                 throw new Error(completed.message);
               return { issues, status: completed };

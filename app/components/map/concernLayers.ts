@@ -35,7 +35,11 @@ export function addConcernLayers(map: Map) {
       id: `heat-${concern.id}`,
       type: "heatmap",
       source: "concern-points",
-      filter: ["==", ["get", "concern"], concern.id],
+      filter: [
+        "all",
+        ["==", ["get", "concern"], concern.id],
+        ["==", ["get", "located"], true],
+      ],
       paint: {
         "heatmap-weight": [
           "case",
@@ -69,6 +73,19 @@ export function addConcernLayers(map: Map) {
       "circle-radius": 3,
       "circle-color": ["get", "color"],
       "circle-opacity": 0.8,
+    },
+  });
+  map.addLayer({
+    id: "concern-approximate",
+    type: "circle",
+    source: "concern-points",
+    filter: ["==", ["get", "located"], false],
+    paint: {
+      "circle-radius": 5,
+      "circle-color": ["get", "color"],
+      "circle-opacity": 0.12,
+      "circle-stroke-color": ["get", "color"],
+      "circle-stroke-width": 1,
     },
   });
   map.addLayer({
@@ -144,6 +161,11 @@ export function updateConcernLayers(
       settings.radius,
     );
   }
+  map.setLayoutProperty(
+    "concern-approximate",
+    "visibility",
+    settings.mode === "Heatmap" ? "visible" : "none",
+  );
   map.setLayoutProperty(
     "concern-events",
     "visibility",
