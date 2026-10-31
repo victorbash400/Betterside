@@ -1,0 +1,72 @@
+.photo {
+  position: absolute;
+  overflow: hidden;
+  isolation: isolate;
+}
+.photo img {
+  object-fit: cover;
+  filter: saturate(.62) contrast(.86) brightness(1.12);
+}
+.care {
+  left: 16.39%;
+  top: 22.42%;
+  width: 18.18%;
+  height: 23.38%;
+  border-radius: 2.45cqw 2.45cqw 3cqw 3cqw;
+}
+.care img {
+  transform: scale(1.35) translateX(-6%);
+  transform-origin: center 25%;
+}
+.relief {
+  left: 10.23%;
+  top: 53.24%;
+  width: 15.07%;
+  height: 27.42%;
+  clip-path: url("#welcome-relief-crop");
+}
+.health {
+  left: 75.06%;
+  top: 19.98%;
+  width: 11.78%;
+  height: 25.5%;
+  clip-path: url("#welcome-health-crop");
+}
+.restoration {
+  left: 72.01%;
+  top: 57.07%;
+  width: 16.57%;
+  height: 22.74%;
+  border-radius: 2.45cqw 2.45cqw 2.1cqw 2.1cqw;
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .care {
+    left: 6%;
+    top: 9%;
+    width: 42%;
+    height: 20%;
+    border-radius: 7cqw;
+  }
+  .care img {
+    transform: scale(1.05);
+  }
+  .health {
+    left: 65%;
+    top: 8%;
+    width: 28%;
+    height: 23%;
+  }
+  .relief {
+    left: 5%;
+    top: 73%;
+    width: 35%;
+    height: 21%;
+  }
+  .restoration {
+    left: 53%;
+    top: 74%;
+    width: 42%;
+    height: 20%;
+    border-radius: 6cqw;
+  }
+}

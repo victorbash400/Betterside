@@ -1,0 +1,28 @@
+.artwork {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.definitions {
+  position: absolute;
+}
+.connections {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.mobileConnections {
+  display: none;
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .connections {
+    display: none;
+  }
+  .mobileConnections {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+}

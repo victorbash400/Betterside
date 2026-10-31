@@ -7,18 +7,19 @@
   gap: 2px;
   padding: 3px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 20px;
   background: var(--surface);
 }
 .north {
   top: 10px;
 }
 .south {
-  bottom: 13px;
+  bottom: 32px;
 }
 .controls button {
   width: 28px;
   height: 28px;
+  border-radius: 17px;
 }
 .controls svg {
   width: 13px;
@@ -29,5 +30,10 @@
   .south {
     left: 12px;
     transform: none;
+  }
+}
+@media (max-width: 360px) {
+  .south {
+    bottom: 80px;
   }
 }

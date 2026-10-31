@@ -1,0 +1,85 @@
+.welcome {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fdfcfc;
+}
+.canvas {
+  position: relative;
+  width: min(100vw, 177.6833svh);
+  aspect-ratio: 1672 / 941;
+  container-type: inline-size;
+}
+.identity {
+  position: absolute;
+  top: 37.6%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.logo {
+  width: 6.1cqw;
+  height: 6.1cqw;
+  background: url("/betterside.svg") center / contain no-repeat;
+}
+.identity h1 {
+  margin: .6cqw 0 1.9cqw;
+  color: #2c2c2c;
+  font-size: 2.85cqw;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -.12cqw;
+}
+.identity button {
+  width: 10.05cqw;
+  height: 3.65cqw;
+  min-width: 112px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid #222;
+  border-radius: 100px;
+  color: #fff;
+  background: #292929;
+  font-size: max(15px, 1.2cqw);
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.identity button:hover {
+  background: #414141;
+}
+.identity button:active {
+  transform: scale(.98);
+}
+.identity button:focus-visible {
+  outline: 2px solid #60a6ab;
+  outline-offset: 5px;
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .canvas {
+    width: 100%;
+    height: 100svh;
+    aspect-ratio: auto;
+  }
+  .identity {
+    top: 38%;
+  }
+  .logo {
+    width: 96px;
+    height: 96px;
+  }
+  .identity h1 {
+    margin: 8px 0 28px;
+    font-size: 36px;
+    letter-spacing: -1.5px;
+  }
+  .identity button {
+    width: 144px;
+    height: 52px;
+    font-size: 18px;
+  }
+}
