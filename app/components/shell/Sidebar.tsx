@@ -29,6 +29,8 @@ export default function Sidebar({
   onView,
   organizationsOpen,
   causesOpen,
+  contributionsOpen,
+  onToggleContributions,
   onToggleOrganizations,
   onToggleCauses,
   onSettings,
@@ -55,6 +57,8 @@ export default function Sidebar({
   view: View;
   organizationsOpen: boolean;
   causesOpen: boolean;
+  contributionsOpen: boolean;
+  onToggleContributions: () => void;
   onToggleOrganizations: () => void;
   onToggleCauses: () => void;
   onView: (view: View) => void;
@@ -188,16 +192,17 @@ export default function Sidebar({
                   <div className={styles.section}>
                     <span>Workspace</span>
                   </div>
-                  <button
-                    className={`${styles.home} ${view === "Contributions" ? styles.selected : ""}`}
-                    onClick={() => {
-                      onView("Contributions");
+                  <SidebarDrawerToggle
+                    label="Contributions"
+                    Icon={Heart}
+                    side="left"
+                    controls="contributions-dialog"
+                    open={contributionsOpen}
+                    onToggle={() => {
+                      onToggleContributions();
                       onClose();
                     }}
-                  >
-                    <Heart size={24} strokeWidth={1.8} />
-                    Contributions
-                  </button>
+                  />
                   <SidebarDrawerToggle
                     label="Organizations"
                     Icon={Building2}

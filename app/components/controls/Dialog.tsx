@@ -4,6 +4,7 @@ import IconButton from "./IconButton";
 import styles from "./Dialog.module.css";
 export default function Dialog({
   title,
+  id,
   onClose,
   children,
   animated = false,
@@ -14,12 +15,13 @@ export default function Dialog({
   modal = true,
 }: {
   title: string;
+  id?: string;
   onClose: () => void;
   children: ReactNode;
   animated?: boolean;
   compact?: boolean;
   centered?: boolean;
-  size?: "standard" | "profile" | "payment";
+  size?: "standard" | "profile" | "payment" | "history";
   footer?: ReactNode;
   modal?: boolean;
 }) {
@@ -42,6 +44,7 @@ export default function Dialog({
   return (
     <dialog
       ref={ref}
+      id={id}
       className={`${styles.dialog} ${animated ? styles.animated : ""}`}
       data-size={size}
       data-centered={centered}

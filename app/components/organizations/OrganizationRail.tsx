@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+import IconButton from "../controls/IconButton";
 import OrganizationSearch from "./OrganizationSearch";
 import type { DirectoryOrganization } from "../../lib/organizations";
 import OrganizationMapGrid from "./OrganizationMapGrid";
@@ -5,6 +7,7 @@ import drawer from "../map/MapDrawer.module.css";
 import styles from "./OrganizationRail.module.css";
 export default function OrganizationRail({
   open,
+  onClose,
   query,
   onQuery,
   organizations,
@@ -13,6 +16,7 @@ export default function OrganizationRail({
   onDetails,
 }: {
   open: boolean;
+  onClose: () => void;
   query: string;
   onQuery: (query: string) => void;
   organizations: DirectoryOrganization[];
@@ -36,6 +40,9 @@ export default function OrganizationRail({
       <div className={styles.heading}>
         <span>Organizations</span>
         <small>{organizations.length.toLocaleString("en")}</small>
+        <IconButton label="Close organizations" onClick={onClose}>
+          <X size={16} />
+        </IconButton>
       </div>
       <OrganizationSearch value={query} onChange={onQuery} />
       <OrganizationMapGrid

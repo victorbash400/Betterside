@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+import IconButton from "../controls/IconButton";
 import { useMemo, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import {
@@ -13,6 +15,7 @@ import LayerControlsDialog from "./LayerControlsDialog";
 import styles from "./MapTools.module.css";
 export default function MapTools({
   open,
+  onClose,
   geography,
   value,
   items,
@@ -20,6 +23,7 @@ export default function MapTools({
   onChange,
 }: {
   open: boolean;
+  onClose: () => void;
   geography: MapGeography;
   value: OverlaySettings;
   items: MapItem[];
@@ -53,6 +57,9 @@ export default function MapTools({
           <span>
             {value.concerns.length} / {concerns.length}
           </span>
+          <IconButton label="Close causes" onClick={onClose}>
+            <X size={16} />
+          </IconButton>
         </div>
         <div className={styles.actions}>
           <button

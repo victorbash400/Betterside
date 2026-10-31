@@ -13,12 +13,14 @@ export default function SidebarDrawerToggle({
   open,
   side,
   onToggle,
+  controls,
 }: {
   label: string;
   Icon: LucideIcon;
   open: boolean;
   side: "left" | "right";
   onToggle: () => void;
+  controls?: string;
 }) {
   const ToggleIcon =
     side === "left"
@@ -33,7 +35,9 @@ export default function SidebarDrawerToggle({
       className={styles.row}
       aria-label={`${open ? "Close" : "Open"} ${label.toLowerCase()}`}
       aria-expanded={open}
-      aria-controls={open ? `map-${label.toLowerCase()}-drawer` : undefined}
+      aria-controls={
+        open ? (controls ?? `map-${label.toLowerCase()}-drawer`) : undefined
+      }
       onClick={onToggle}
     >
       <Icon size={24} strokeWidth={1.8} />

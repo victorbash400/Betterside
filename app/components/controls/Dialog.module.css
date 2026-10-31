@@ -200,3 +200,17 @@
   display: block;
   padding-top: 20px;
 }
+
+.dialog[data-size="history"] {
+  width: min(960px, calc(100vw - 40px));
+  height: fit-content;
+  max-height: calc(100dvh - 48px);
+  padding: 20px;
+  border-radius: 16px;
+}
+.dialog[data-size="history"] .body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}

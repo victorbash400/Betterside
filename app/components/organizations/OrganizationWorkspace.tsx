@@ -19,6 +19,8 @@ export default function OrganizationWorkspace({
   mode,
   onMode,
   organizationsOpen,
+  onCloseOrganizations,
+  onCloseCauses,
   causesOpen,
   geography,
   crisis,
@@ -30,6 +32,8 @@ export default function OrganizationWorkspace({
   mode: "map" | "list";
   onMode: (value: "map" | "list") => void;
   organizationsOpen: boolean;
+  onCloseOrganizations: () => void;
+  onCloseCauses: () => void;
   causesOpen: boolean;
   geography: ReturnType<typeof useMapGeography>;
   crisis: ReturnType<typeof useOrganizationCrisisMap>;
@@ -57,6 +61,7 @@ export default function OrganizationWorkspace({
         <>
           <OrganizationRail
             open={organizationsOpen}
+            onClose={onCloseOrganizations}
             query={query}
             onQuery={onQuery}
             organizations={state.visible}
@@ -72,6 +77,7 @@ export default function OrganizationWorkspace({
           />
           <OrganizationIssues
             open={causesOpen}
+            onClose={onCloseCauses}
             organization={state.organization}
             value={state.filters.topics}
             onChange={(topics) => state.update({ ...state.filters, topics })}

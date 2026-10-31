@@ -10,9 +10,11 @@ import { useContributions } from "../../state/useContributions";
 import type { Contribution } from "../../lib/types";
 import styles from "./ContributionHistory.module.css";
 export default function ContributionHistory({
+  compact = false,
   onExplore,
   onProject,
 }: {
+  compact?: boolean;
   onExplore: () => void;
   onProject: (projectId: string) => void;
 }) {
@@ -36,7 +38,18 @@ export default function ContributionHistory({
     URL.revokeObjectURL(url);
   }
   return (
-    <section className={styles.history} aria-label="Contribution history">
+    <section
+      className={styles.history}
+      aria-label="Contribution history"
+      style={
+        compact
+          ? {
+              height: `min(${Math.min(420, 164 + Math.max(1, visible.length) * 48)}px, calc(100dvh - 140px))`,
+              flex: "none",
+            }
+          : undefined
+      }
+    >
       <div className={styles.toolbar}>
         <button
           className={styles.filter}

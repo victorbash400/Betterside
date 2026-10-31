@@ -1,4 +1,4 @@
-import { ArrowLeft, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, SlidersHorizontal, X } from "lucide-react";
 import {
   organizationCauseTopics,
   type DirectoryOrganization,
@@ -9,6 +9,7 @@ import MapLayerGrid from "../map/MapLayerGrid";
 import styles from "./OrganizationIssues.module.css";
 export default function OrganizationIssues({
   open,
+  onClose,
   organization,
   value,
   onChange,
@@ -16,6 +17,7 @@ export default function OrganizationIssues({
   onSettings,
 }: {
   open: boolean;
+  onClose: () => void;
   organization?: DirectoryOrganization;
   value: string[];
   onChange: (topics: string[]) => void;
@@ -50,6 +52,9 @@ export default function OrganizationIssues({
           <span>Causes</span>
           <small>{topics.length}</small>
         </div>
+        <IconButton label="Close causes" onClick={onClose}>
+          <X size={16} />
+        </IconButton>
       </div>
       <MapLayerGrid
         rows={topics.map((topic) => ({ id: topic, label: topic }))}
