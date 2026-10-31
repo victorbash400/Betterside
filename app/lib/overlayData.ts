@@ -62,9 +62,11 @@ export function overlayPoints(
           ? item.reportingArea.admin2Code
           : item.reportingArea?.admin1Code;
       const key =
-        item.dataset === "ucdp" && item.geographicPrecision !== "Event location"
+        item.dataset === "ucdp" && item.geographicPrecision === "Country centroid"
           ? `ucdp-unlocated:${item.country}`
-          : item.geographicPrecision === "Event location"
+          : item.geographicPrecision === "Event location" ||
+              (item.dataset === "ucdp" &&
+                item.geographicPrecision === "Administrative area")
             ? item.id
             : areaCode && geography[areaCode]
               ? areaCode

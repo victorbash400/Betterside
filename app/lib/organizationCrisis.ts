@@ -87,9 +87,9 @@ export function organizationCrisisRecords({
       return false;
     if (!selection.concerns.some((id) => matchesConcern(item, id)))
       return false;
-    if (item.reportingArea) return codes.has(item.reportingArea.countryCode);
     if (item.geographicPrecision === "Event location")
       return areas.some((area) => pointInArea(item.coordinates, area.geometry));
+    if (item.reportingArea) return codes.has(item.reportingArea.countryCode);
     return names.has(item.country);
   });
 }

@@ -57,8 +57,8 @@ test("UCDP retains provider coordinates and uncertainty without claiming aggrega
   assert.equal(result.issues.length, 3);
   assert.deepEqual(result.issues[0].coordinates, [35.5, 0.25]);
   assert.equal(result.issues[1].locationPrecision?.uncertaintyKm, 25);
-  assert.deepEqual(result.issues[2].coordinates, [38, 1]);
-  assert.equal(result.issues[2].geographicPrecision, "Country centroid");
+  assert.deepEqual(result.issues[2].coordinates, [35.5, 0.25]);
+  assert.equal(result.issues[2].geographicPrecision, "Administrative area");
   assert.equal(result.issues[0].source.published, null);
   assert.equal(result.issues[0].measurements?.[0].metric, "conflict-incidents");
 });
@@ -149,4 +149,31 @@ test("FTS directory adds source IDs and directory locations without inventing op
   assert.equal(org.donateUrl, null);
   assert.equal(org.directoryLocations?.[0].name, "Kenya");
   assert.equal(org.identifiers[0].scheme, "OCHA FTS");
+});
+
+test("regional UCDP reporting anchors remain separate instead of collapsing into a national point", () => {
+  const result = ucdpEvents(
+    {
+      ...feed,
+      data: [
+        { ...event, where_prec: "3" },
+        { ...event, id: "2", where_prec: "4", longitude: "36" },
+        { ...event, id: "3", where_prec: "6" },
+      ],
+    },
+    countries,
+  );
+  const points = overlayPoints(result.issues, {
+    concerns: ["war"],
+    scale: "Linear",
+  });
+  assert.equal(points.length, 3);
+  assert.equal(
+    points.filter(
+      (point) => point.records[0].geographicPrecision === "Administrative area",
+    ).length,
+    2,
+  );
+  assert.ok(points.some((point) => point.coordinates[0] === 35.5));
+  assert.ok(points.some((point) => point.coordinates[0] === 36));
 });

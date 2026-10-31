@@ -30,7 +30,7 @@ export const trackingSchema = z
             .enum(["Observation", "Emergency", "Indicator"])
             .optional(),
           geographicPrecision: z
-            .enum(["Event location", "Country centroid"])
+            .enum(["Event location", "Administrative area", "Country centroid"])
             .optional(),
           referencePeriod: z
             .object({ start: z.string(), end: z.string().nullable() })

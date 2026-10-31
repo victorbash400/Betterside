@@ -275,3 +275,44 @@ test("clearing organization causes removes all crisis layers even with an organi
     [],
   );
 });
+
+test("country metadata does not bypass the operating-area check for located conflict observations", () => {
+  const base: MapItem = {
+    id: "inside-conflict",
+    country: "Kenya",
+    location: "Reported event",
+    coordinates: [5, 5],
+    kind: "Conflict",
+    severity: "Insufficient data",
+    summary: "Source observation",
+    source: {
+      label: "Provider",
+      url: "https://example.org/conflict",
+      published: null,
+      reviewed: "2026-10-31",
+    },
+    dataset: "ucdp",
+    geographicPrecision: "Event location",
+    recordType: "Observation",
+    eventType: "political_violence",
+    categoryIds: ["conflict"],
+    reportingArea: {
+      countryCode: "KEN",
+      adminLevel: 0,
+      admin1Code: null,
+      admin2Code: null,
+    },
+  };
+  const result = organizationCrisisRecords({
+    records: [base, { ...base, id: "outside-conflict", coordinates: [80, 60] }],
+    organizations: [organization],
+    topics: ["Conflict response"],
+    geography,
+    datasets: defaultDatasets,
+    period: "Latest",
+  });
+  assert.deepEqual(
+    result.map((record) => record.id),
+    ["inside-conflict"],
+  );
+});

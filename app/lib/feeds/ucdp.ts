@@ -78,12 +78,13 @@ export function ucdpEvents(raw: unknown, countries: Country[]) {
         byCode.get(aliases[row.country]) ??
         byName.get(row.country.toLocaleLowerCase());
       const located = row.where_prec <= 2;
-      if (!located && !country?.centroid) {
+      const regional = row.where_prec === 3 || row.where_prec === 4;
+      if (!located && !regional && !country?.centroid) {
         skipped++;
         continue;
       }
       const coordinates = coordinatesSchema.parse(
-        located
+        located || regional
           ? [row.longitude, row.latitude]
           : country!.centroid!.coordinates,
       );
@@ -92,7 +93,9 @@ export function ucdpEvents(raw: unknown, countries: Country[]) {
           ? "Reported event locality"
           : row.where_prec === 2
             ? "Within approximately 25 km of reported locality"
-            : "Country-centre placeholder · precise event location unavailable";
+            : regional
+              ? "Reported administrative area · event position uncertain"
+              : "Country-centre placeholder · precise event location unavailable";
       const start = date(row.date_start),
         end = date(row.date_end);
       if (Date.parse(end) < Date.parse(start)) {
@@ -113,7 +116,11 @@ export function ucdpEvents(raw: unknown, countries: Country[]) {
         recordType: "Observation",
         eventType: "political_violence",
         categoryIds: ["conflict"],
-        geographicPrecision: located ? "Event location" : "Country centroid",
+        geographicPrecision: located
+          ? "Event location"
+          : regional
+            ? "Administrative area"
+            : "Country centroid",
         locationPrecision: {
           label: locationLabel,
           ...(row.where_prec === 2 ? { uncertaintyKm: 25 } : {}),
@@ -144,7 +151,7 @@ export function ucdpEvents(raw: unknown, countries: Country[]) {
           ? {
               reportingArea: {
                 countryCode: country.iso3,
-                adminLevel: 0,
+                adminLevel: regional ? (row.where_prec === 3 ? 2 : 1) : 0,
                 admin1Code: null,
                 admin2Code: null,
               },

@@ -37,7 +37,8 @@ export type MapItem = Omit<Issue, "project"> & {
   project?: Issue["project"];
   dataset?: import("./dataSources").DatasetId;
   recordType?: "Observation" | "Emergency" | "Indicator";
-  geographicPrecision?: "Event location" | "Country centroid";
+  geographicPrecision?:
+    "Event location" | "Administrative area" | "Country centroid";
   referencePeriod?: { start: string; end: string | null };
   sourceAlert?: string;
   identities?: string[];
