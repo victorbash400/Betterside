@@ -14,14 +14,16 @@ import styles from "./ProfileGoals.module.css";
 export default function ProfileGoals({
   profile,
   payments,
-  records,
+  records = [],
+  availableCategories,
   busy,
   onSave,
   onContribute,
 }: {
   profile: DonorProfile;
   payments: Contribution[];
-  records: MapItem[];
+  records?: MapItem[];
+  availableCategories?: string[];
   busy: boolean;
   onSave: (profile: DonorProfile) => Promise<void>;
   onContribute: (goal: ContributionGoal) => void;
@@ -48,9 +50,9 @@ export default function ProfileGoals({
             goal={goal}
             {...goalProgress(goal, payments, profile.timeZone)}
             busy={busy}
-            canContribute={records.some((record) =>
-              goalMatchesProject(goal, record),
-            )}
+            canContribute={availableCategories
+              ? availableCategories.includes(goal.category)
+              : records.some((record) => goalMatchesProject(goal, record))}
             onEdit={() => setEditor(goal)}
             onDelete={() => {
               setError("");

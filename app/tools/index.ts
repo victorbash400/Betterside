@@ -1,3 +1,6 @@
+import { listGoalsTool } from "./list-goals.ts";
+import { createGoalTool } from "./create-goal.ts";
+import { updateGoalTool } from "./update-goal.ts";
 import "server-only";
 import type { WorkspaceToolContext } from "./context.ts";
 import { searchRecordsTool } from "./search-records.ts";
@@ -14,6 +17,9 @@ import { showChartTool } from "./show-chart.ts";
 import { showSummaryTool } from "./show-summary.ts";
 export function workspaceTools(context: WorkspaceToolContext) {
   return {
+    list_goals: listGoalsTool(context),
+    create_goal: createGoalTool(context),
+    update_goal: updateGoalTool(context),
     search_records: searchRecordsTool(context),
     search_organizations: searchOrganizationsTool,
     filter_map: filterMapTool,

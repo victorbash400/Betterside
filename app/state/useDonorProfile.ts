@@ -58,9 +58,11 @@ export function useDonorProfile() {
       if (!writing.current) void load(controller.signal);
     };
     window.addEventListener("focus", focus);
+    window.addEventListener("betterside-profile-changed", focus);
     return () => {
       controller.abort();
       window.removeEventListener("focus", focus);
+      window.removeEventListener("betterside-profile-changed", focus);
     };
   }, [load, attempt]);
   async function save(profile: DonorProfile) {
@@ -82,6 +84,7 @@ export function useDonorProfile() {
       const next = profileResponseSchema.parse(body);
       current.current = next;
       setSnapshot(next);
+      window.dispatchEvent(new Event("betterside-profile-changed"));
     } catch (failure) {
       setError(
         failure instanceof Error ? failure.message : "Could not save profile.",

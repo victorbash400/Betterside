@@ -49,7 +49,7 @@ const topicKinds: Record<string, string[]> = {
   Shelter: ["Displacement"],
   "Camp management": ["Displacement"],
 };
-export function goalMatchesProject(goal: ContributionGoal, record: MapItem) {
+export function goalMatchesProject(goal: Pick<ContributionGoal, "category">, record: MapItem) {
   return (
     Boolean(record.project) &&
     (goal.category === "All causes" ||

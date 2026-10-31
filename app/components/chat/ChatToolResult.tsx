@@ -1,3 +1,5 @@
+import ChatGoalsWidget from "./ChatGoalsWidget";
+import { goalsResultSchema } from "../../lib/chatGoals";
 import dynamic from "next/dynamic";
 import { chartResultSchema } from "../../lib/chatCharts";
 import { useState } from "react";
@@ -53,6 +55,9 @@ export default function ChatToolResult({
     );
   if (part.state !== "output-available") {
     const names: Record<string, string> = {
+      "tool-list_goals": "Reading goals",
+      "tool-create_goal": "Saving goal",
+      "tool-update_goal": "Updating goal",
       "tool-search_records": "Searching records",
       "tool-search_organizations": "Searching organizations",
       "tool-filter_map": "Updating map",
@@ -74,6 +79,16 @@ export default function ChatToolResult({
   }
   const output = part.output;
   switch (part.type) {
+    case "tool-list_goals":
+    case "tool-create_goal":
+    case "tool-update_goal": {
+      const parsed = goalsResultSchema.safeParse(output);
+      return parsed.success ? (
+        <ChatGoalsWidget result={parsed.data} actions={actions} busy={busy} />
+      ) : (
+        <span role="alert">Goals unavailable.</span>
+      );
+    }
     case "tool-show_summary":
     case "tool-show_chart": {
       const parsed = chartResultSchema.safeParse(output);

@@ -17,3 +17,9 @@ Connection state is random, short-lived, HttpOnly and bound to the signed-in acc
 When Identity is not configured, the profile still provides checkout, contribution history and the official sandbox account-management link. The Connect PayPal action becomes available once configured. The application's existing credentials do not prove that Identity or vaulting has been enabled. Live Identity requires PayPal review; this implementation intentionally retains sandbox-only endpoints.
 
 Official integration: https://developer.paypal.com/log-in/build . Button/consent URL: https://developer.paypal.com/log-in/build-button/ . Saved payment methods require a separate PayPal vaulting integration and approval: https://developer.paypal.com/docs/checkout/save-payment-methods/ .
+
+## Agent goal tools
+
+`app/tools/list-goals.ts`, `create-goal.ts`, and `update-goal.ts` are registered separately from the agent. They scope every operation to the server-resolved current donor/account, never a model-supplied owner. Listing returns exact IDs, revision, capture-backed progress and available checkout categories. Creation uses a deterministic owner/tool-call ID to prevent duplicate execution of the same request. Edits require the current revision and preserve unspecified fields; changing cause requires a new goal. These tools never approve payments or schedule recurring charges.
+
+Tool output renders `ChatGoalsWidget`, which reads the current profile and contribution ledger rather than treating persisted chat history as current state. It reuses Profile goal rows and editors. Saves and new tool results publish a profile-change event; mounted cards refresh through that event or window focus, without polling. Historical tool results do not replay writes. Checkout carries the saved goal ID, and the server verifies project-cause compatibility.
