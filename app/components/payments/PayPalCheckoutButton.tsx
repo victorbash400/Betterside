@@ -7,6 +7,7 @@ import styles from "./PayPalCheckoutButton.module.css";
 export type { PaymentCompletion } from "../../state/usePayPalCheckout";
 export default function PayPalCheckoutButton(props: {
   projectId: string;
+  goalId?: string;
   amount: string;
   disabled: boolean;
   onBusy: (busy: boolean) => void;

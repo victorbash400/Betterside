@@ -1,3 +1,5 @@
+import { useCheckoutGoal } from "../../state/useCheckoutGoal";
+import { goalMatchesProject } from "../../lib/profile";
 import { useState } from "react";
 import { Check, HeartHandshake, LockKeyhole } from "lucide-react";
 import Dialog from "../controls/Dialog";
@@ -19,9 +21,15 @@ export default function ContributionDialog({
   initial: CheckoutInput;
   onClose: () => void;
 }) {
+  const goalState = useCheckoutGoal(initial.goalId);
+  const projectRecords = initial.goalId
+    ? goalState.goal
+      ? records.filter((record) => goalMatchesProject(goalState.goal!, record))
+      : []
+    : records;
   const projects = Array.from(
     new Map(
-      records.flatMap((record) =>
+      projectRecords.flatMap((record) =>
         record.project ? [[record.project.id, record.project] as const] : [],
       ),
     ).values(),
@@ -40,7 +48,10 @@ export default function ContributionDialog({
       failure instanceof Error ? failure.message : "Enter a valid amount.";
   }
   const valid =
-    projects.some((project) => project.id === projectId) && !amountError;
+    projects.some((project) => project.id === projectId) &&
+    !amountError &&
+    !goalState.loading &&
+    !goalState.error;
   return (
     <Dialog
       title="PayPal checkout"
@@ -63,6 +74,7 @@ export default function ContributionDialog({
             </div>
             <PayPalCheckoutButton
               projectId={projectId}
+              goalId={initial.goalId}
               amount={amount}
               disabled={!valid || busy}
               onBusy={setBusy}
@@ -92,6 +104,18 @@ export default function ContributionDialog({
               <span>Sandbox contribution</span>
             </div>
           </div>
+          {goalState.goal && (
+            <span className={styles.status}>
+              Goal · {goalState.goal.category} ·{" "}
+              {goalState.goal.period === "monthly" ? "Monthly" : "One-time"}
+            </span>
+          )}
+          {goalState.loading && <span role="status">Loading goal</span>}
+          {goalState.error && (
+            <span className={styles.error} role="alert">
+              {goalState.error}
+            </span>
+          )}
           <PaymentProjectPicker
             projects={projects}
             selectedId={projectId}

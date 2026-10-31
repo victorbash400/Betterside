@@ -54,6 +54,7 @@ export async function completePayment(
   captureId: string,
 ) {
   const TableName = requireTable();
+  const completedAt = new Date().toISOString();
   try {
     await database.send(
       new TransactWriteCommand({
@@ -62,13 +63,15 @@ export async function completePayment(
             Update: {
               TableName,
               Key: { pk: `PAYMENT#${record.id}`, sk: "META" },
-              UpdateExpression: "SET #status=:completed,captureId=:capture",
+              UpdateExpression:
+                "SET #status=:completed,captureId=:capture,completedAt=:completedAt",
               ConditionExpression: "#status=:created",
               ExpressionAttributeNames: { "#status": "status" },
               ExpressionAttributeValues: {
                 ":completed": "COMPLETED",
                 ":created": "CREATED",
                 ":capture": captureId,
+                ":completedAt": completedAt,
               },
             },
           },
@@ -79,11 +82,13 @@ export async function completePayment(
                 pk: `DONOR#${record.donor}`,
                 sk: `PAYMENT#${record.createdAt}#${record.id}`,
               },
-              UpdateExpression: "SET #status=:completed,captureId=:capture",
+              UpdateExpression:
+                "SET #status=:completed,captureId=:capture,completedAt=:completedAt",
               ExpressionAttributeNames: { "#status": "status" },
               ExpressionAttributeValues: {
                 ":completed": "COMPLETED",
                 ":capture": captureId,
+                ":completedAt": completedAt,
               },
             },
           },
@@ -145,29 +150,42 @@ export async function changePaymentStatus(
     }),
   );
 }
-export async function contributions(donor: string) {
-  const result = await database.send(
-    new QueryCommand({
-      TableName: requireTable(),
-      KeyConditionExpression: "pk=:pk AND begins_with(sk,:payment)",
-      ExpressionAttributeValues: {
-        ":pk": `DONOR#${donor}`,
-        ":payment": "PAYMENT#",
-      },
-      ScanIndexForward: false,
-    }),
-  );
-  return (result.Items ?? []).map(
-    (item) =>
-      ({
-        id: item.id,
-        projectId: item.projectId,
-        projectName: item.projectName,
-        amount: item.amount,
-        currency: item.currency,
-        status: item.status,
-        createdAt: item.createdAt,
-        captureId: item.captureId,
-      }) as Contribution,
-  );
+export async function contributions(donor: string): Promise<Contribution[]> {
+  const records: Contribution[] = [];
+  let cursor: Record<string, unknown> | undefined;
+  do {
+    const result = await database.send(
+      new QueryCommand({
+        TableName: requireTable(),
+        KeyConditionExpression: "pk=:pk AND begins_with(sk,:payment)",
+        ExpressionAttributeValues: {
+          ":pk": `DONOR#${donor}`,
+          ":payment": "PAYMENT#",
+        },
+        ScanIndexForward: false,
+        ConsistentRead: true,
+        ExclusiveStartKey: cursor,
+      }),
+    );
+    records.push(
+      ...(result.Items ?? []).map(
+        (item) =>
+          ({
+            id: item.id,
+            goalId: item.goalId,
+            completedAt: item.completedAt,
+            refundedCents: item.refundedCents,
+            projectId: item.projectId,
+            projectName: item.projectName,
+            amount: item.amount,
+            currency: item.currency,
+            status: item.status,
+            createdAt: item.createdAt,
+            captureId: item.captureId,
+          }) as Contribution,
+      ),
+    );
+    cursor = result.LastEvaluatedKey;
+  } while (cursor);
+  return records;
 }

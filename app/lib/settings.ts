@@ -1,5 +1,5 @@
 import { z } from "zod";
-export type SettingsSection = "appearance" | "models" | "paypal";
+export type SettingsSection = "profile" | "appearance" | "models" | "paypal";
 export const settingsConfigurationSchema = z.object({
   models: z.object({
     fast: z.string().nullable(),

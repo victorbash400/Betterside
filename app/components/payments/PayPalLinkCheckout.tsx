@@ -7,11 +7,13 @@ import { amountInCents, decimalAmount } from "../../lib/payment";
 import styles from "./PayPalLinkCheckout.module.css";
 export default function PayPalLinkCheckout({
   projectId,
+  goalId,
   amount,
   disabled,
   onBusy,
 }: {
   projectId: string;
+  goalId?: string;
   amount: string;
   disabled: boolean;
   onBusy: (busy: boolean) => void;
@@ -51,7 +53,7 @@ export default function PayPalLinkCheckout({
           );
       }
     },
-    [order?.id, order?.amount],
+    [order?.id, order?.amount, fetch],
   );
   useEffect(() => {
     const controller = new AbortController();
@@ -80,6 +82,7 @@ export default function PayPalLinkCheckout({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId,
+          goalId,
           amount: decimalAmount(amountInCents(amount)),
         }),
       });

@@ -127,6 +127,9 @@ export const workspaceChatContextSchema = z.object({
 export type WorkspaceChatContext = z.infer<typeof workspaceChatContextSchema>;
 
 export const contributionRecordSchema = paymentStatusSchema.extend({
+  goalId: z.string().optional(),
+  completedAt: z.string().optional(),
+  refundedCents: z.number().int().nonnegative().optional(),
   projectId: z.string(),
   createdAt: z.string(),
   captureId: z.string().optional(),
@@ -140,6 +143,7 @@ export const contributionsResultSchema = z.object({
 
 export const checkoutInputSchema = z.object({
   projectId: z.string().min(1).max(160).optional(),
+  goalId: z.string().min(1).max(100).optional(),
   amount: z.string().max(12).optional(),
 });
 export type CheckoutInput = z.infer<typeof checkoutInputSchema>;

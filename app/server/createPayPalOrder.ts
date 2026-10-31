@@ -4,15 +4,19 @@ import { loadCatalogue } from "./catalogue.ts";
 import { amountInCents, decimalAmount } from "../lib/payment.ts";
 import { paypalRequest } from "./paypal.ts";
 import { payment, recordPayment } from "./contributions.ts";
+import { loadProfile } from "./profile.ts";
+import { goalMatchesProject } from "../lib/profile.ts";
 import { paymentResultSchema } from "../lib/chatWorkspace.ts";
 export async function createPayPalOrder({
   projectId,
+  goalId,
   amount: amountInput,
   donor,
   originUrl,
   requestId,
 }: {
   projectId: string;
+  goalId?: string;
   amount: string;
   donor: string;
   originUrl: string;
@@ -21,6 +25,14 @@ export async function createPayPalOrder({
   const issues = await loadCatalogue();
   const issue = issues.find((issue) => issue.project.id === projectId);
   if (!issue) throw new Error("Project not found.");
+  if (goalId) {
+    const goal = (await loadProfile(donor)).profile.goals.find(
+      (goal) => goal.id === goalId,
+    );
+    if (!goal) throw new Error("Contribution goal unavailable.");
+    if (!goalMatchesProject(goal, issue))
+      throw new Error("This project does not match the goal cause.");
+  }
   const merchantId = process.env.PAYPAL_MERCHANT_ID;
   if (!merchantId) throw new Error("Configure PAYPAL_MERCHANT_ID.");
   const cents = amountInCents(amountInput),
@@ -72,6 +84,7 @@ export async function createPayPalOrder({
     existing &&
     (existing.donor !== donor ||
       existing.projectId !== projectId ||
+      existing.goalId !== goalId ||
       existing.cents !== cents)
   )
     throw new Error("PayPal order does not match this request.");
@@ -83,6 +96,7 @@ export async function createPayPalOrder({
       amount,
       currency: "USD",
       projectId: issue.project.id,
+      goalId,
       projectKey: issue.id,
       projectName: issue.project.name,
       recipient: merchantId,

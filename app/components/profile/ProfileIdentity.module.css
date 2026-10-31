@@ -1,0 +1,35 @@
+.identity {
+  display: grid;
+  gap: 7px;
+}
+.identity label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.identity > div {
+  display: flex;
+  gap: 8px;
+}
+.identity input {
+  min-width: 0;
+  flex: 1;
+  padding: 9px 11px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+.identity button {
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 12px;
+  background: var(--hover);
+  color: var(--ink);
+  font-size: 12px;
+}
+.identity > span {
+  color: var(--danger);
+  font-size: 12px;
+}

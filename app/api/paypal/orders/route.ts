@@ -9,7 +9,11 @@ export async function POST(request: Request) {
   try {
     sameOrigin(request);
     const input = z
-      .object({ projectId: z.string(), amount: z.string() })
+      .object({
+        projectId: z.string(),
+        goalId: z.string().min(1).max(100).optional(),
+        amount: z.string(),
+      })
       .strict()
       .parse(await request.json());
     const donor = await donorSession(true);

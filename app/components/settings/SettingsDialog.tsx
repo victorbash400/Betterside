@@ -1,3 +1,6 @@
+import ProfileSettings from "../profile/ProfileSettings";
+import type { MapItem } from "../../lib/types";
+import type { CheckoutInput } from "../../lib/chatWorkspace";
 import { ArrowLeft, PanelLeftOpen } from "lucide-react";
 import IconButton from "../controls/IconButton";
 import AppearanceSettings from "../appearance/AppearanceSettings";
@@ -17,7 +20,15 @@ export default function SettingsDialog({
   onModel,
   onClose,
   onNavigation,
+  records,
+  onCheckout,
+  onContributions,
+  onSection,
 }: {
+  records: MapItem[];
+  onCheckout: (input: CheckoutInput) => void;
+  onContributions: () => void;
+  onSection: (section: SettingsSection) => void;
   section: SettingsSection;
   appearance: Appearance;
   onAppearance: (value: Appearance) => void;
@@ -43,7 +54,15 @@ export default function SettingsDialog({
           <h1>{title}</h1>
         </header>
         <div className={styles.surface}>
-          {section === "appearance" ? (
+          {section === "profile" ? (
+            <ProfileSettings
+              records={records}
+              onCheckout={() => onCheckout({})}
+              onGoal={(goal) => onCheckout({ goalId: goal.id })}
+              onContributions={onContributions}
+              onPaymentSettings={() => onSection("paypal")}
+            />
+          ) : section === "appearance" ? (
             <AppearanceSettingsProvider
               value={appearance}
               update={onAppearance}

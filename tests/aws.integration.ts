@@ -12,6 +12,7 @@ import {
 import { trackingSchema } from "../app/lib/tracking.ts";
 import { contributions } from "../app/server/contributions.ts";
 import { recordRefund } from "../app/server/payment-events.ts";
+import { goalProgress } from "../app/lib/profile.ts";
 test("isolated AWS fixture captures once, refunds once, and preserves isolation", async () => {
   assert.equal(requireTable(), "BetterSide-dev");
   const suffix = randomUUID(),
@@ -30,6 +31,7 @@ test("isolated AWS fixture captures once, refunds once, and preserves isolation"
     projectId,
     projectKey: projectId,
     projectName: "Isolated QA fixture",
+    goalId: `qa-goal-${suffix}`,
     recipient: "qa",
     status: "CREATED" as const,
     createdAt,
@@ -56,6 +58,21 @@ test("isolated AWS fixture captures once, refunds once, and preserves isolation"
     const captured = await payment(id);
     assert.equal(captured?.status, "COMPLETED");
     assert.ok(captured);
+    const ledger = await contributions(donor);
+    assert.equal(ledger[0].goalId, record.goalId);
+    assert.equal(ledger[0].completedAt, captured.completedAt);
+    assert.ok(ledger[0].completedAt);
+    const goal = {
+      id: record.goalId,
+      category: "Water" as const,
+      targetCents: 1000,
+      period: "monthly" as const,
+      createdAt,
+    };
+    assert.deepEqual(goalProgress(goal, ledger, "Africa/Nairobi"), {
+      cents: 100,
+      percent: 10,
+    });
     await recordRefund(captured, eventId, `qa-refund-${suffix}`, 100);
     await assert.rejects(() =>
       recordRefund(captured, eventId, `qa-refund-${suffix}`, 100),
@@ -65,6 +82,10 @@ test("isolated AWS fixture captures once, refunds once, and preserves isolation"
     );
     assert.equal((await funding()).Item?.receivedCents, 0);
     assert.equal((await payment(id))?.status, "REFUNDED");
+    assert.equal(
+      goalProgress(goal, await contributions(donor), "Africa/Nairobi").cents,
+      0,
+    );
     await completePayment(record, captureId);
     assert.equal((await funding()).Item?.receivedCents, 0);
     await assert.rejects(
@@ -114,6 +135,52 @@ test("interests persist per visitor and reject conflicting revisions", async () 
       new DeleteCommand({
         TableName: requireTable(),
         Key: { pk: `DONOR#${donor}`, sk: "TRACKING" },
+      }),
+    );
+  }
+});
+
+test("profile goals persist per donor with conflict protection and immutable cause identity", async () => {
+  const { loadProfile, saveProfile } = await import("../app/server/profile.ts");
+  const donor = `qa-profile-${randomUUID()}`;
+  const TableName = requireTable();
+  const profile = {
+    name: "QA",
+    timeZone: "Africa/Nairobi",
+    goals: [
+      {
+        id: "qa-goal",
+        category: "Water" as const,
+        targetCents: 10000,
+        period: "monthly" as const,
+        createdAt: "2020-01-01T00:00:00.000Z",
+      },
+    ],
+  };
+  try {
+    const saved = await saveProfile(donor, profile, 0);
+    assert.notEqual(
+      saved.profile.goals[0].createdAt,
+      profile.goals[0].createdAt,
+    );
+    assert.equal(
+      (await loadProfile(donor)).profile.goals[0].targetCents,
+      10000,
+    );
+    assert.equal((await loadProfile(`${donor}-other`)).profile.goals.length, 0);
+    await assert.rejects(() => saveProfile(donor, profile, 0));
+    await assert.rejects(() =>
+      saveProfile(
+        donor,
+        { ...profile, goals: [{ ...profile.goals[0], category: "Education" }] },
+        1,
+      ),
+    );
+  } finally {
+    await database.send(
+      new DeleteCommand({
+        TableName,
+        Key: { pk: `DONOR#${donor}`, sk: "PROFILE" },
       }),
     );
   }

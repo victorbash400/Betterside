@@ -8,12 +8,14 @@ export default function SettingsPicker({
   options,
   onChange,
   width = 180,
+  disabled = false,
 }: {
   label: string;
   value: string;
   options: { value: string; label: string }[];
   onChange: (value: string) => void;
   width?: number;
+  disabled?: boolean;
 }) {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(
     null,
@@ -23,6 +25,7 @@ export default function SettingsPicker({
     <>
       <button
         type="button"
+        disabled={disabled}
         className={styles.button}
         style={{ width }}
         aria-label={label}
@@ -36,7 +39,7 @@ export default function SettingsPicker({
         <span>{options.find((item) => item.value === value)?.label}</span>
         <ChevronDown size={14} />
       </button>
-      {position && (
+      {position && !disabled && (
         <ContextMenu
           {...position}
           label={label}

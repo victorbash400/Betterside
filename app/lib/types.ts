@@ -52,6 +52,9 @@ export type MapItem = Omit<Issue, "project"> & {
   locationPrecision?: { label: string; uncertaintyKm?: number };
 };
 export interface Contribution {
+  goalId?: string;
+  completedAt?: string;
+  refundedCents?: number;
   id: string;
   projectId: string;
   projectName: string;

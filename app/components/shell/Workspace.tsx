@@ -1,7 +1,7 @@
 "use client";
 import type { CheckoutInput } from "../../lib/chatWorkspace";
 import type { SettingsSection } from "../../lib/settings";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useChatWorkspaceActions } from "../../state/useChatWorkspaceActions";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
@@ -86,6 +86,14 @@ export default function Workspace() {
   )?.reportingArea?.countryCode;
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection>("appearance");
+  useEffect(() => {
+    if (
+      new URL(window.location.href).searchParams.get("profile") === "payments"
+    ) {
+      setSettingsSection("profile");
+      state.setSettingsOpen(true);
+    }
+  }, [state.setSettingsOpen]);
   const [action, setAction] = useState<InterestAction | null>(null),
     [adding, setAdding] = useState(false),
     [creating, setCreating] = useState(false);
@@ -209,6 +217,10 @@ export default function Workspace() {
             state.setSettingsOpen(false);
           }
         }}
+        onProfile={() => {
+          setSettingsSection("profile");
+          state.setSettingsOpen(true);
+        }}
         onSettings={() => state.setSettingsOpen(true)}
         open={state.navigationOpen}
         onClose={() => state.setNavigationOpen(false)}
@@ -233,6 +245,13 @@ export default function Workspace() {
       />
       {state.settingsOpen ? (
         <SettingsDialog
+          records={state.allRecords}
+          onCheckout={setChatCheckout}
+          onContributions={() => {
+            state.setSettingsOpen(false);
+            state.setView("Contributions");
+          }}
+          onSection={setSettingsSection}
           section={settingsSection}
           appearance={state.appearance.value}
           onAppearance={state.appearance.update}

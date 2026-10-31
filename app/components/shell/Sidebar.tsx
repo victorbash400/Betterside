@@ -32,6 +32,7 @@ export default function Sidebar({
   onToggleOrganizations,
   onToggleCauses,
   onSettings,
+  onProfile,
   open,
   onClose,
   issues,
@@ -58,6 +59,7 @@ export default function Sidebar({
   onToggleCauses: () => void;
   onView: (view: View) => void;
   onSettings: () => void;
+  onProfile: () => void;
   open: boolean;
   onClose: () => void;
   issues: Issue[];
@@ -247,7 +249,7 @@ export default function Sidebar({
               aria-expanded={Boolean(menu)}
               onClick={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
-                setMenu(menu ? null : { x: rect.left, y: rect.top - 58 });
+                setMenu(menu ? null : { x: rect.left, y: rect.top - 96 });
               }}
             >
               <CircleUserRound size={24} strokeWidth={1.8} />
@@ -259,7 +261,10 @@ export default function Sidebar({
         <ContextMenu
           {...menu}
           label="Account"
-          entries={[{ label: "Settings", icon: Settings, action: onSettings }]}
+          entries={[
+            { label: "Profile", icon: CircleUserRound, action: onProfile },
+            { label: "Settings", icon: Settings, action: onSettings },
+          ]}
           onClose={() => setMenu(null)}
         />
       )}

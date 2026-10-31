@@ -31,20 +31,29 @@ async function post(path: string, input: unknown) {
 }
 export function usePayPalCheckout({
   projectId,
+  goalId,
   amount,
   disabled,
   onBusy,
   onComplete,
 }: {
   projectId: string;
+  goalId?: string;
   amount: string;
   disabled: boolean;
   onBusy: (busy: boolean) => void;
   onComplete: (result: PaymentCompletion) => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
-  const current = useRef({ projectId, amount, disabled, onBusy, onComplete });
-  current.current = { projectId, amount, disabled, onBusy, onComplete };
+  const current = useRef({
+    projectId,
+    goalId,
+    amount,
+    disabled,
+    onBusy,
+    onComplete,
+  });
+  current.current = { projectId, goalId, amount, disabled, onBusy, onComplete };
   const buttonRef = useRef<PayPalButtonElement | undefined>(undefined);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
@@ -75,6 +84,7 @@ export function usePayPalCheckout({
       const order = paymentResultSchema.parse(
         await post("/api/paypal/orders", {
           projectId: input.projectId,
+          goalId: input.goalId,
           amount: decimalAmount(amountInCents(input.amount)),
         }),
       );
