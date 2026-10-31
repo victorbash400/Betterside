@@ -266,6 +266,7 @@ export default function Sidebar({
         <ContextMenu
           {...menu}
           label="Account"
+          className={styles.accountMenu}
           entries={[
             { label: "Profile", icon: CircleUserRound, action: onProfile },
             { label: "Settings", icon: Settings, action: onSettings },

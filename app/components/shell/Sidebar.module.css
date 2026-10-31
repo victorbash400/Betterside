@@ -169,3 +169,11 @@
 .section > span:last-child {
   opacity: 1;
 }
+
+.accountMenu {
+  border-radius: 18px;
+  padding: 7px;
+}
+.accountMenu > button {
+  border-radius: 11px;
+}
