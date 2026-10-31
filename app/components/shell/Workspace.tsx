@@ -90,7 +90,7 @@ export default function Workspace() {
     if (
       new URL(window.location.href).searchParams.get("profile") === "payments"
     ) {
-      setSettingsSection("profile");
+      setSettingsSection("paypal");
       state.setSettingsOpen(true);
     }
   }, [state.setSettingsOpen]);
@@ -251,7 +251,6 @@ export default function Workspace() {
             state.setSettingsOpen(false);
             state.setView("Contributions");
           }}
-          onSection={setSettingsSection}
           section={settingsSection}
           appearance={state.appearance.value}
           onAppearance={state.appearance.update}

@@ -3,7 +3,7 @@ import { useDonorProfile } from "../../state/useDonorProfile";
 import type { GoalsResult } from "../../lib/chatGoals";
 import type { ChatWorkspaceActions } from "../../lib/chatWorkspace";
 import ProfileGoals from "../profile/ProfileGoals";
-import styles from "./ChatResult.module.css";
+import styles from "./ChatGoalsWidget.module.css";
 export default function ChatGoalsWidget({
   result,
   actions,
@@ -19,7 +19,7 @@ export default function ChatGoalsWidget({
     window.dispatchEvent(new Event("betterside-profile-changed"));
   }, [result.revision]);
   return (
-    <div className={styles.result}>
+    <div className={styles.widget}>
       {(state.error || error) && (
         <div className={styles.error} role="alert">
           {state.error || error}

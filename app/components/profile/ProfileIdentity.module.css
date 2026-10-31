@@ -1,19 +1,13 @@
-.identity {
-  display: grid;
-  gap: 7px;
-}
-.identity label {
-  font-size: 11px;
-  color: var(--muted);
-}
-.identity > div {
+.form {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
-.identity input {
+.form input {
   min-width: 0;
-  flex: 1;
-  padding: 9px 11px;
+  width: 180px;
+  padding: 8px 10px;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -21,15 +15,9 @@
   font: inherit;
   font-size: 13px;
 }
-.identity button {
-  border: 0;
-  border-radius: 7px;
-  padding: 7px 12px;
-  background: var(--hover);
-  color: var(--ink);
-  font-size: 12px;
-}
-.identity > span {
+.error {
+  display: block;
+  padding: 0 16px 12px;
   color: var(--danger);
   font-size: 12px;
 }

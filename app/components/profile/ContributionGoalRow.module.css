@@ -1,6 +1,7 @@
 .goal {
   display: grid;
   gap: 9px;
+  padding: 16px;
 }
 .heading {
   display: flex;

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import SettingsRow from "../settings/SettingsRow";
+import SettingsInlineButton from "../settings/SettingsInlineButton";
 import styles from "./ProfileIdentity.module.css";
 export default function ProfileIdentity({
   name,
@@ -9,34 +11,68 @@ export default function ProfileIdentity({
   busy: boolean;
   onSave: (name: string) => Promise<void>;
 }) {
+  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name);
   const [error, setError] = useState("");
   return (
-    <form
-      className={styles.identity}
-      onSubmit={(event) => {
-        event.preventDefault();
-        setError("");
-        void onSave(draft).catch((failure) =>
-          setError(
-            failure instanceof Error ? failure.message : "Could not save name.",
-          ),
-        );
-      }}
-    >
-      <label htmlFor="profile-name">Name</label>
-      <div>
-        <input
-          id="profile-name"
-          value={draft}
-          maxLength={100}
-          disabled={busy}
-          onChange={(event) => setDraft(event.target.value)}
-          autoComplete="name"
-        />
-        {draft.trim() !== name && <button disabled={busy}>Save</button>}
-      </div>
-      {error && <span role="alert">{error}</span>}
-    </form>
+    <div>
+      <SettingsRow label="Name">
+        {editing ? (
+          <form
+            className={styles.form}
+            onSubmit={(event) => {
+              event.preventDefault();
+              setError("");
+              void onSave(draft)
+                .then(() => setEditing(false))
+                .catch((failure) =>
+                  setError(
+                    failure instanceof Error
+                      ? failure.message
+                      : "Could not save name.",
+                  ),
+                );
+            }}
+          >
+            <input
+              aria-label="Name"
+              value={draft}
+              maxLength={100}
+              disabled={busy}
+              onChange={(event) => setDraft(event.target.value)}
+              autoComplete="name"
+              autoFocus
+            />
+            <SettingsInlineButton
+              disabled={busy}
+              onClick={() => setEditing(false)}
+            >
+              Cancel
+            </SettingsInlineButton>
+            <SettingsInlineButton type="submit" disabled={busy}>
+              Save
+            </SettingsInlineButton>
+          </form>
+        ) : (
+          <>
+            <span>{name || "—"}</span>
+            <SettingsInlineButton
+              disabled={busy}
+              onClick={() => {
+                setDraft(name);
+                setEditing(true);
+              }}
+            >
+              Edit
+            </SettingsInlineButton>
+          </>
+        )}
+      </SettingsRow>
+      {error && (
+        <span className={styles.error} role="alert">
+          {error}
+        </span>
+      )}
+    </div>
   );
 }

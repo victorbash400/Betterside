@@ -6,7 +6,8 @@ import IconButton from "../controls/IconButton";
 import AppearanceSettings from "../appearance/AppearanceSettings";
 import { AppearanceSettingsProvider } from "../../state/AppearanceContext";
 import ModelSettings from "./ModelSettings";
-import PayPalSettings from "./PayPalSettings";
+import PaymentSettings from "./PaymentSettings";
+import GoalsSettings from "../profile/GoalsSettings";
 import { settingsSections } from "./SettingsNavigation";
 import { useSettingsConfiguration } from "../../state/useSettingsConfiguration";
 import type { SettingsSection } from "../../lib/settings";
@@ -23,12 +24,10 @@ export default function SettingsDialog({
   records,
   onCheckout,
   onContributions,
-  onSection,
 }: {
   records: MapItem[];
   onCheckout: (input: CheckoutInput) => void;
   onContributions: () => void;
-  onSection: (section: SettingsSection) => void;
   section: SettingsSection;
   appearance: Appearance;
   onAppearance: (value: Appearance) => void;
@@ -55,12 +54,11 @@ export default function SettingsDialog({
         </header>
         <div className={styles.surface}>
           {section === "profile" ? (
-            <ProfileSettings
+            <ProfileSettings />
+          ) : section === "goals" ? (
+            <GoalsSettings
               records={records}
-              onCheckout={() => onCheckout({})}
-              onGoal={(goal) => onCheckout({ goalId: goal.id })}
-              onContributions={onContributions}
-              onPaymentSettings={() => onSection("paypal")}
+              onContribute={(goal) => onCheckout({ goalId: goal.id })}
             />
           ) : section === "appearance" ? (
             <AppearanceSettingsProvider
@@ -83,7 +81,11 @@ export default function SettingsDialog({
               configuration={configuration.data.models}
             />
           ) : (
-            <PayPalSettings configuration={configuration.data.paypal} />
+            <PaymentSettings
+              configuration={configuration.data.paypal}
+              onCheckout={() => onCheckout({})}
+              onContributions={onContributions}
+            />
           )}
         </div>
       </div>

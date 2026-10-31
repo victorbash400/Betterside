@@ -1,77 +1,20 @@
-.payments {
-  display: grid;
-  gap: 12px;
-}
-.payments header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.payments h2 {
-  font-size: 14px;
-  font-weight: 500;
-  margin: 0;
-}
-.payments header span {
-  color: var(--muted);
-  font-size: 11px;
-}
-.payments > div {
-  display: flex;
-  gap: 8px;
-}
-.payments > div button {
-  padding: 8px 12px;
-  border: 0;
-  border-radius: 7px;
-  background: var(--hover);
+.link {
   color: var(--ink);
   font-size: 12px;
-}
-.payments > div button:first-child {
-  background: var(--ink);
-  color: var(--surface);
-}
-.payments a {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--ink);
-  font-size: 12px;
-  text-decoration: none;
-}
-.settings {
-  justify-self: start;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.linked {
-  font-size: 12px;
-}
-.connect {
-  justify-self: start;
-  padding: 8px 12px;
-  border: 0;
-  border-radius: 7px;
-  background: var(--hover);
-  color: var(--ink);
-  font-size: 12px;
+  text-underline-offset: 3px;
 }
 .error {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 12px;
   color: var(--danger);
-  font-size: 11px;
 }
 .error button {
-  justify-self: start;
   border: 0;
   border-radius: 6px;
-  padding: 5px 8px;
-  background: var(--hover);
+  padding: 6px 10px;
   color: var(--ink);
+  background: var(--hover);
 }

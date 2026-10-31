@@ -4,6 +4,7 @@ import {
   goalCategories,
   type ContributionGoal,
 } from "../../lib/profile";
+import SettingsRow from "../settings/SettingsRow";
 import SettingsPicker from "../settings/SettingsPicker";
 import styles from "./GoalEditor.module.css";
 export default function GoalEditor({
@@ -67,46 +68,50 @@ export default function GoalEditor({
         void submit();
       }}
     >
-      <label>Cause</label>
-      {goal ? (
-        <strong>{goal.category}</strong>
-      ) : (
-        <SettingsPicker
-          label="Goal cause"
+      <SettingsRow label="Cause">
+        {goal ? (
+          <strong>{goal.category}</strong>
+        ) : (
+          <SettingsPicker
+            label="Goal cause"
+            disabled={busy}
+            value={category}
+            options={goalCategories.map((value) => ({ value, label: value }))}
+            onChange={(value) =>
+              setCategory(contributionGoalSchema.shape.category.parse(value))
+            }
+            width={240}
+          />
+        )}
+      </SettingsRow>
+      <SettingsRow label="Target · USD">
+        <input
+          id="goal-target"
+          aria-label="Goal target in USD"
+          type="number"
+          min="1"
+          max="1000000"
+          step="0.01"
+          required
           disabled={busy}
-          value={category}
-          options={goalCategories.map((value) => ({ value, label: value }))}
-          onChange={(value) =>
-            setCategory(contributionGoalSchema.shape.category.parse(value))
-          }
-          width={240}
+          value={amount}
+          onChange={(event) => setAmount(event.target.value)}
         />
-      )}
-      <label htmlFor="goal-target">Target · USD</label>
-      <input
-        id="goal-target"
-        aria-label="Goal target in USD"
-        type="number"
-        min="1"
-        max="1000000"
-        step="0.01"
-        required
-        disabled={busy}
-        value={amount}
-        onChange={(event) => setAmount(event.target.value)}
-      />
-      <SettingsPicker
-        label="Goal period"
-        disabled={busy}
-        value={period}
-        options={[
-          { value: "monthly", label: "Monthly" },
-          { value: "once", label: "One-time" },
-        ]}
-        onChange={(value) =>
-          setPeriod(contributionGoalSchema.shape.period.parse(value))
-        }
-      />
+      </SettingsRow>
+      <SettingsRow label="Period">
+        <SettingsPicker
+          label="Goal period"
+          disabled={busy}
+          value={period}
+          options={[
+            { value: "monthly", label: "Monthly" },
+            { value: "once", label: "One-time" },
+          ]}
+          onChange={(value) =>
+            setPeriod(contributionGoalSchema.shape.period.parse(value))
+          }
+        />
+      </SettingsRow>
       {error && <span role="alert">{error}</span>}
       <div className={styles.actions}>
         <button type="button" disabled={busy} onClick={onClose}>

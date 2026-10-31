@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
-import IconButton from "../controls/IconButton";
+import SettingsGroup from "../settings/SettingsGroup";
+import SettingsRow from "../settings/SettingsRow";
+import SettingsInlineButton from "../settings/SettingsInlineButton";
 import GoalEditor from "./GoalEditor";
 import ContributionGoalRow from "./ContributionGoalRow";
 import {
@@ -32,64 +33,66 @@ export default function ProfileGoals({
   const [error, setError] = useState("");
   return (
     <section className={styles.goals} aria-label="Contribution goals">
-      <header>
-        <h2>Goals</h2>
-        <IconButton
-          label="New contribution goal"
-          disabled={busy || profile.goals.length >= 30}
-          onClick={() => setEditor("new")}
-        >
-          <Plus size={16} />
-        </IconButton>
-      </header>
-      <span className={styles.context}>USD · Sandbox</span>
-      {profile.goals.map((goal) =>
-        editor !== "new" && editor?.id === goal.id ? null : (
-          <ContributionGoalRow
-            key={goal.id}
-            goal={goal}
-            {...goalProgress(goal, payments, profile.timeZone)}
+      <SettingsGroup>
+        <SettingsRow label="Contribution goals">
+          <span>USD · Sandbox</span>
+          <SettingsInlineButton
+            disabled={busy || profile.goals.length >= 30 || Boolean(editor)}
+            onClick={() => setEditor("new")}
+          >
+            New goal
+          </SettingsInlineButton>
+        </SettingsRow>
+        {profile.goals.map((goal) =>
+          editor !== "new" && editor?.id === goal.id ? null : (
+            <ContributionGoalRow
+              key={goal.id}
+              goal={goal}
+              {...goalProgress(goal, payments, profile.timeZone)}
+              busy={busy}
+              canContribute={
+                availableCategories
+                  ? availableCategories.includes(goal.category)
+                  : records.some((record) => goalMatchesProject(goal, record))
+              }
+              onEdit={() => setEditor(goal)}
+              onDelete={() => {
+                setError("");
+                void onSave({
+                  ...profile,
+                  goals: profile.goals.filter((item) => item.id !== goal.id),
+                }).catch((failure) =>
+                  setError(
+                    failure instanceof Error
+                      ? failure.message
+                      : "Could not delete goal.",
+                  ),
+                );
+              }}
+              onContribute={() => onContribute(goal)}
+            />
+          ),
+        )}
+        {editor && (
+          <GoalEditor
+            key={editor === "new" ? "new" : editor.id}
+            goal={editor === "new" ? undefined : editor}
             busy={busy}
-            canContribute={availableCategories
-              ? availableCategories.includes(goal.category)
-              : records.some((record) => goalMatchesProject(goal, record))}
-            onEdit={() => setEditor(goal)}
-            onDelete={() => {
-              setError("");
-              void onSave({
+            onClose={() => setEditor(undefined)}
+            onSave={async (goal) => {
+              await onSave({
                 ...profile,
-                goals: profile.goals.filter((item) => item.id !== goal.id),
-              }).catch((failure) =>
-                setError(
-                  failure instanceof Error
-                    ? failure.message
-                    : "Could not delete goal.",
-                ),
-              );
+                goals:
+                  editor === "new"
+                    ? [...profile.goals, goal]
+                    : profile.goals.map((item) =>
+                        item.id === goal.id ? goal : item,
+                      ),
+              });
             }}
-            onContribute={() => onContribute(goal)}
           />
-        ),
-      )}
-      {editor && (
-        <GoalEditor
-          key={editor === "new" ? "new" : editor.id}
-          goal={editor === "new" ? undefined : editor}
-          busy={busy}
-          onClose={() => setEditor(undefined)}
-          onSave={async (goal) => {
-            await onSave({
-              ...profile,
-              goals:
-                editor === "new"
-                  ? [...profile.goals, goal]
-                  : profile.goals.map((item) =>
-                      item.id === goal.id ? goal : item,
-                    ),
-            });
-          }}
-        />
-      )}
+        )}
+      </SettingsGroup>
       {error && <span role="alert">{error}</span>}
     </section>
   );

@@ -1,4 +1,5 @@
 import {
+  Target,
   Palette,
   SlidersHorizontal,
   CreditCard,
@@ -8,6 +9,7 @@ import type { SettingsSection } from "../../lib/settings";
 import styles from "../shell/Sidebar.module.css";
 export const settingsSections = [
   { id: "profile", label: "Profile", Icon: CircleUserRound },
+  { id: "goals", label: "Goals", Icon: Target },
   { id: "appearance", label: "Appearance", Icon: Palette },
   { id: "models", label: "Models", Icon: SlidersHorizontal },
   { id: "paypal", label: "PayPal Sandbox", Icon: CreditCard },
