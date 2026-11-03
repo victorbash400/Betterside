@@ -36,6 +36,7 @@ export default function ContextMenu({
   const [position, setPosition] = useState({ left: x, top: y });
   useLayoutEffect(() => {
     const previous = document.activeElement;
+    menu.current?.showPopover();
     const rect = menu.current?.getBoundingClientRect();
     if (rect)
       setPosition({
@@ -62,6 +63,7 @@ export default function ContextMenu({
   return createPortal(
     <div
       ref={menu}
+      popover="manual"
       role="menu"
       aria-label={label}
       className={`${styles.menu} ${className}`}
