@@ -1,7 +1,7 @@
 import "server-only";
 import { BatchGetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { database, requireTable } from "./aws";
-import { issueSchema } from "../lib/catalogueSchema";
+import { database, requireTable } from "./aws.ts";
+import { issueSchema } from "../lib/catalogueSchema.ts";
 export async function loadCatalogue() {
   const TableName = requireTable();
   const result = await database.send(

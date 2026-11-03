@@ -1,3 +1,4 @@
+import { handleSubscriptionWebhook } from "../../../server/subscriptionWebhook";
 import { z } from "zod";
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { paypalRequest } from "../../../server/paypal";
@@ -58,6 +59,8 @@ export async function POST(request: Request) {
         { error: "Invalid PayPal signature." },
         { status: 401 },
       );
+    if (await handleSubscriptionWebhook(raw))
+      return Response.json({ received: true });
     const event = eventSchema.parse(raw);
     const seen = await database.send(
       new GetCommand({

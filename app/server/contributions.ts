@@ -52,9 +52,11 @@ export async function recordPayment(record: PaymentRecord) {
 export async function completePayment(
   record: PaymentRecord,
   captureId: string,
+  completedAt = new Date().toISOString(),
 ) {
   const TableName = requireTable();
-  const completedAt = new Date().toISOString();
+  if (!Number.isFinite(Date.parse(completedAt)))
+    throw new Error("Invalid payment completion date.");
   try {
     await database.send(
       new TransactWriteCommand({

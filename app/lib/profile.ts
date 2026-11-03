@@ -2,10 +2,29 @@ import { z } from "zod";
 import { organizationTopics } from "./organizations.ts";
 import type { MapItem, Contribution } from "./types.ts";
 import { amountInCents } from "./payment.ts";
-export const goalCategories = ["All causes", ...organizationTopics] as const;
+export const goalCategories = [
+  "All causes",
+  ...organizationTopics,
+  "Conflict",
+  "Displacement",
+  "Humanitarian needs",
+] as const;
 export const contributionGoalSchema = z.object({
   id: z.string().min(1).max(100),
   category: z.enum(goalCategories),
+  projectId: z.string().min(1).max(160).optional(),
+  targetText: z.string().trim().max(180).optional(),
+  status: z.enum(["active", "paused"]).optional(),
+  organization: z
+    .object({
+      id: z.string().min(1).max(300),
+      name: z.string().min(1).max(300),
+      donateUrl: z
+        .url()
+        .refine((url) => new URL(url).protocol === "https:")
+        .nullable(),
+    })
+    .optional(),
   targetCents: z.number().int().min(100).max(100000000),
   period: z.enum(["monthly", "once"]),
   createdAt: z.iso.datetime(),
@@ -49,9 +68,16 @@ const topicKinds: Record<string, string[]> = {
   Shelter: ["Displacement"],
   "Camp management": ["Displacement"],
 };
-export function goalMatchesProject(goal: Pick<ContributionGoal, "category">, record: MapItem) {
+export function goalMatchesProject(
+  goal: Pick<ContributionGoal, "category"> &
+    Partial<Pick<ContributionGoal, "organization" | "status" | "projectId">>,
+  record: MapItem,
+) {
   return (
+    !goal.organization &&
+    goal.status !== "paused" &&
     Boolean(record.project) &&
+    (!goal.projectId || goal.projectId === record.project?.id) &&
     (goal.category === "All causes" ||
       record.kind === goal.category ||
       topicKinds[goal.category]?.includes(record.kind) === true)

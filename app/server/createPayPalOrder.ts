@@ -31,7 +31,7 @@ export async function createPayPalOrder({
     );
     if (!goal) throw new Error("Contribution goal unavailable.");
     if (!goalMatchesProject(goal, issue))
-      throw new Error("This project does not match the goal cause.");
+      throw new Error("This project is unavailable for this goal.");
   }
   const merchantId = process.env.PAYPAL_MERCHANT_ID;
   if (!merchantId) throw new Error("Configure PAYPAL_MERCHANT_ID.");

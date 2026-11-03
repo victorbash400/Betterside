@@ -26,18 +26,19 @@ export async function paypalToken() {
     },
     body: "grant_type=client_credentials",
   });
-  const data = await response.json();
   if (!response.ok) throw new Error("PayPal authentication failed.");
+  const data = await paypalJson(response);
   return z.object({ access_token: z.string() }).parse(data).access_token;
 }
 export async function paypalRequest(
   path: string,
   body?: unknown,
   requestId?: string,
+  method?: "PATCH",
 ) {
   const token = await paypalToken();
   const response = await paypalFetch(path, {
-    method: body === undefined ? "GET" : "POST",
+    method: method ?? (body === undefined ? "GET" : "POST"),
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -45,8 +46,15 @@ export async function paypalRequest(
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  const data = await response.json();
+  if (response.status === 204 && response.ok) return {};
   if (!response.ok)
     throw new Error(`PayPal request failed (${response.status}).`);
-  return data;
+  return paypalJson(response);
+}
+async function paypalJson(response: Response) {
+  try {
+    return await response.json();
+  } catch {
+    throw new Error("PayPal returned an invalid response. Retry.");
+  }
 }

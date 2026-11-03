@@ -101,3 +101,60 @@ test("goals reject duplicate IDs and unsupported timezones; cannot pretend unrel
     true,
   );
 });
+
+test("goals preserve target text and organization destinations without allowing sandbox routing", () => {
+  const input = {
+    ...goal,
+    targetText: "  Fund clean water access  ",
+    organization: {
+      id: "water-org",
+      name: "Water organization",
+      donateUrl: "https://example.org/donate",
+    },
+    status: "active" as const,
+  };
+  const parsed = profileSchema.parse({ goals: [input] }).goals[0];
+  assert.equal(parsed.targetText, "Fund clean water access");
+  assert.equal(parsed.organization?.id, "water-org");
+  const project = { kind: "Water", project: { id: "demo" } } as MapItem;
+  assert.equal(goalMatchesProject(goal, project), true);
+  assert.equal(goalMatchesProject(parsed, project), false);
+  assert.equal(
+    goalMatchesProject({ ...goal, status: "paused" }, project),
+    false,
+  );
+  assert.equal(
+    profileSchema.safeParse({
+      goals: [{ ...input, targetText: "x".repeat(181) }],
+    }).success,
+    false,
+  );
+  assert.equal(
+    profileSchema.safeParse({
+      goals: [
+        {
+          ...input,
+          organization: {
+            ...input.organization,
+            donateUrl: "javascript:alert(1)",
+          },
+        },
+      ],
+    }).success,
+    false,
+  );
+  assert.equal(
+    profileSchema.safeParse({
+      goals: [
+        {
+          ...input,
+          organization: {
+            ...input.organization,
+            donateUrl: "http://example.org/donate",
+          },
+        },
+      ],
+    }).success,
+    false,
+  );
+});
