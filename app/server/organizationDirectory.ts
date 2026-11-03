@@ -277,10 +277,16 @@ export async function loadOrganizationDirectory(
   const identifier = createHash("sha256")
     .update(process.env.HDX_HAPI_APP_IDENTIFIER ?? "")
     .digest("hex");
+  const key = JSON.stringify([country ?? "all", identifier]);
+  if (refresh) directories.invalidate(key);
   const result = await directories.get(
-    JSON.stringify([country ?? "all", identifier, refresh]),
+    key,
     () => buildOrganizationDirectory(country, refresh),
-    { ttlMs: 60000, errorTtlMs: cacheLifetimes.failure },
+    {
+      ttlMs: (value) => value.sources.some((source) => source.state === "error" || source.state === "partial")
+        ? cacheLifetimes.failure : cacheLifetimes.organizations,
+      errorTtlMs: cacheLifetimes.failure,
+    },
   );
   return result.value;
 }

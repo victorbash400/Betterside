@@ -19,14 +19,12 @@ export async function GET(request: Request) {
   );
   if (!result.success) return apiError(new Error("Invalid country filter."));
   try {
-    return cachedResponse(
-      request,
-      await loadOrganizationDirectory(
-        result.data.country,
-        result.data.refresh === "1",
-      ),
-      60,
+    const directory = await loadOrganizationDirectory(
+      result.data.country,
+      result.data.refresh === "1",
     );
+    const incomplete = directory.sources.some((source) => source.state === "error" || source.state === "partial");
+    return cachedResponse(request, directory, incomplete ? 120 : 12 * 60 * 60);
   } catch (error) {
     const response = apiError(error, 503);
     response.headers.set("Cache-Control", "no-store");

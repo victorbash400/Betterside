@@ -1,14 +1,19 @@
-import { useEffect, useState } from "react";
+import LoadingRegion from "../controls/LoadingRegion";
+import { useEffect, useRef, useState } from "react";
 import { Building2, ChevronDown, ChevronUp } from "lucide-react";
-import { organizationsResponseSchema } from "../../lib/responseOrganizations";
-import type { z } from "zod";
+import {
+  responseOrganizationsPath,
+  cachedResponseOrganizations,
+  fetchResponseOrganizations,
+  type ResponseOrganizationsData,
+} from "../../state/responseOrganizationsCache";
 import type { ConcernId } from "../../lib/concerns";
 import OrganizationRow from "./OrganizationRow";
 import styles from "./ResponseOrganizations.module.css";
 type Result =
   | { state: "loading" }
   | { state: "error"; message: string }
-  | { state: "ready"; data: z.infer<typeof organizationsResponseSchema> };
+  | { state: "ready"; data: ResponseOrganizationsData };
 export default function ResponseOrganizations({
   country,
   concern,
@@ -22,49 +27,35 @@ export default function ResponseOrganizations({
 }) {
   const [open, setOpen] = useState(embedded);
   const [attempt, setAttempt] = useState(0);
-  const [result, setResult] = useState<Result>({ state: "loading" });
+  const previousAttempt = useRef(attempt);
+  const path = responseOrganizationsPath(country, concern);
+  const [result, setResult] = useState<Result>(() => {
+    const data = cachedResponseOrganizations(path);
+    return data ? { state: "ready", data } : { state: "loading" };
+  });
   const [page, setPage] = useState(0);
   useEffect(() => {
     if (!open) return;
-    const controller = new AbortController();
-    setResult({ state: "loading" });
-    setPage(0);
-    async function load() {
-      try {
-        const query = new URLSearchParams({ country, concern });
-        const response = await fetch(`/api/organizations?${query}`, {
-          signal: controller.signal,
-        });
-        const data: unknown = await response.json();
-        if (!response.ok) {
-          const message =
-            data &&
-            typeof data === "object" &&
-            "error" in data &&
-            typeof data.error === "string"
-              ? data.error
-              : "Organization lookup failed. Retry.";
-          throw new Error(message);
-        }
-        if (!controller.signal.aborted)
-          setResult({
-            state: "ready",
-            data: organizationsResponseSchema.parse(data),
-          });
-      } catch (error) {
-        if (!controller.signal.aborted)
-          setResult({
-            state: "error",
-            message:
-              error instanceof Error
-                ? error.message
-                : "Organization lookup failed. Retry.",
-          });
-      }
+    let active = true;
+    const refresh = attempt > previousAttempt.current;
+    previousAttempt.current = attempt;
+    const saved = cachedResponseOrganizations(path);
+    if (saved && !refresh) {
+      setResult({ state: "ready", data: saved });
+      return;
     }
-    void load();
-    return () => controller.abort();
-  }, [open, country, concern, attempt]);
+    if (!saved) setResult({ state: "loading" });
+    setPage(0);
+    void fetchResponseOrganizations(path, refresh)
+      .then((data) => {
+        if (active) setResult({ state: "ready", data });
+      })
+      .catch((error) => {
+        if (active) setResult({ state: "error", message: error instanceof Error
+          ? error.message : "Organization lookup failed. Retry." });
+      });
+    return () => { active = false; };
+  }, [open, path, attempt]);
   return (
     <section
       className={styles.organizations}
@@ -84,7 +75,7 @@ export default function ResponseOrganizations({
       {open && (
         <div className={styles.content}>
           {result.state === "loading" && (
-            <span role="status">Loading organizations</span>
+            <LoadingRegion compact label="Loading organizations" />
           )}
           {result.state === "error" && (
             <div className={styles.error} role="alert">

@@ -280,3 +280,22 @@ test("opt-in stale retention preserves original data and dates while exposing re
     (error) => error instanceof Error && error.message === "HTTP 503",
   );
 });
+
+test("cached views can read fresh data synchronously without restarting a request", async () => {
+  const { cache, advance } = fixture();
+  let calls = 0;
+  const load = async () => ({ version: ++calls });
+  assert.equal(cache.peek("country"), undefined);
+  const first = await cache.get("country", load, policy);
+  assert.equal(cache.peek("country"), first);
+  advance(99);
+  assert.equal(cache.peek("country"), first);
+  assert.equal(calls, 1);
+  cache.invalidate("country");
+  assert.equal(cache.peek("country"), undefined);
+  const refreshed = await cache.get("country", load, policy);
+  assert.equal(cache.peek("country"), refreshed);
+  assert.equal(calls, 2);
+  advance(100);
+  assert.equal(cache.peek("country"), undefined);
+});

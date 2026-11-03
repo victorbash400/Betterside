@@ -63,6 +63,15 @@ export function createAsyncCache<T>({
     bytes += entry.bytes;
   }
   return {
+    peek(key: string): CacheResult<T> | undefined {
+      const entry = entries.get(key);
+      return entry && "result" in entry && entry.result.expiresAt > now()
+        ? entry.result
+        : undefined;
+    },
+    invalidate(key: string) {
+      remove(key);
+    },
     async get(
       key: string,
       load: () => Promise<T>,
