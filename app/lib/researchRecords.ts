@@ -1,4 +1,4 @@
-import { concerns, matchesConcern } from "./concerns.ts";
+import { concerns, matchesConcern, type ConcernId } from "./concerns.ts";
 import type { MapItem, IssueKind } from "./types.ts";
 import type { DatasetId } from "./dataSources.ts";
 export function searchRecords(
@@ -6,6 +6,8 @@ export function searchRecords(
   input: {
     query?: string;
     country?: string;
+    countryCode?: string;
+    concern?: ConcernId;
     kind?: IssueKind;
     dataset?: DatasetId;
     offset?: number;
@@ -19,6 +21,8 @@ export function searchRecords(
   const country = input.country?.trim().toLocaleLowerCase();
   const matches = records
     .filter((item) => {
+      if (input.countryCode && item.reportingArea?.countryCode !== input.countryCode) return false;
+      if (input.concern && !matchesConcern(item, input.concern)) return false;
       if (input.kind && item.kind !== input.kind) return false;
       if (input.dataset && (item.dataset ?? "catalogue") !== input.dataset)
         return false;

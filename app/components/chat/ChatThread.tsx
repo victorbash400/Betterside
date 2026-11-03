@@ -1,3 +1,4 @@
+import LoadingRegion from "../controls/LoadingRegion";
 import type {
   ChatWorkspaceActions,
   WorkspaceChatContext,
@@ -46,15 +47,20 @@ export default function ChatThread({
   }, []);
   return (
     <div ref={thread} className={styles.thread}>
-      <MessageList
-        messages={chat.messages}
-        busy={chat.busy}
-        onSelect={onSelect}
-        actions={actions}
-        onMessage={(text) => {
-          if (!chat.busy) void chat.sendMessage({ text });
-        }}
-      />
+      {!chat.hydrated && !chat.storageError ? (
+        <LoadingRegion label="Loading conversation" />
+      ) : (
+        <MessageList
+          messages={chat.messages}
+          busy={chat.busy}
+          onSelect={onSelect}
+          actions={actions}
+        onApprove={(id, approved) => { void chat.addToolApprovalResponse({ id, approved }); }}
+          onMessage={(text, requestedAction) => {
+            if (!chat.busy) void chat.sendMessage({ text }, { body: requestedAction ? { requestedAction } : undefined });
+          }}
+        />
+      )}
       {(chat.error || chat.storageError) && (
         <div className={styles.error} role="alert">
           {chat.storageError || chat.error?.message}

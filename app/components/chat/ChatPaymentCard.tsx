@@ -1,3 +1,5 @@
+import SettingsInlineButton from "../settings/SettingsInlineButton";
+import LoadingSpinner from "../controls/LoadingSpinner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import {
@@ -89,9 +91,18 @@ export default function ChatPaymentCard({
             Continue to PayPal
           </a>
         )}
-        <button onClick={() => void refresh()} disabled={busy}>
-          {busy ? "Checking order" : "Check payment"}
-        </button>
+        <SettingsInlineButton
+          aria-label="Check payment"
+          aria-busy={busy}
+          onClick={() => void refresh()}
+          disabled={busy}
+        >
+          {busy ? (
+            <LoadingSpinner size={24} label="Checking payment" />
+          ) : (
+            "Check payment"
+          )}
+        </SettingsInlineButton>
       </div>
     </section>
   );

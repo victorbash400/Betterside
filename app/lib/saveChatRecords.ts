@@ -14,7 +14,7 @@ export function saveChatRecords(
   if (selected.length !== ids.size)
     throw new Error("A requested record is unavailable. Search again.");
   const existing = previous.interests.find(
-    (interest) => interest.name === name && !interest.archived,
+    (interest) => interest.name === name && !interest.archived && !interest.target,
   );
   const id = existing?.id ?? callId;
   const snapshot = trackingSchema.parse({

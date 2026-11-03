@@ -1,3 +1,6 @@
+import type { ChatMessageAction } from "../../lib/chatActions";
+import { hasInlineResult } from "../../lib/chatRenderPolicy";
+import { goalsResultSchema } from "../../lib/chatGoals";
 import { useEffect, useRef } from "react";
 import type { UIMessage } from "ai";
 import type { ChatWorkspaceActions } from "../../lib/chatWorkspace";
@@ -12,12 +15,14 @@ export default function MessageList({
   onSelect,
   onMessage,
   actions,
+  onApprove,
 }: {
   messages: UIMessage[];
   busy: boolean;
   onSelect: (record: MapItem) => void;
-  onMessage: (text: string) => void;
+  onMessage: ChatMessageAction;
   actions: ChatWorkspaceActions;
+  onApprove: (id: string, approved: boolean) => void;
 }) {
   const scroll = useRef<HTMLDivElement>(null),
     following = useRef(true);
@@ -25,6 +30,12 @@ export default function MessageList({
     if (following.current && scroll.current)
       scroll.current.scrollTop = scroll.current.scrollHeight;
   }, [messages, busy]);
+  const goalNames = new Map<string, string>();
+  for (const message of messages) for (const part of message.parts) {
+    if (!("output" in part)) continue;
+    const parsed = goalsResultSchema.safeParse(part.output);
+    if (parsed.success) for (const goal of parsed.data.goals) goalNames.set(goal.id, goal.targetText || goal.category);
+  }
   return (
     <div
       className={styles.list}
@@ -44,6 +55,7 @@ export default function MessageList({
           "tool-list_goals",
           "tool-create_goal",
           "tool-update_goal",
+          "tool-manage_goal",
         ];
         const latestGoal = message.parts.findLastIndex(
           (part) =>
@@ -58,7 +70,7 @@ export default function MessageList({
           >
             {message.parts.map((part, index) =>
               (index < latestGoal && goalTools.includes(part.type)) ||
-              (latestGoal >= 0 && part.type === "text") ? null :
+              (hasInlineResult(message.parts) && part.type === "text") ? null :
               part.type === "text" ? (
                 <MessageText key={index} text={part.text} />
               ) : (
@@ -69,6 +81,8 @@ export default function MessageList({
                   onMessage={onMessage}
                   actions={actions}
                   busy={busy}
+                  onApprove={onApprove}
+                  goalNames={goalNames}
                 />
               ),
             )}

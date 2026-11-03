@@ -1,3 +1,5 @@
+import { pinChatItems, unpinChatItems, type PinItemsInput, type UnpinItemsInput, type PinsResult } from "../lib/chatPins";
+import type { DirectoryOrganization } from "../lib/organizations";
 import { samePinTarget } from "../lib/pins";
 import { saveChatRecords } from "../lib/saveChatRecords";
 import type { SaveRecordsAction } from "../lib/chatWorkspace";
@@ -93,6 +95,26 @@ export function useTracking() {
   }
   return {
     ...storage.state,
+    pinFromChat: async (records: MapItem[], input: PinItemsInput, callId: string, organizations: DirectoryOrganization[]) => {
+      let result: PinsResult | undefined;
+      await storage.commit((previous) => {
+        const saved = pinChatItems(previous, records, input, callId, organizations);
+        result = saved.result;
+        return saved.snapshot;
+      });
+      if (!result) throw new Error("Could not save pins.");
+      return result;
+    },
+    unpinFromChat: async (records: MapItem[], input: UnpinItemsInput) => {
+      let result: PinsResult | undefined;
+      await storage.commit((previous) => {
+        const saved = unpinChatItems(previous, records, input);
+        result = saved.result;
+        return saved.snapshot;
+      });
+      if (!result) throw new Error("Could not remove pins.");
+      return result;
+    },
     saveFromChat: async (
       records: MapItem[],
       input: SaveRecordsAction,

@@ -1,3 +1,5 @@
+import { donorSubscriptions } from "../server/subscriptionStore.ts";
+import { subscriptionSchema } from "../lib/paypalSubscription.ts";
 import "server-only";
 import { loadProfile } from "../server/profile.ts";
 import { contributions } from "../server/contributions.ts";
@@ -5,13 +7,15 @@ import { goalCategories, goalMatchesProject, goalProgress } from "../lib/profile
 import { goalsResultSchema } from "../lib/chatGoals.ts";
 import type { WorkspaceToolContext } from "./context.ts";
 export async function goalState({ donor, records }: WorkspaceToolContext) {
-  const [{ profile, revision }, ledger] = await Promise.all([
+  const [{ profile, revision }, ledger, subscriptions] = await Promise.all([
     loadProfile(donor),
     contributions(donor),
+    donorSubscriptions(donor),
   ]);
   const now = new Date();
   return goalsResultSchema.parse({
     kind: "goals",
+    subscriptions: subscriptions.map((subscription) => subscriptionSchema.parse(subscription)),
     revision,
     timeZone: profile.timeZone,
     asOf: now.toISOString(),

@@ -1,0 +1,4 @@
+.surface { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.toolbar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.grid { height: 280px; min-width: 0; }
+.surface > span { color: var(--danger); font-size: 12px; }

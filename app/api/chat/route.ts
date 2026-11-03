@@ -1,3 +1,4 @@
+import { chatActionSchema } from "../../lib/chatActions";
 import { donorSession } from "../../server/donor";
 import { loadTracking } from "../../server/tracking";
 import { loadDiscovery } from "../../server/discovery";
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
         model: z.enum(["fast", "reasoning"]).optional(),
         areaId: z.string().optional(),
         context: workspaceChatContextSchema.optional(),
+        requestedAction: chatActionSchema.optional(),
         recordIds: z.array(z.string().max(160)).max(20000).optional(),
       })
       .passthrough()
@@ -58,9 +60,10 @@ export async function POST(request: Request) {
       records: allRecords,
       selectedIds: input.recordIds,
       donor,
-      origin: request.url,
+      origin: new URL(request.url).origin,
       areaId: input.areaId,
       context: input.context,
+      requestedAction: input.requestedAction,
       sources: discovery.sources,
       selectedOrganization,
       modelMode: input.model,

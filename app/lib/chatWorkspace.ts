@@ -1,3 +1,4 @@
+import type { PinItemsInput, UnpinItemsInput, PinsResult } from "./chatPins.ts";
 import { z } from "zod";
 import { concerns } from "./concerns.ts";
 import { issueKinds } from "./issueKinds.ts";
@@ -10,6 +11,8 @@ export const chatRecordSchema =
 export const searchInputSchema = z.object({
   query: z.string().max(200).optional(),
   country: z.string().max(120).optional(),
+  countryCode: z.string().length(3).optional(),
+  concern: z.enum(concerns.map((concern) => concern.id)).optional(),
   kind: z.enum(issueKinds).optional(),
   dataset: z.enum(datasetIds).optional(),
   scope: z.enum(["all", "selection"]).default("all"),
@@ -29,7 +32,7 @@ export const saveRecordsSchema = z.object({
   recordIds: z.array(z.string().min(1).max(160)).min(1).max(100),
 });
 export const focusOrganizationSchema = z.object({
-  organizationId: z.string().min(1).max(200),
+  organizationId: z.string().min(1).max(512),
   topics: z.array(z.string().max(120)).max(20),
 });
 export const calculationInputSchema = z.object({
@@ -99,6 +102,10 @@ export type MapFilterAction = z.infer<typeof mapFilterSchema>;
 export type SaveRecordsAction = z.infer<typeof saveRecordsSchema>;
 export type FocusOrganizationAction = z.infer<typeof focusOrganizationSchema>;
 export interface ChatWorkspaceActions {
+  isPinned: (id: string) => boolean;
+  pinItems: (input: PinItemsInput, callId: string) => Promise<PinsResult>;
+  unpinItems: (input: UnpinItemsInput) => Promise<PinsResult>;
+  openPin: (id: string) => Promise<void>;
   openCheckout: (
     input: CheckoutInput,
   ) => Promise<z.infer<typeof checkoutResultSchema>>;
@@ -122,7 +129,7 @@ export const workspaceChatContextSchema = z.object({
     .array(z.enum(concerns.map((concern) => concern.id)))
     .max(concerns.length),
   visualization: z.enum(["Heatmap", "Areas", "Columns", "Spikes"]),
-  organizationId: z.string().max(200).optional(),
+  organizationId: z.string().max(512).optional(),
 });
 export type WorkspaceChatContext = z.infer<typeof workspaceChatContextSchema>;
 

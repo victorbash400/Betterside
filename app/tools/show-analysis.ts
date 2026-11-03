@@ -5,7 +5,7 @@ import type { WorkspaceToolContext } from "./context.ts";
 export function showAnalysisTool({ records }: WorkspaceToolContext) {
   return tool({
     description:
-      "Open a funding chart only when explicitly asked for a chart or graph. Do not use for tables, grids, lists or project comparisons; use search_records for those. All figures are sandbox data.",
+      "Open the separate analysis studio only when explicitly requested. Use show_chart for inline category charts, show_trends for dated provider measurements and pin comparisons, search_records for inline analysis grids, and show_contribution_chart for actual contribution history. All funding figures here are illustrative sandbox data.",
     inputSchema: z.object({
       kind: z.enum([
         "funding-by-area",

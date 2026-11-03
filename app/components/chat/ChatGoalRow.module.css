@@ -1,0 +1,4 @@
+.details { padding-bottom: 12px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px 0; }
+.actions a { display: inline-flex; align-items: center; min-height: 32px; color: var(--ink); font-size: 12px; text-underline-offset: 3px; }
+.details > span { display: block; padding: 8px 16px 0; color: var(--danger); font-size: 12px; }

@@ -1,3 +1,4 @@
+import { subscriptionSchema } from "./paypalSubscription.ts";
 import { z } from "zod";
 import { contributionGoalSchema, goalCategories } from "./profile.ts";
 export const goalsResultSchema = z.object({
@@ -6,6 +7,7 @@ export const goalsResultSchema = z.object({
   timeZone: z.string(),
   asOf: z.iso.datetime(),
   availableCategories: z.array(z.enum(goalCategories)),
+  subscriptions: z.array(subscriptionSchema).default([]),
   goals: z.array(contributionGoalSchema.extend({
     contributedCents: z.number().int().nonnegative(),
     percent: z.number().min(0).max(100),

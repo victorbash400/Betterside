@@ -3,7 +3,8 @@ import type { ColDef } from "ag-grid-community";
 import type { MapItem } from "../../lib/types";
 import { recordValue, recordUnit } from "../../lib/recordValues";
 import { formatDate } from "../../lib/dates";
-import DataGrid from "../grid/DataGrid";
+import ChatAnalysisGrid from "./ChatAnalysisGrid";
+import SettingsInlineButton from "../settings/SettingsInlineButton";
 import ChatRecordSourceCell from "./ChatRecordSourceCell";
 import styles from "./ChatResult.module.css";
 export default function ChatRecordGrid({
@@ -34,6 +35,7 @@ export default function ChatRecordGrid({
         headerName: onlyProjects ? "Project · sandbox" : "Record",
         valueGetter: ({ data }) => data?.project?.name ?? data?.location ?? "",
         minWidth: 180,
+        chartDataType: "category",
         flex: 1,
         tooltipField: "location",
       },
@@ -48,6 +50,7 @@ export default function ChatRecordGrid({
               minWidth: 100,
               type: "numericColumn",
               filter: "agNumberColumnFilter",
+              chartDataType: "excluded" as const,
               valueGetter: ({ data }: { data?: MapItem }) =>
                 data ? recordValue(data) : null,
               valueFormatter: ({
@@ -80,6 +83,8 @@ export default function ChatRecordGrid({
               width: 165,
               type: "numericColumn",
               filter: "agNumberColumnFilter",
+              enableValue: true,
+              chartDataType: "series" as const,
               valueGetter: ({ data }: { data?: MapItem }) =>
                 data?.project
                   ? Math.max(0, data.project.target - data.project.raised)
@@ -109,20 +114,19 @@ export default function ChatRecordGrid({
       <div className={styles.heading}>
         <span>{total.toLocaleString("en")} matching records</span>
         {nextOffset !== null && (
-          <button disabled={busy} onClick={onMore}>
+          <SettingsInlineButton disabled={busy} onClick={onMore}>
             More results
-          </button>
+          </SettingsInlineButton>
         )}
       </div>
       <div
         className={styles.grid}
-        style={{ height: Math.min(300, 82 + Math.max(1, records.length) * 34) }}
+
       >
-        <DataGrid
+        <ChatAnalysisGrid
           label="Chat record results"
           rows={records}
           columns={columns}
-          rowHeight={34}
           onOpen={onSelect}
         />
       </div>

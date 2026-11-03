@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { MapItem } from "./types.ts";
 export const chartInputSchema = z.object({
-  type: z.enum(["bar", "donut", "line", "area", "summary"]),
+  type: z.enum(["bar", "column", "pie", "donut", "line", "area", "histogram", "radar", "radial-bar", "treemap", "waterfall", "scatter", "bubble", "heatmap", "summary"]),
   metric: z.enum(["records", "funding-gap", "raised", "target"]),
   groupBy: z.enum(["country", "cause", "month", "project"]),
   country: z.string().max(120).optional(),
@@ -11,9 +11,10 @@ export const chartResultSchema = z.object({
   kind: z.literal("chart"),
   type: chartInputSchema.shape.type,
   title: z.string(),
-  unit: z.enum(["Records", "USD"]),
+  unit: z.enum(["Records", "USD", "Orders"]),
+  basis: z.enum(["source-records", "contributions"]).default("source-records"),
   data: z
-    .array(z.object({ label: z.string(), value: z.number().nonnegative() }))
+    .array(z.object({ label: z.string(), value: z.number().nonnegative(), x: z.number().nonnegative().optional(), size: z.number().nonnegative().optional(), category: z.string().optional() }))
     .min(1)
     .max(24),
   recordCount: z.number().int().nonnegative(),
@@ -35,11 +36,15 @@ export function buildChatChart(
     );
   if (
     input.metric !== "records" &&
-    (input.groupBy !== "project" || input.type === "donut")
+    (input.groupBy !== "project" || ["donut", "pie"].includes(input.type))
   )
     throw new Error(
       "Compare demonstration funding by project using bars or summary values.",
     );
+  if (["scatter", "bubble"].includes(input.type) && (input.metric === "records" || input.groupBy !== "project"))
+    throw new Error("Scatter and bubble charts compare demonstration project funding against targets.");
+  if (input.type === "heatmap" && (input.metric !== "records" || !["country", "cause"].includes(input.groupBy)))
+    throw new Error("Heatmaps compare source-record counts by country and cause.");
   const ids = input.recordIds ? new Set(input.recordIds) : undefined;
   if (ids && [...ids].some((id) => !records.some((record) => record.id === id)))
     throw new Error("Chart records unavailable. Search records again.");
@@ -54,6 +59,7 @@ export function buildChatChart(
   );
   const groups = new Map<string, number>();
   const projects = new Set<string>();
+  const dimensions = new Map<string, { label?: string; x?: number; size?: number; category?: string }>();
   const sources = new Map<string, { label: string; url: string }>();
   let undatedCount = 0;
   for (const record of selected) {
@@ -78,6 +84,12 @@ export function buildChatChart(
       }
       label = date.toISOString().slice(0, 7);
     }
+    if (input.type === "heatmap") {
+      label = JSON.stringify([record.country, record.kind]);
+      dimensions.set(label, { label: record.country, category: record.kind });
+    }
+    if (["scatter", "bubble"].includes(input.type) && record.project)
+      dimensions.set(label, { x: record.project.target, size: Math.max(0, record.project.target - record.project.raised) });
     const value =
       input.metric === "records"
         ? 1
@@ -113,11 +125,13 @@ export function buildChatChart(
   return chartResultSchema.parse({
     kind: "chart",
     type: input.type,
-    title: `${metric} by ${group}${input.country?.trim() ? ` · ${input.country.trim()}` : ""}`,
+    title: input.type === "heatmap" ? "Source records by country and cause"
+      : ["scatter", "bubble"].includes(input.type) ? `${metric} against demonstration targets`
+      : `${metric} by ${group}${input.country?.trim() ? ` · ${input.country.trim()}` : ""}`,
     unit: input.metric === "records" ? "Records" : "USD",
     data: [...groups]
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([label, value]) => ({ label, value })),
+      .map(([label, value]) => ({ label, value, ...dimensions.get(label) })),
     recordCount: selected.length,
     undatedCount,
     sources: [...sources.values()],

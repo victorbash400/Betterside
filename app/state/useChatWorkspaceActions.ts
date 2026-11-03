@@ -1,5 +1,6 @@
-import { z } from "zod";
-import { chatRecordSchema } from "../lib/chatWorkspace";
+import { pinItemsSchema, unpinItemsSchema } from "../lib/chatPins";
+import { fetchOrganizationDirectory } from "./useOrganizationDirectory";
+import { fetchChatRecords } from "./fetchChatRecords";
 import type { ChatWorkspaceActions } from "../lib/chatWorkspace";
 import {
   checkoutInputSchema,
@@ -10,7 +11,7 @@ import {
 } from "../lib/chatWorkspace";
 import { defaultDiscoveryFilters } from "../lib/discoveryFilters";
 import { issueKinds } from "../lib/issueKinds";
-import { matchesConcern, inOverlayPeriod } from "../lib/concerns";
+import { concerns, matchesConcern, inOverlayPeriod } from "../lib/concerns";
 import type { useWorkspace } from "./useWorkspace";
 import type { useOrganizations } from "./useOrganizations";
 
@@ -21,6 +22,47 @@ export function useChatWorkspaceActions(
   onCheckout: (input: CheckoutInput) => void,
 ): ChatWorkspaceActions {
   return {
+    isPinned: (id) => state.interests.some((pin) => pin.id === id) || state.following.includes(id),
+    pinItems: async (raw, callId) => {
+      const input = pinItemsSchema.parse(raw);
+      const targets = input.targets.filter((target) => target.kind === "organization");
+      const directories = await Promise.all([...new Set(targets.map((target) => target.countryCode))]
+        .map((country) => fetchOrganizationDirectory(country)));
+      const missing = input.targets.filter((target) => target.kind === "record")
+        .map((target) => target.recordId).filter((id) => !state.allRecords.some((record) => record.id === id));
+      const records = missing.length ? [...state.allRecords, ...await fetchChatRecords(fetch, missing)] : state.allRecords;
+      return state.pinFromChat(records, input, callId, directories.flatMap((directory) => directory.value.organizations));
+    },
+    unpinItems: async (raw) => state.unpinFromChat(state.allRecords, unpinItemsSchema.parse(raw)),
+    openPin: async (id) => {
+      state.setSettingsOpen(false);
+      state.setSelectedId(undefined);
+      const pin = state.interests.find((pin) => pin.id === id);
+      if (pin?.target?.kind === "organization") {
+        await organizations.focus(pin.target.organizationId, undefined, pin.target.countryCode);
+        state.setSelectedInterestId(id);
+        state.setView("Organizations");
+        state.setCollectionMode("map");
+        onOrganizationDrawer();
+      } else if (pin) {
+        state.setSelectedInterestId(id);
+        state.setView("Following");
+        state.setCollectionMode("list");
+        state.setOverlay({ ...state.overlay, concerns: pin.target?.kind === "scope" || pin.target?.kind === "cause"
+          ? [pin.target.concern] : concerns.map((cause) => cause.id) });
+        state.setDiscoveryFilters(defaultDiscoveryFilters);
+        state.setFilters({ ...state.filters, query: "", kinds: [...issueKinds] });
+      } else {
+        if (!state.following.includes(id)) throw new Error("Pin unavailable. Read list_pins again.");
+        state.setSelectedInterestId(undefined);
+        state.setDiscoveryFilters(defaultDiscoveryFilters);
+        state.setFilters({ ...state.filters, query: "", kinds: [...issueKinds] });
+        state.setOverlay({ ...state.overlay, concerns: concerns.map((cause) => cause.id) });
+        state.setView("Following");
+        state.setCollectionMode("list");
+        state.setSelectedId(id);
+      }
+    },
     openCheckout: async (raw) => {
       const input = checkoutInputSchema.parse(raw);
       if (
@@ -66,17 +108,7 @@ export function useChatWorkspaceActions(
     },
     saveRecords: async (raw, callId) => {
       const input = saveRecordsSchema.parse(raw);
-      const response = await fetch("/api/chat/records", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recordIds: input.recordIds }),
-      });
-      const body = await response.json();
-      if (!response.ok)
-        throw new Error(z.object({ error: z.string() }).parse(body).error);
-      const { records } = z
-        .object({ records: z.array(chatRecordSchema) })
-        .parse(body);
+      const records = await fetchChatRecords(fetch, input.recordIds);
       return state.saveFromChat(records, input, callId);
     },
     focusOrganization: async (raw) => {

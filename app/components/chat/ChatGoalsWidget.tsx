@@ -1,54 +1,22 @@
-import { useEffect, useState } from "react";
-import { useDonorProfile } from "../../state/useDonorProfile";
+import type { ChatMessageAction } from "../../lib/chatActions";
 import type { GoalsResult } from "../../lib/chatGoals";
 import type { ChatWorkspaceActions } from "../../lib/chatWorkspace";
-import ProfileGoals from "../profile/ProfileGoals";
+import SettingsGroup from "../settings/SettingsGroup";
+import ChatGoalRow from "./ChatGoalRow";
 import styles from "./ChatGoalsWidget.module.css";
-export default function ChatGoalsWidget({
-  result,
-  actions,
-  busy,
-}: {
+export default function ChatGoalsWidget({ result, actions, onMessage, busy }: {
   result: GoalsResult;
   actions: ChatWorkspaceActions;
+  onMessage: ChatMessageAction;
   busy: boolean;
 }) {
-  const state = useDonorProfile();
-  const [error, setError] = useState("");
-  useEffect(() => {
-    window.dispatchEvent(new Event("betterside-profile-changed"));
-  }, [result.revision]);
-  return (
-    <div className={styles.widget}>
-      {(state.error || error) && (
-        <div className={styles.error} role="alert">
-          {state.error || error}
-          <button onClick={() => {
-            setError("");
-            state.retry();
-          }}>
-            Reload goals
-          </button>
-        </div>
-      )}
-      {!state.profile && !state.error && <span role="status">Loading goals</span>}
-      {state.profile && (
-        <ProfileGoals
-          profile={state.profile}
-          payments={state.payments}
-          availableCategories={result.availableCategories}
-          busy={busy || state.saving}
-          onSave={state.save}
-          onContribute={(goal) => {
-            setError("");
-            void actions.openCheckout({ goalId: goal.id }).catch((failure) =>
-              setError(
-                failure instanceof Error ? failure.message : "Checkout unavailable.",
-              ),
-            );
-          }}
-        />
-      )}
-    </div>
-  );
+  return <section className={styles.widget} aria-label="Contribution goals">
+    <span>{result.goals.length} {result.goals.length === 1 ? "goal" : "goals"}</span>
+    <SettingsGroup>
+      {result.goals.map((goal) => <ChatGoalRow key={goal.id} goal={goal}
+        subscription={result.subscriptions.find((subscription) => subscription.goalId === goal.id)}
+        revision={result.revision} timeZone={result.timeZone}
+        canContribute={result.availableCategories.includes(goal.category) && !goal.organization && goal.status !== "paused"} actions={actions} onMessage={onMessage} busy={busy}/>)}
+    </SettingsGroup>
+  </section>;
 }

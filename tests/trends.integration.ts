@@ -82,6 +82,16 @@ test("history routes coalesce country/source requests and preserve dated measure
     );
     assert.ok([...calls.values()].every((count) => count === 1));
     const initial = new Map(calls);
+    const { showTrendsTool } = await import("../app/tools/show-trends.ts");
+    const output = await showTrendsTool({ donor: "history-test", records: [], origin: "http://localhost" }).execute!(
+      { scopes: [{ countries: ["PAK"], concern: "hunger" }], view: "Compare data", offset: 0 },
+      { toolCallId: "history-tool", messages: [], context: {} },
+    ) as { kind: string; view: string; total: number; series: unknown[] };
+    assert.equal(output.kind, "trends");
+    assert.equal(output.view, "Compare data");
+    assert.equal(output.total, 1);
+    assert.deepEqual(output.series, result.series);
+    assert.deepEqual(calls, initial);
     const conditional = await GET(
       new Request(request().url, {
         headers: { "If-None-Match": responses[0].headers.get("etag")! },

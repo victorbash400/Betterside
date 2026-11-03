@@ -1,3 +1,4 @@
+import { contributionsResultSchema } from "../lib/chatWorkspace.ts";
 import "server-only";
 import { tool } from "ai";
 import { z } from "zod";
@@ -11,11 +12,20 @@ export function listContributionsTool({ donor }: WorkspaceToolContext) {
       status: z
         .enum(["CREATED", "COMPLETED", "CANCELLED", "FAILED", "REFUNDED"])
         .optional(),
+      goalId: z.string().min(1).max(100).optional(),
+      projectId: z.string().min(1).max(160).optional(),
+      from: z.iso.date().optional(),
+      through: z.iso.date().optional(),
       offset: z.number().int().min(0).max(20000).default(0),
     }),
-    execute: async ({ status, offset }) => {
+    outputSchema: contributionsResultSchema,
+    execute: async ({ status, goalId, projectId, from, through, offset }) => {
+      if (from && through && from > through) throw new Error("Choose a valid contribution date range.");
       const records = (await contributions(donor)).filter(
-        (record) => !status || record.status === status,
+        (record) => (!status || record.status === status) && (!goalId || record.goalId === goalId)
+          && (!projectId || record.projectId === projectId)
+          && (!from || record.createdAt.slice(0, 10) >= from)
+          && (!through || record.createdAt.slice(0, 10) <= through),
       );
       return {
         kind: "contributions" as const,

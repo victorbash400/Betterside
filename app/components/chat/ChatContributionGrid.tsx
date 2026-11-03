@@ -1,5 +1,7 @@
 import type { ColDef } from "ag-grid-community";
-import DataGrid from "../grid/DataGrid";
+import ChatAnalysisGrid from "./ChatAnalysisGrid";
+import ChatContributionReceipt from "./ChatContributionReceipt";
+import SettingsInlineButton from "../settings/SettingsInlineButton";
 import { contributionColumns } from "../payments/contributionColumns";
 import type { Contribution } from "../../lib/types";
 import { useState } from "react";
@@ -7,8 +9,8 @@ import styles from "./ChatResult.module.css";
 const columns: ColDef<Contribution>[] = [
   ...contributionColumns.map((column) =>
     column.field === "projectName"
-      ? { ...column, minWidth: 180, cellRenderer: undefined }
-      : column,
+      ? { ...column, minWidth: 180, cellRenderer: undefined, chartDataType: "category" as const }
+      : column.colId === "amount" ? { ...column, enableValue: true, chartDataType: "series" as const } : column,
   ),
   { field: "id", headerName: "Order", width: 190 },
 ];
@@ -31,24 +33,23 @@ export default function ChatContributionGrid({
       <div className={styles.heading}>
         <span>{total.toLocaleString("en")} sandbox orders</span>
         {nextOffset !== null && (
-          <button disabled={busy} onClick={onMore}>
+          <SettingsInlineButton disabled={busy} onClick={onMore}>
             More results
-          </button>
+          </SettingsInlineButton>
         )}
       </div>
       <div
         className={styles.grid}
-        style={{ height: Math.min(300, 82 + Math.max(1, records.length) * 34) }}
+
       >
-        <DataGrid
+        <ChatAnalysisGrid
           label="Chat contribution records"
           rows={records}
           columns={columns}
-          selected={selected}
-          rowHeight={34}
           onOpen={(record) => setSelected(record.id)}
         />
       </div>
+      {records.find((record) => record.id === selected) && <ChatContributionReceipt record={records.find((record) => record.id === selected)!}/>}
     </div>
   );
 }

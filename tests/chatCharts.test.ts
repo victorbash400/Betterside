@@ -104,3 +104,15 @@ test("unknown IDs and excessive groups fail explicitly instead of drawing fabric
   );
   assert.deepEqual(checkoutInputSchema.parse({}), {});
 });
+
+test("expanded chart families preserve derived counts and actual project dimensions", () => {
+  for (const type of ["column", "pie", "histogram", "radar", "radial-bar", "treemap", "waterfall"] as const)
+    assert.deepEqual(buildChatChart([record], { type, metric: "records", groupBy: "country" }).data, [{ label: "Kenya", value: 1 }]);
+  const project = { ...record, project: { id: "project", name: "Demo", organisation: "Sandbox", target: 100, raised: 40, reportedOutcome: null, demonstration: true as const } };
+  for (const type of ["scatter", "bubble"] as const) {
+    const result = buildChatChart([project], { type, metric: "raised", groupBy: "project" });
+    assert.deepEqual(result.data, [{ label: "Demo", value: 40, x: 100, size: 60 }]);
+  }
+  const matrix = buildChatChart([record, { ...record, id: "b" }], { type: "heatmap", metric: "records", groupBy: "country" });
+  assert.deepEqual(matrix.data, [{ label: "Kenya", category: "Hunger", value: 2 }]);
+});

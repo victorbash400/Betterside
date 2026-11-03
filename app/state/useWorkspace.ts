@@ -209,6 +209,8 @@ export function useWorkspace() {
       ),
     addItems: tracking.addMany,
     saveFromChat: tracking.saveFromChat,
+    pinFromChat: tracking.pinFromChat,
+    unpinFromChat: tracking.unpinFromChat,
     renameInterest: tracking.rename,
     moveInterest: tracking.moveFolder,
     archiveInterest: tracking.archive,

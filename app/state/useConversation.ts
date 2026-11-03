@@ -1,10 +1,12 @@
 "use client";
+import { pinItemsSchema, unpinItemsSchema } from "../lib/chatPins";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import {
   DefaultChatTransport,
   validateUIMessages,
   lastAssistantMessageIsCompleteWithToolCalls,
+  lastAssistantMessageIsCompleteWithApprovalResponses,
 } from "ai";
 import { z } from "zod";
 import {
@@ -59,6 +61,8 @@ export function useConversation({
   const executeAction = useEffectEvent(
     async (name: string, input: unknown, callId: string) => {
       switch (name) {
+        case "pin_items": return actions.pinItems(pinItemsSchema.parse(input), callId);
+        case "unpin_items": return actions.unpinItems(unpinItemsSchema.parse(input));
         case "open_checkout":
           return actions.openCheckout(checkoutInputSchema.parse(input));
         case "filter_map":
@@ -77,10 +81,13 @@ export function useConversation({
   const chat = useChat({
     id: conversationId,
     transport,
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: (state) => lastAssistantMessageIsCompleteWithToolCalls(state)
+      || lastAssistantMessageIsCompleteWithApprovalResponses(state),
     onToolCall: async ({ toolCall }) => {
       if (
         ![
+          "pin_items",
+          "unpin_items",
           "filter_map",
           "save_records",
           "focus_organization",
@@ -115,6 +122,12 @@ export function useConversation({
   useEffect(() => {
     for (const message of chat.messages)
       for (const part of message.parts) {
+        if (["tool-create_goal", "tool-update_goal", "tool-manage_goal"].includes(part.type)
+          && "state" in part && part.state === "output-available" && "toolCallId" in part
+          && !seen.current.has(`goal:${part.toolCallId}`)) {
+          seen.current.add(`goal:${part.toolCallId}`);
+          window.dispatchEvent(new Event("betterside-payments-changed"));
+        }
         if (
           part.type !== "tool-show_analysis" ||
           !("state" in part) ||
@@ -137,11 +150,8 @@ export function useConversation({
     async function restore() {
       setStorageError("");
       try {
-        const saved =
-          localStorage.getItem(`betterside-chat:${conversationId}`) ??
-          (conversationId === "default"
-            ? localStorage.getItem("betterside-chat")
-            : null);
+        const saved = localStorage.getItem(`betterside-chat:${conversationId}`)
+          ?? (conversationId === "default" ? localStorage.getItem("betterside-chat") : null);
         if (saved) {
           const raw = JSON.parse(saved);
           const snapshot = Array.isArray(raw)
@@ -153,6 +163,8 @@ export function useConversation({
           if (!active) return;
           for (const message of messages)
             for (const part of message.parts) {
+              if (["tool-create_goal", "tool-update_goal", "tool-manage_goal"].includes(part.type) && "toolCallId" in part)
+                seen.current.add(`goal:${part.toolCallId}`);
               if (part.type === "tool-show_analysis" && "output" in part) {
                 const parsed = analysisSchema.safeParse(part.output);
                 if (parsed.success) seen.current.add(parsed.data.id);
@@ -162,11 +174,8 @@ export function useConversation({
         }
         if (active)
           setDraft(
-            localStorage.getItem(`betterside-draft:${conversationId}`) ??
-              (conversationId === "default"
-                ? localStorage.getItem("betterside-draft")
-                : null) ??
-              "",
+            localStorage.getItem(`betterside-draft:${conversationId}`)
+              ?? (conversationId === "default" ? localStorage.getItem("betterside-draft") : null) ?? "",
           );
       } catch {
         if (active) setStorageError("Could not restore conversation.");
@@ -186,7 +195,10 @@ export function useConversation({
         `betterside-chat:${conversationId}`,
         JSON.stringify({ version: 1, messages: chat.messages }),
       );
-      localStorage.setItem(`betterside-draft:${conversationId}`, draft);
+      localStorage.setItem(
+        `betterside-draft:${conversationId}`,
+        draft,
+      );
     } catch {
       setStorageError("Could not save conversation.");
     }
@@ -214,7 +226,10 @@ export function useConversation({
           `betterside-chat:${conversationId}`,
           JSON.stringify({ version: 1, messages: saved.messages }),
         );
-        localStorage.setItem(`betterside-draft:${conversationId}`, saved.draft);
+        localStorage.setItem(
+          `betterside-draft:${conversationId}`,
+          saved.draft,
+        );
       } catch {
         console.error("Could not save chat before closing.");
       }
@@ -226,6 +241,7 @@ export function useConversation({
     draft,
     setDraft,
     storageError,
+    hydrated,
     busy:
       !hydrated || chat.status === "submitted" || chat.status === "streaming",
   };

@@ -1,3 +1,10 @@
+import { getPayPalStatusTool } from "./get-paypal-status.ts";
+import { showContributionChartTool } from "./show-contribution-chart.ts";
+import { manageGoalTool } from "./manage-goal.ts";
+import { getContributionTool } from "./get-contribution.ts";
+import { showTrendsTool } from "./show-trends.ts";
+import { listPinsTool } from "./list-pins.ts";
+import { pinItemsTool, unpinItemsTool } from "./pin-items.ts";
 import { listGoalsTool } from "./list-goals.ts";
 import { createGoalTool } from "./create-goal.ts";
 import { updateGoalTool } from "./update-goal.ts";
@@ -17,6 +24,12 @@ import { showChartTool } from "./show-chart.ts";
 import { showSummaryTool } from "./show-summary.ts";
 export function workspaceTools(context: WorkspaceToolContext) {
   return {
+    get_paypal_status: getPayPalStatusTool(context),
+    list_pins: listPinsTool(context),
+    pin_items: pinItemsTool,
+    unpin_items: unpinItemsTool,
+    manage_goal: manageGoalTool(context),
+    get_contribution: getContributionTool(context),
     list_goals: listGoalsTool(context),
     create_goal: createGoalTool(context),
     update_goal: updateGoalTool(context),
@@ -27,7 +40,9 @@ export function workspaceTools(context: WorkspaceToolContext) {
     save_records: saveRecordsTool,
     calculate: calculateTool,
     list_contributions: listContributionsTool(context),
+    show_trends: showTrendsTool(context),
     show_summary: showSummaryTool(context),
+    show_contribution_chart: showContributionChartTool(context),
     show_chart: showChartTool(context),
     open_checkout: openCheckoutTool,
     prepare_payment: preparePaymentTool(context),

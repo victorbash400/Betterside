@@ -1,3 +1,4 @@
+import SettingsInlineButton from "../settings/SettingsInlineButton";
 import { useState } from "react";
 import type {
   CheckoutInput,
@@ -24,7 +25,7 @@ export default function ChatCheckoutCard({
         </span>
       )}
       <div className={styles.actions}>
-        <button
+        <SettingsInlineButton
           onClick={() => {
             setError("");
             void actions
@@ -39,7 +40,7 @@ export default function ChatCheckoutCard({
           }}
         >
           Open checkout
-        </button>
+        </SettingsInlineButton>
       </div>
     </div>
   );
