@@ -1,101 +1,112 @@
-import { ArrowUpRight } from "lucide-react";
+import SettingsInlineButton from "../settings/SettingsInlineButton";
+import { useState } from "react";
 import Dialog from "../controls/Dialog";
-import ProjectFunding from "./ProjectFunding";
+import DetailViews from "../controls/DetailViews";
+import IssueOverview from "./IssueOverview";
+import ResponseOrganizations from "./ResponseOrganizations";
+import TrendPanel from "../trends/TrendPanel";
 import { concerns, matchesConcern } from "../../lib/concerns";
-import { measurementLabels } from "../../lib/measurementLabels";
-import { formatDate } from "../../lib/dates";
-import { recordPrecision } from "../../lib/recordValues";
+import { trendDatasets } from "../../lib/trends";
 import type { MapItem } from "../../lib/types";
+import { samePinTarget } from "../../lib/pins";
+import type { Interest, PinTarget } from "../../lib/tracking";
 import styles from "./IssueDetails.module.css";
-
 export default function IssueDetails({
   issue,
   onClose,
   onContribute,
+  pinned,
+  canPin,
+  onTogglePin,
+  onPinScope,
+  pins,
 }: {
   issue: MapItem;
   onClose: () => void;
   onContribute: () => void;
+  pinned: boolean;
+  canPin: boolean;
+  onTogglePin: () => void;
+  onPinScope: (name: string, target: PinTarget) => void;
+  pins: Interest[];
 }) {
-  const concern = concerns.find((entry) => matchesConcern(issue, entry.id));
-  const facts = [
-    { label: "Country", value: issue.country },
-    ...(issue.measurements ?? []).map((measurement) => ({
-      label: measurementLabels[measurement.metric],
-      value: new Intl.NumberFormat("en", { maximumFractionDigits: 1 }).format(
-        measurement.value,
-      ),
-    })),
-    ...(issue.eventStatus
-      ? [{ label: "Status", value: issue.eventStatus }]
-      : []),
-    {
-      label: "Source updated",
-      value: formatDate(issue.source.published, "UTC"),
-    },
-    ...(issue.referencePeriod
-      ? [
-          {
-            label: "Reference from",
-            value: formatDate(issue.referencePeriod.start, "UTC"),
-          },
-          ...(issue.referencePeriod.end
-            ? [
-                {
-                  label: "Reference through",
-                  value: formatDate(issue.referencePeriod.end, "UTC"),
-                },
-              ]
-            : []),
-        ]
-      : []),
-    ...(issue.geographicPrecision
-      ? [{ label: "Reporting geography", value: recordPrecision(issue) }]
-      : []),
-    ...(issue.sourceAlert
-      ? [{ label: "Source alert", value: issue.sourceAlert }]
-      : []),
-  ];
-  const sources = [issue.source, ...(issue.relatedSources ?? [])].filter(
-    (source, index, all) =>
-      all.findIndex((entry) => entry.url === source.url) === index,
-  );
+  const [view, setView] = useState("Information");
+  const concern = concerns.find((cause) => matchesConcern(issue, cause.id));
+  const code = issue.reportingArea?.countryCode;
+  const scope = code
+    ? {
+        countries: [code],
+        concern: concern?.id,
+        dataset: issue.dataset,
+        recordId: issue.id,
+      }
+    : undefined;
+  const target: PinTarget | undefined =
+    code && concern
+      ? {
+          kind: "scope",
+          countryCode: code,
+          country: issue.country,
+          concern: concern.id,
+        }
+      : undefined;
+  const scopedPin =
+    target && pins.some((pin) => samePinTarget(pin.target, target));
+  const hasHistory = scope && trendDatasets(scope).length > 0;
   return (
     <Dialog
       title={issue.location}
-      size="profile"
+      size={view === "Information" ? "profile" : "insights"}
       centered
       modal={false}
       onClose={onClose}
     >
-      <div className={styles.content}>
-        <span className={styles.type}>{concern?.label ?? issue.kind}</span>
-        {issue.summary && <p>{issue.summary}</p>}
-        <dl className={styles.facts}>
-          {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt>{fact.label}</dt>
-              <dd>{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
+      <DetailViews
+        views={[
+          "Information",
+          ...(hasHistory ? ["Trends"] : []),
+          ...(code ? ["Organizations"] : []),
+        ]}
+        value={view}
+        onChange={setView}
+      />
+      {view === "Information" && (
+        <IssueOverview
+          issue={issue}
+          pinned={pinned}
+          canPin={canPin}
+          onTogglePin={onTogglePin}
+          onContribute={onContribute}
+        />
+      )}
+      {view === "Trends" && scope && (
+        <TrendPanel key={issue.id} scopes={[scope]} recordId={issue.id} />
+      )}
+      {view === "Organizations" && code && (
+        <ResponseOrganizations
+          embedded
+          country={code}
+          countryName={issue.country}
+          concern={concern?.id ?? "all"}
+        />
+      )}
+      {code && concern && (
         <div className={styles.sources}>
-          {sources.map((source) => (
-            <a
-              key={source.url}
-              href={source.url}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {source.label}
-              <ArrowUpRight size={13} />
-            </a>
-          ))}
+          <SettingsInlineButton
+            disabled={!canPin || scopedPin}
+            onClick={() =>
+              onPinScope(`${concern.label} · ${issue.country}`, {
+                kind: "scope",
+                countryCode: code,
+                country: issue.country,
+                concern: concern.id,
+              })
+            }
+          >
+            {scopedPin ? "Pinned" : `Pin ${concern.label} · ${issue.country}`}
+          </SettingsInlineButton>
         </div>
-        {issue.project && (
-          <ProjectFunding project={issue.project} onContribute={onContribute} />
-        )}
-      </div>
+      )}
     </Dialog>
   );
 }

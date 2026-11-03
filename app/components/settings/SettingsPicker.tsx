@@ -14,7 +14,7 @@ export default function SettingsPicker({
   value: string;
   options: { value: string; label: string }[];
   onChange: (value: string) => void;
-  width?: number;
+  width?: number | string;
   disabled?: boolean;
 }) {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(

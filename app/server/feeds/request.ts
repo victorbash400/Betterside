@@ -1,14 +1,10 @@
 import "server-only";
 import { createHash } from "node:crypto";
-import { createAsyncCache } from "../../lib/asyncCache";
+import { CachedLoadError } from "../../lib/asyncCache";
+import { publicFeeds } from "./cache";
 import { feedRequestKey } from "../../lib/feedRequestKey";
 import { cacheLifetimes } from "../../lib/feedCachePolicy";
-import { createRequestQueue } from "../../lib/requestQueue";
-const hapiQueue = createRequestQueue(2);
-const responses = createAsyncCache<unknown>({
-  maxEntries: 128,
-  maxBytes: 32 * 1024 * 1024,
-});
+const { responses, hapiQueue } = publicFeeds;
 export async function feedJson(
   url: string | URL,
   headers?: Record<string, string>,
@@ -42,8 +38,28 @@ export async function feedJson(
         { cause: error },
       );
     }
-    if (!response.ok)
+    if (!response.ok) {
+      if (response.status === 429) {
+        const now = Date.now(),
+          header = response.headers.get("retry-after");
+        const seconds = header === null ? NaN : Number(header);
+        const date = header === null ? NaN : Date.parse(header);
+        const retryAt =
+          Number.isFinite(seconds) && seconds >= 0
+            ? now + seconds * 1000
+            : Number.isFinite(date) && date > now
+              ? date
+              : now + cacheLifetimes.failure;
+        throw new CachedLoadError(
+          new Error(
+            `Source rate limited. Retry after ${new Date(retryAt).toISOString()}.`,
+          ),
+          now,
+          retryAt,
+        );
+      }
       throw new Error(`Source returned HTTP ${response.status}. Retry.`);
+    }
     const body = response.status === 204 ? "null" : await response.text();
     const value: unknown = JSON.parse(body);
     validate?.(value);

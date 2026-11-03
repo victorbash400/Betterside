@@ -111,7 +111,8 @@ export const interestCategories: InterestCategory[] = [
 ];
 export interface InterestChoice {
   name: string;
-  categoryId: string;
+  categoryId?: string;
+  target?: import("./tracking.ts").PinTarget;
 }
 export function categoryPath(id?: string) {
   const category = interestCategories.find((item) => item.id === id);

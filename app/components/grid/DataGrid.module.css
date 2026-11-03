@@ -1,4 +1,5 @@
 .surface {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -11,6 +12,7 @@
   min-height: 0;
 }
 .grid {
+  position: relative;
   flex: 1;
   min-height: 0;
   min-width: 0;
@@ -73,4 +75,10 @@
   border: 2px solid var(--surface);
   border-radius: 6px;
   background: color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
+.loading {
+  position: absolute;
+  inset: 36px 0 35px;
+  z-index: 6;
 }

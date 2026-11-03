@@ -67,16 +67,29 @@ export function useOrganizations(enabled: boolean, query: string) {
   }
   return {
     ...directory,
-    focus: async (id: string, topics: string[]) => {
-      const result = await fetchOrganizationDirectory();
+    focus: async (
+      id: string,
+      topics?: string[],
+      pinnedCountryCode?: string,
+    ) => {
+      const result = await fetchOrganizationDirectory(pinnedCountryCode);
       const organization = result.value.organizations.find(
         (org) => org.id === id,
       );
       if (!organization)
         throw new Error("Organization unavailable. Search again.");
-      if (topics.some((topic) => !organization.topics.includes(topic)))
+      if (topics?.some((topic) => !organization.topics.includes(topic)))
         throw new Error("Cause is not reported by this organization.");
-      setFilters({ ...defaultOrganizationFilters, topics });
+      const country = pinnedCountryCode
+        ? countries.find((country) => country.code === pinnedCountryCode)?.name
+        : undefined;
+      if (pinnedCountryCode && !country)
+        throw new Error("Country unavailable. Refresh geography.");
+      setFilters({
+        ...defaultOrganizationFilters,
+        country: country ?? "",
+        topics: topics ?? organization.topics,
+      });
       setRevision(0);
       setSelected(id);
       return organization;

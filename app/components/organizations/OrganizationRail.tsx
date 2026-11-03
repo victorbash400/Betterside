@@ -11,6 +11,7 @@ export default function OrganizationRail({
   query,
   onQuery,
   organizations,
+  loading = false,
   selected,
   onSelect,
   onDetails,
@@ -20,6 +21,7 @@ export default function OrganizationRail({
   query: string;
   onQuery: (query: string) => void;
   organizations: DirectoryOrganization[];
+  loading?: boolean;
   selected?: string;
   onSelect: (id: string) => void;
   onDetails: (id: string) => void;
@@ -34,7 +36,9 @@ export default function OrganizationRail({
       data-open={open}
       aria-label="Map organizations"
       style={{
-        height: Math.min(520, 116 + Math.min(100, organizations.length) * 34),
+        height: loading
+          ? 280
+          : Math.min(520, 116 + Math.min(100, organizations.length) * 34),
       }}
     >
       <div className={styles.heading}>
@@ -47,6 +51,7 @@ export default function OrganizationRail({
       <OrganizationSearch value={query} onChange={onQuery} />
       <OrganizationMapGrid
         organizations={organizations}
+        loading={loading}
         selected={selected}
         onSelect={onSelect}
         onDetails={onDetails}

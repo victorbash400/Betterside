@@ -1,6 +1,7 @@
 import type { MapItem } from "./types.ts";
 export interface DiscoveryFilters {
   country: string;
+  countryCode?: string;
   recordType: string;
   precision: string;
 }
@@ -14,7 +15,10 @@ export function matchesDiscoveryFilters(
   filters: DiscoveryFilters,
 ) {
   return (
-    (!filters.country || item.country === filters.country) &&
+    (!filters.country ||
+      (filters.countryCode && item.reportingArea
+        ? item.reportingArea.countryCode === filters.countryCode
+        : item.country === filters.country)) &&
     (!filters.recordType || item.recordType === filters.recordType) &&
     (!filters.precision ||
       (filters.precision === "Administrative area"

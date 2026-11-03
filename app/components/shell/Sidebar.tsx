@@ -43,7 +43,8 @@ export default function Sidebar({
   following,
   activeInterestId,
   onInterest,
-  onCreateInterest,
+  onRequestPin,
+  onComparePins,
   onInterestAction,
   onTrack,
   selected,
@@ -72,7 +73,8 @@ export default function Sidebar({
   following: string[];
   activeInterestId?: string;
   onInterest: (id: string) => void;
-  onCreateInterest: (choice: InterestChoice) => void;
+  onRequestPin: () => void;
+  onComparePins: () => void;
   onInterestAction: (action: InterestAction) => void;
   onTrack: (id: string, interestId?: string) => void;
   selected?: string;
@@ -240,7 +242,8 @@ export default function Sidebar({
                       onInterest(id);
                       onClose();
                     }}
-                    onCreate={onCreateInterest}
+                    onComparePins={onComparePins}
+                    onRequestPin={onRequestPin}
                   />
                 </>
               )}

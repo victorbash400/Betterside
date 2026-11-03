@@ -1,0 +1,31 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+.error {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 12px;
+}
+.error button {
+  align-self: flex-start;
+}
+.unavailable {
+  color: var(--muted);
+  font-size: 12px;
+}
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+.sources a {
+  color: var(--muted);
+  font-size: 10px;
+  text-underline-offset: 3px;
+}

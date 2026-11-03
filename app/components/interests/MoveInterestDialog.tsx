@@ -25,12 +25,13 @@ export default function MoveInterestDialog({
           onClick={() => setSelected(undefined)}
         >
           <Bookmark size={20} />
-          <span>Following</span>
+          <span>Pinned</span>
         </button>
         {interests
           .filter(
             (interest) =>
-              !folderId || canMoveInterest(interests, folderId, interest.id),
+              !interest.target &&
+              (!folderId || canMoveInterest(interests, folderId, interest.id)),
           )
           .map((interest) => (
             <button

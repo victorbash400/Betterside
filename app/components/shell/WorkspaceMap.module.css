@@ -1,0 +1,7 @@
+.emptyMessage {
+  max-width: 320px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+}

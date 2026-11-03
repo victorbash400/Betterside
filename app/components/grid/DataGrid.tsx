@@ -5,9 +5,10 @@ import { AgGridReact } from "ag-grid-react";
 import {
   AllCommunityModule,
   type ColDef,
-  type GridOptions,
   type GridApi,
 } from "ag-grid-community";
+import LoadingRegion from "../controls/LoadingRegion";
+import EmptyState from "../controls/EmptyState";
 import RecordPagination from "../collections/RecordPagination";
 import { gridTheme } from "./gridTheme";
 import styles from "./DataGrid.module.css";
@@ -42,6 +43,8 @@ export default function DataGrid<T extends { id: string }>({
   rows,
   columns,
   rowHeight,
+  loading = false,
+  emptyMessage = "Adjust filters to view records.",
   selected,
   selectedIds,
   onOpen,
@@ -51,11 +54,14 @@ export default function DataGrid<T extends { id: string }>({
   rows: T[];
   columns: ColDef<T>[];
   rowHeight?: number;
+  loading?: boolean;
+  emptyMessage?: string;
   selected?: string;
   selectedIds?: string[];
   onOpen: (row: T) => void;
   onContextMenu?: (row: T, event: MouseEvent) => void;
 }) {
+  const [ready, setReady] = useState(false);
   const grid = useRef<AgGridReact<T>>(null);
   useEffect(() => {
     syncSelection(
@@ -68,7 +74,7 @@ export default function DataGrid<T extends { id: string }>({
     pages: 1,
     count: rows.length,
   });
-  const syncPagination: GridOptions<T>["onPaginationChanged"] = ({ api }) => {
+  const syncPagination = ({ api }: { api: GridApi<T> }) => {
     const next = {
       page: api.paginationGetCurrentPage(),
       pages: Math.max(1, api.paginationGetTotalPages()),
@@ -83,13 +89,14 @@ export default function DataGrid<T extends { id: string }>({
     );
   };
   return (
-    <div className={styles.surface}>
+    <div className={styles.surface} aria-busy={loading || !ready}>
       <div className={styles.grid}>
         <AgGridReact<T>
           ref={grid}
           modules={modules}
           theme={gridTheme}
           rowData={rows}
+          loading={false}
           rowHeight={rowHeight}
           columnDefs={columns}
           defaultColDef={defaultColDef}
@@ -104,6 +111,7 @@ export default function DataGrid<T extends { id: string }>({
           tooltipShowDelay={400}
           ensureDomOrder
           onGridReady={({ api }) => {
+            setReady(true);
             api.setGridAriaProperty("label", label);
             syncSelection(
               api,
@@ -117,6 +125,7 @@ export default function DataGrid<T extends { id: string }>({
             )
           }
           onPaginationChanged={syncPagination}
+          onFilterChanged={syncPagination}
           onRowClicked={({ data, event }) => {
             if (
               event?.target instanceof Element &&
@@ -148,9 +157,21 @@ export default function DataGrid<T extends { id: string }>({
             onContextMenu(data, event);
           }}
         />
+        {!loading && ready && pagination.count === 0 && (
+          <EmptyState overlay>{emptyMessage}</EmptyState>
+        )}
       </div>
+      {(loading || !ready) && (
+        <div className={styles.loading}>
+          <LoadingRegion
+            overlay
+            compact
+            label={`Loading ${label.toLowerCase()}`}
+          />
+        </div>
+      )}
       <div className={styles.footer}>
-        <span>
+        <span hidden={loading}>
           {pagination.count.toLocaleString("en")}{" "}
           {pagination.count === 1 ? "record" : "records"}
         </span>

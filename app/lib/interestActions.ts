@@ -7,7 +7,7 @@ export type InterestAction =
     }
   | {
       kind:
-        "open-item" | "map-item" | "move-item" | "remove-item" | "chat-item";
+        "pin-item" | "open-item" | "map-item" | "move-item" | "remove-item" | "chat-item";
       item: MapItem;
       interestId?: string;
     };

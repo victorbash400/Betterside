@@ -15,3 +15,5 @@
 .website:hover {
   background: var(--selection);
 }
+
+.pin { margin-bottom: 12px; }

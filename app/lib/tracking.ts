@@ -8,6 +8,31 @@ import {
   locationPrecisionSchema,
 } from "./measurements.ts";
 import { z } from "zod";
+import { concerns } from "./concerns.ts";
+export const pinTargetSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("country"),
+    countryCode: z.string().min(1).max(3),
+    country: z.string().trim().min(1).max(160),
+  }),
+  z.object({
+    kind: z.literal("scope"),
+    countryCode: z.string().length(3),
+    country: z.string().trim().min(1).max(160),
+    concern: z.enum(concerns.map((item) => item.id)),
+  }),
+  z.object({
+    kind: z.literal("organization"),
+    organizationId: z.string().min(1).max(512),
+    countryCode: z.string().length(3).optional(),
+    country: z.string().trim().min(1).max(160).optional(),
+  }),
+  z.object({
+    kind: z.literal("cause"),
+    concern: z.enum(concerns.map((item) => item.id)),
+  }),
+]);
+export type PinTarget = z.infer<typeof pinTargetSchema>;
 const ids = z
   .array(z.string().min(1).max(160))
   .max(1000)
@@ -51,7 +76,7 @@ export const trackingSchema = z
       .array(
         z.object({
           id: z.string().min(1).max(160),
-          name: z.string().trim().min(1).max(120),
+          name: z.string().trim().min(1).max(512),
           categoryId: z
             .string()
             .refine(
@@ -59,6 +84,7 @@ export const trackingSchema = z
               "Unknown interest category.",
             )
             .optional(),
+          target: pinTargetSchema.optional(),
           issueIds: ids,
           parentId: z.string().optional(),
           archived: z.boolean().optional(),

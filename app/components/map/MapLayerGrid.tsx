@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { ColDef } from "ag-grid-community";
+import MapLayerSelectionCell from "./MapLayerSelectionCell";
 import DataGrid from "../grid/DataGrid";
 
 export interface MapLayerRow {
@@ -20,6 +21,21 @@ export default function MapLayerGrid({
   const columns = useMemo<ColDef<MapLayerRow>[]>(
     () => [
       {
+        colId: "selection",
+        headerName: "",
+        width: 32,
+        minWidth: 32,
+        maxWidth: 32,
+        sortable: false,
+        filter: false,
+        resizable: false,
+        suppressMovable: true,
+        cellStyle: { padding: "0", justifyContent: "center" },
+        valueGetter: ({ data }) => Boolean(data && selected.includes(data.id)),
+        cellRenderer: MapLayerSelectionCell,
+        cellRendererParams: { onToggle },
+      },
+      {
         field: "label",
         headerName: "Cause",
         flex: 1,
@@ -31,19 +47,20 @@ export default function MapLayerGrid({
             {
               field: "count" as const,
               headerName: "Records",
-              width: 96,
-              minWidth: 96,
+              width: 80,
+              minWidth: 80,
               type: "numericColumn",
               filter: "agNumberColumnFilter",
             },
           ]
         : []),
     ],
-    [hasCounts],
+    [hasCounts, selected, onToggle],
   );
   return (
     <DataGrid
       label="Map cause layers"
+      emptyMessage="Select a source to view causes."
       rows={rows}
       columns={columns}
       selectedIds={selected}

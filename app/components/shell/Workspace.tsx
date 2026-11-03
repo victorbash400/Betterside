@@ -1,4 +1,5 @@
 "use client";
+import LoadingRegion from "../controls/LoadingRegion";
 import type { CheckoutInput } from "../../lib/chatWorkspace";
 import type { SettingsSection } from "../../lib/settings";
 import { useEffect, useState } from "react";
@@ -15,6 +16,10 @@ import CountryOrganizations from "../issues/CountryOrganizations";
 import WorkspaceToolbar from "../map/WorkspaceToolbar";
 import MapTools from "../map/MapTools";
 import IssueDetails from "../issues/IssueDetails";
+import CollectionInsights from "../collections/CollectionInsights";
+import PinnedCompareDialog from "../interests/PinnedCompareDialog";
+import ScopeDetails, { type ScopeSelection } from "../issues/ScopeDetails";
+import type { PinTarget } from "../../lib/tracking";
 import InterestActionDialog from "../interests/InterestActionDialog";
 import AddItemsDialog from "../interests/AddItemsDialog";
 import NewInterestDialog from "../interests/NewInterestDialog";
@@ -22,19 +27,26 @@ import SettingsDialog from "../settings/SettingsDialog";
 import ContributionsModal from "../payments/ContributionsModal";
 import ContributionDialog from "../payments/ContributionDialog";
 import { useWorkspace } from "../../state/useWorkspace";
+import { issueKinds } from "../../lib/catalogue";
 import { interestPath } from "../../lib/interestTree";
 import type { InterestAction } from "../../lib/interestActions";
 import type { MapItem } from "../../lib/types";
-import type { OverlaySettings } from "../../lib/concerns";
+import { concerns, type OverlaySettings } from "../../lib/concerns";
+import { defaultDiscoveryFilters } from "../../lib/discoveryFilters";
 import { useOrganizationCrisisMap } from "../../state/useOrganizationCrisisMap";
 import styles from "./Workspace.module.css";
 const InterestContents = dynamic(
   () => import("../collections/InterestContents"),
-  { ssr: false },
+  { ssr: false, loading: () => <LoadingRegion label="Loading table" /> },
 );
 const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), { ssr: false });
 export default function Workspace() {
   const state = useWorkspace();
+  const [scopeDetails, setScopeDetails] = useState<ScopeSelection>();
+  const [comparingPins, setComparingPins] = useState(false);
+  function pinScope(name: string, target: PinTarget) {
+    state.createInterest(name, undefined, undefined, undefined, target);
+  }
   const [chatCheckout, setChatCheckout] = useState<CheckoutInput>();
   const [contributionsOpen, setContributionsOpen] = useState(false);
   const narrow = useNarrowLayout();
@@ -78,10 +90,12 @@ export default function Workspace() {
     code: string;
     country: string;
   }>();
-  const organizationCode = state.allRecords.find(
+  const organizationCode = (state.activeInterest?.target?.kind === "country" || state.activeInterest?.target?.kind === "scope") && state.view === "Following"
+    ? state.activeInterest.target.countryCode : state.allRecords.find(
     (item) =>
       item.country === state.discoveryFilters.country && item.reportingArea,
   )?.reportingArea?.countryCode;
+  const scopedCountryName=state.discoveryFilters.country || ((state.activeInterest?.target?.kind==="country" || state.activeInterest?.target?.kind==="scope") ? state.activeInterest.target.country : "");
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection>("appearance");
   useEffect(() => {
@@ -106,6 +120,8 @@ export default function Workspace() {
     state.setSettingsOpen(false);
   }
   function following() {
+    state.setOverlay({ ...state.overlay, concerns: concerns.map((cause) => cause.id) });
+    state.setDiscoveryFilters(defaultDiscoveryFilters);
     if (state.view === "Organizations") {
       state.setFilters({ ...state.filters, query: "" });
     }
@@ -116,9 +132,24 @@ export default function Workspace() {
     state.setSettingsOpen(false);
   }
   function openInterest(id: string) {
-    if (state.view === "Organizations") {
-      state.setFilters({ ...state.filters, query: "" });
+    const pin = state.interests.find((item) => item.id === id);
+    if (pin?.target?.kind === "organization") {
+      state.setError("");
+      void organizations.focus(pin.target.organizationId,undefined,pin.target.countryCode).then(() => {
+        state.setView("Organizations");
+        state.setFilters({...state.filters, query:""});
+        state.setSelectedInterestId(id);
+        state.setSelectedId(undefined);
+        state.setCollectionMode("map");
+        state.setSettingsOpen(false);
+        setOrganizationsOpen(true);
+      }).catch((error) => state.setError(error instanceof Error ? error.message : "Organization unavailable."));
+      return;
     }
+    state.setOverlay({ ...state.overlay, concerns: pin?.target?.kind === "cause" || pin?.target?.kind === "scope"
+      ? [pin.target.concern] : concerns.map((cause) => cause.id) });
+    state.setDiscoveryFilters(defaultDiscoveryFilters);
+    state.setFilters({ ...state.filters, query: "", kinds: [...issueKinds] });
     state.setSelectedInterestId(id);
     state.setSelectedId(undefined);
     state.setView("Following");
@@ -140,6 +171,10 @@ export default function Workspace() {
     setChatContext(undefined);
   }
   function handleAction(next: InterestAction) {
+    if (next.kind === "pin-item") {
+      state.track(next.item.id);
+      return;
+    }
     if (next.kind === "open-item") {
       select(next.item);
       return;
@@ -162,6 +197,11 @@ export default function Workspace() {
     if (next.kind === "chat") {
       openInterest(next.interest.id);
       state.setChatOpen(true);
+      return;
+    }
+    if (next.kind === "archive" && next.interest.target) {
+      state.archiveInterest(next.interest.id);
+      if (state.selectedInterestId === next.interest.id) following();
       return;
     }
     setAction(next);
@@ -230,9 +270,8 @@ export default function Workspace() {
         following={state.following}
         activeInterestId={state.selectedInterestId}
         onInterest={openInterest}
-        onCreateInterest={(choice) =>
-          state.createInterest(choice.name, undefined, choice.categoryId)
-        }
+        onComparePins={() => setComparingPins(true)}
+        onRequestPin={() => setCreating(true)}
         onInterestAction={handleAction}
         onTrack={state.track}
         selected={state.selected?.id}
@@ -333,17 +372,18 @@ export default function Workspace() {
                   error={state.dataError}
                   busy={state.dataBusy}
                   onRefresh={state.refreshData}
+                  onTrends={organizationCode ? () => setScopeDetails({code:organizationCode,country:scopedCountryName,concern:state.overlay.concerns.length===1?state.overlay.concerns[0]:undefined}) : undefined}
                   onOrganizations={
                     organizationCode
                       ? () =>
                           setOrganizationCountry({
                             code: organizationCode,
-                            country: state.discoveryFilters.country,
+                            country: scopedCountryName,
                           })
                       : undefined
                   }
                   onAdd={
-                    state.activeInterest
+                    state.activeInterest && !state.activeInterest.target
                       ? () =>
                           setAction({
                             kind: "add",
@@ -359,9 +399,16 @@ export default function Workspace() {
               <div className={styles.discoveryContent}>
                 {state.collectionMode === "list" ? (
                   state.view === "Organizations" ? null : (
+                    <CollectionInsights pins={state.interests} rightInset={!narrow&&causesOpen?310:0} key={state.activeInterest?.id ?? state.view} pin={state.activeInterest ?? {id:"following",name:"Pinned",issueIds:state.following,hiddenKinds:[]}} items={state.allRecords} canPin={state.trackingReady} onPin={pinScope}>
                     <InterestContents
+                      loading={
+                        state.view === "Explore"
+                          ? state.dataBusy
+                          : !state.trackingReady && !state.error
+                      }
                       discovery={state.view === "Explore"}
                       interest={state.activeInterest}
+                      following={state.following}
                       items={state.records}
                       onAdd={() =>
                         state.activeInterest
@@ -375,10 +422,25 @@ export default function Workspace() {
                       onAction={handleAction}
                       canEdit={state.trackingReady}
                     />
+                    </CollectionInsights>
                   )
                 ) : (
                   <>
                     <WorkspaceMap
+                      emptyMessage={
+                        state.error
+                          ? undefined
+                          : state.view === "Organizations"
+                            ? "Select an organization or adjust filters to view causes."
+                            : state.view === "Following"
+                              ? ""
+                              : "Select a source or adjust filters to view causes and projects."
+                      }
+                      loading={
+                        state.view !== "Organizations" &&
+                        state.dataBusy &&
+                        !state.allRecords.length
+                      }
                       geography={state.geography}
                       points={
                         state.view === "Organizations"
@@ -429,6 +491,9 @@ export default function Workspace() {
                 )}
                 {state.view === "Organizations" ? (
                   <OrganizationWorkspace
+                    pins={state.interests}
+                    canPin={state.trackingReady}
+                    onPin={pinScope}
                     state={{
                       ...organizations,
                       update: updateOrganizations,
@@ -474,6 +539,13 @@ export default function Workspace() {
                     (item) => item.id === state.selected?.id,
                   )) && (
                   <IssueDetails
+          pinned={state.following.includes(state.selected.id)}
+          canPin={state.trackingReady}
+          onTogglePin={() => state.following.includes(state.selected!.id)
+            ? state.untrack(state.selected!.id) : state.track(state.selected!.id)}
+                    key={state.selected.id}
+                    pins={state.interests}
+                    onPinScope={pinScope}
                     issue={state.selected}
                     onClose={() => state.setSelectedId(undefined)}
                     onContribute={() => state.setCheckout(state.selected)}
@@ -556,6 +628,7 @@ export default function Workspace() {
               undefined,
               choice.categoryId,
               parentId,
+              choice.target,
             )
           }
           onRename={state.renameInterest}
@@ -577,13 +650,18 @@ export default function Workspace() {
           }}
         />
       )}
+      {comparingPins && <PinnedCompareDialog pins={[...state.interests,...state.allRecords.filter(item=>state.following.includes(item.id)).map(item=>({id:item.id,name:item.location,issueIds:[item.id],hiddenKinds:[]}))]} items={state.allRecords} onClose={()=>setComparingPins(false)}/>}
+      {scopeDetails && <ScopeDetails pins={state.interests} key={JSON.stringify(scopeDetails)} scope={scopeDetails} canPin={state.trackingReady} onPin={pinScope} onClose={()=>setScopeDetails(undefined)}/>}
       {creating && (
         <NewInterestDialog
           interests={state.interests}
+          items={state.allRecords}
+          initialCountry={(state.view==="Organizations"?organizations.countryCode:organizationCode) ?? ""}
+          following={state.following}
+          onPinItem={(id) => state.track(id)}
           onClose={() => setCreating(false)}
           onCreate={(choice) => {
-            state.createInterest(choice.name, undefined, choice.categoryId);
-            setCreating(false);
+            state.createInterest(choice.name, undefined, choice.categoryId, undefined, choice.target);
           }}
         />
       )}

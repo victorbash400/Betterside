@@ -214,3 +214,16 @@
   min-height: 0;
   overflow: hidden;
 }
+
+.dialog[data-size="analysis"] { width: min(960px, calc(100vw - 32px)); height: min(760px, calc(100dvh - 40px)); display: flex; flex-direction: column; }
+.dialog[data-size="analysis"] .body { flex: 1; min-height: 0; overflow-y: auto; }
+
+.dialog[data-size="insights"][data-modal="false"] {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, calc(100vw - 32px));
+  height: min(640px, calc(100dvh - 96px));
+  max-height: calc(100dvh - 96px);
+  border-radius: 28px;
+}
+.dialog[data-size="insights"] .body { flex: 1; min-height: 0; overflow-y: auto; }

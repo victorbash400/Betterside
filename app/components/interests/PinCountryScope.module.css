@@ -1,0 +1,74 @@
+.scope {
+  position: relative;
+  min-width: 0;
+}
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.trigger span {
+  flex: 1;
+  text-align: left;
+}
+.menu {
+  position: absolute;
+  inset: calc(100% + 4px) 0 auto;
+  z-index: 4;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel);
+}
+.search {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px;
+  color: var(--muted);
+}
+.search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+}
+.options {
+  max-height: 180px;
+  overflow-y: auto;
+}
+.options button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.options button:hover,
+.options button[aria-pressed="true"] {
+  background: var(--selection);
+}
+.trigger:focus-visible,
+.options button:focus-visible {
+  outline: 2px solid var(--icon);
+  outline-offset: -2px;
+}

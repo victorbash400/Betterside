@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import {
+  concerns,
   defaultOverlaySettings,
   matchesConcern,
   inOverlayPeriod,
@@ -15,6 +16,7 @@ import { defaultDatasets } from "../lib/dataSources";
 import { deduplicateRecords } from "../lib/feeds/deduplicate";
 import { useDiscoveryData } from "./useDiscoveryData";
 import { useAppearance } from "./useAppearance";
+import { matchesPin, pinCountries } from "../lib/pins";
 import { useTracking } from "./useTracking";
 import { useMapGeography } from "./useMapGeography";
 import { overlayPoints } from "../lib/overlayData";
@@ -51,6 +53,7 @@ export function useWorkspace() {
       ),
     [tracking.savedItems, discovery.catalogue, discovery.events],
   );
+  const countryChoices = useMemo(() => pinCountries(catalogue), [catalogue]);
   const [view, setView] = useState<View>("Explore"),
     [filters, setFilters] = useState<Filters>({
       query: "",
@@ -93,9 +96,7 @@ export function useWorkspace() {
         view === "Following"
           ? catalogue.filter((issue) =>
               selectedInterestId
-                ? tracking.interests
-                    .find((interest) => interest.id === selectedInterestId)
-                    ?.issueIds.includes(issue.id)
+                ? Boolean(activeInterest && matchesPin(issue, activeInterest))
                 : following.includes(issue.id),
             )
           : deduplicateRecords(
@@ -106,7 +107,8 @@ export function useWorkspace() {
         filters,
       ).filter(
         (item) =>
-          inOverlayPeriod(item, overlay.period, Date.now()) &&
+          (view === "Following" ||
+            inOverlayPeriod(item, overlay.period, Date.now())) &&
           matchesDiscoveryFilters(item, discoveryFilters),
       ),
     [
@@ -124,10 +126,13 @@ export function useWorkspace() {
   );
   const records = useMemo(
     () =>
-      availableRecords.filter((item) =>
-        overlay.concerns.some((id) => matchesConcern(item, id)),
+      availableRecords.filter(
+        (item) =>
+          (view === "Following" &&
+            overlay.concerns.length === concerns.length) ||
+          overlay.concerns.some((id) => matchesConcern(item, id)),
       ),
-    [availableRecords, overlay.concerns],
+    [availableRecords, overlay.concerns, view],
   );
   const selected =
     records.find((issue) => issue.id === selectedId) ??
@@ -149,14 +154,15 @@ export function useWorkspace() {
     setMapViewSettings,
     discoveryFilters,
     setDiscoveryFilters: (next: typeof discoveryFilters) => {
-      setDiscoveryFilters(next);
+      setDiscoveryFilters({
+        ...next,
+        countryCode: countryChoices.find(
+          (country) => country.country === next.country,
+        )?.countryCode,
+      });
       setSelectedId(undefined);
     },
-    countries: [
-      ...new Set(
-        catalogue.flatMap((item) => (item.country ? [item.country] : [])),
-      ),
-    ].sort(),
+    countries: countryChoices.map((country) => country.country),
     retryCatalogue: () => {
       if (appearance.error) {
         appearance.retry();

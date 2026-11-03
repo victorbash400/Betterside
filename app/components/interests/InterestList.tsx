@@ -1,15 +1,12 @@
+import { comparablePins } from "../../lib/pins";
 import { interestPath } from "../../lib/interestTree";
 import type { InterestAction } from "../../lib/interestActions";
 import TrackedItem from "./TrackedItem";
-import {
-  interestOrder,
-  type InterestChoice,
-} from "../../lib/interestCategories";
-import { useState } from "react";
-import { Plus } from "lucide-react";
+import { interestOrder } from "../../lib/interestCategories";
+import { Plus, ChartNoAxesCombined } from "lucide-react";
 import IconButton from "../controls/IconButton";
+import PinnedShortcut from "./PinnedShortcut";
 import InterestFolder from "./InterestFolder";
-import NewInterestDialog from "./NewInterestDialog";
 import type { Interest } from "../../state/useTracking";
 import type { MapItem as Issue } from "../../lib/types";
 import styles from "./InterestList.module.css";
@@ -22,7 +19,8 @@ export default function InterestList({
   activeId,
   onSelect,
   onOpen,
-  onCreate,
+  onRequestPin,
+  onComparePins,
   onAction,
   onTrack,
 }: {
@@ -34,13 +32,37 @@ export default function InterestList({
   activeId?: string;
   onSelect: (issue: Issue) => void;
   onOpen: (id: string) => void;
-  onCreate: (choice: InterestChoice) => void;
+  onRequestPin: () => void;
+  onComparePins: () => void;
   onAction: (action: InterestAction) => void;
   onTrack: (id: string, interestId?: string) => void;
 }) {
-  const [creating, setCreating] = useState(false);
+  const comparisonCount = comparablePins(
+    [
+      ...interests,
+      ...issues
+        .filter((item) => following.includes(item.id))
+        .map((item) => ({
+          id: item.id,
+          name: item.location,
+          issueIds: [item.id],
+          hiddenKinds: [],
+        })),
+    ],
+    issues,
+  ).length;
   const grouped = new Set(interests.flatMap((interest) => interest.issueIds));
   function renderFolder(interest: Interest, depth: number): React.ReactNode {
+    if (interest.target)
+      return (
+        <PinnedShortcut
+          key={interest.id}
+          pin={interest}
+          active={activeId === interest.id}
+          onOpen={() => onOpen(interest.id)}
+          onUnpin={() => onAction({ kind: "archive", interest })}
+        />
+      );
     return (
       <InterestFolder
         key={interest.id}
@@ -67,15 +89,25 @@ export default function InterestList({
   return (
     <>
       <div className={styles.header}>
-        <span>Interests</span>
-        <IconButton
-          disabled={disabled}
-          label="New interest"
-          title="New interest"
-          onClick={() => setCreating(true)}
-        >
-          <Plus />
-        </IconButton>
+        <span>Pinned</span>
+        <div className={styles.headerActions}>
+          <IconButton
+            label="Compare pins"
+            title="Compare pins"
+            disabled={disabled || comparisonCount < 2}
+            onClick={onComparePins}
+          >
+            <ChartNoAxesCombined />
+          </IconButton>
+          <IconButton
+            disabled={disabled}
+            label="Pin"
+            title="Pin"
+            onClick={onRequestPin}
+          >
+            <Plus />
+          </IconButton>
+        </div>
       </div>
       {interests
         .filter((interest) => !interest.parentId)
@@ -95,16 +127,6 @@ export default function InterestList({
             depth={0}
           />
         ))}
-      {creating && (
-        <NewInterestDialog
-          interests={interests}
-          onClose={() => setCreating(false)}
-          onCreate={(name) => {
-            onCreate(name);
-            setCreating(false);
-          }}
-        />
-      )}
     </>
   );
 }

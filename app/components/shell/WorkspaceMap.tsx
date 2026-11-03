@@ -1,3 +1,5 @@
+import LoadingRegion from "../controls/LoadingRegion";
+import DismissibleNotice from "../controls/DismissibleNotice";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import MapWindow from "../map/MapWindow";
@@ -8,12 +10,17 @@ import type { Analysis } from "../../lib/analysis";
 import type { OverlayPoint } from "../../lib/overlayData";
 import type { useMapGeography } from "../../state/useMapGeography";
 import styles from "./Workspace.module.css";
-const GlobeCanvas = dynamic(() => import("../map/GlobeCanvas"), { ssr: false });
+const GlobeCanvas = dynamic(() => import("../map/GlobeCanvas"), {
+  ssr: false,
+  loading: () => <LoadingRegion label="Loading map" />,
+});
 const StudioDashboard = dynamic(() => import("../dashboard/StudioDashboard"), {
   ssr: false,
+  loading: () => <LoadingRegion label="Loading analysis" />,
 });
 export default function WorkspaceMap({
   geography,
+  loading = false,
   points,
   items,
   selected,
@@ -28,8 +35,10 @@ export default function WorkspaceMap({
   countryCode,
   focusAreas,
   mapViewSettings,
+  emptyMessage,
 }: {
   geography: ReturnType<typeof useMapGeography>;
+  loading?: boolean;
   points: OverlayPoint[];
   items: MapItem[];
   selected?: MapItem;
@@ -44,6 +53,7 @@ export default function WorkspaceMap({
   countryCode?: string;
   focusAreas?: string[];
   mapViewSettings: MapViewSettings;
+  emptyMessage?: string;
 }) {
   const [funding, setFunding] = useState(false),
     [projects, setProjects] = useState(false),
@@ -62,6 +72,7 @@ export default function WorkspaceMap({
     <div className={styles.mapWorkspace}>
       <GlobeCanvas
         geography={geography}
+        loading={loading}
         points={points}
         issues={items}
         overlay={overlay}
@@ -76,6 +87,9 @@ export default function WorkspaceMap({
         projection={projection}
         onProjection={onProjection}
       />
+      {!loading && !items.length && emptyMessage && (
+        <DismissibleNotice key={`${countryCode ?? country}:${emptyMessage}`} message={emptyMessage}/>
+      )}
       {opened.funding && (
         <MapWindow
           title="Funding"

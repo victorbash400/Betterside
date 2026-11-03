@@ -1,3 +1,4 @@
+import LoadingSpinner from "../controls/LoadingSpinner";
 import type { ReactNode } from "react";
 import {
   PanelLeft,
@@ -5,7 +6,7 @@ import {
   MessageCircle,
   Map,
   Table2,
-  FolderPlus,
+  Pin,
   RefreshCw,
 } from "lucide-react";
 import IconButton from "../controls/IconButton";
@@ -106,11 +107,11 @@ export default function WorkspaceHeader({
         )}
         <div className={styles.group}>
           <IconButton
-            label="New interest"
-            title="New interest"
+            label="Pin"
+            title="Pin"
             onClick={onCreate}
           >
-            <FolderPlus />
+            <Pin />
           </IconButton>
           <IconButton
             label="Refresh data"
@@ -118,7 +119,11 @@ export default function WorkspaceHeader({
             onClick={onRefresh}
             disabled={busy}
           >
-            <RefreshCw />
+            {busy ? (
+              <LoadingSpinner size={24} label="Refreshing data" />
+            ) : (
+              <RefreshCw />
+            )}
           </IconButton>
         </div>
       </div>

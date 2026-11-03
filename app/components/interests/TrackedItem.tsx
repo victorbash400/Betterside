@@ -39,10 +39,10 @@ export default function TrackedItem({
         <button
           className={styles.label}
           onClick={onSelect}
-          title={item.location}
+          title={`${item.location} · ${item.kind} · ${item.source.label}`}
         >
           <FileText size={24} strokeWidth={1.7} />
-          <span>{item.location}</span>
+          <span>{item.project?.name ?? `${item.location} · ${item.kind}`}</span>
         </button>
         <IconButton
           label={`${item.location} actions`}

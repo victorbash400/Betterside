@@ -23,7 +23,7 @@ export default function WorkspaceBreadcrumbs({
       <ChevronRight size={12} />
       {view === "Following" ? (
         <>
-          <button onClick={onFollowing}>Following</button>
+          <button onClick={onFollowing}>Pinned</button>
           {path.map((interest) => (
             <span key={interest.id}>
               <ChevronRight size={12} />

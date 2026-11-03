@@ -1,0 +1,27 @@
+.notice {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: min(420px, calc(100% - 32px));
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.notice > span {
+  min-width: 0;
+}
+.notice > button {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}

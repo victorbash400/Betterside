@@ -47,17 +47,21 @@ export default function InterestActionDialog({
     return (
       <NewInterestDialog
         interests={interests}
+        items={items}
+        following={interests.flatMap((interest) => interest.issueIds)}
+        onPinItem={(id) => {
+          onMoveItem(id);
+        }}
         onClose={onClose}
         onCreate={(choice) => {
           onCreate(choice, action.interest.id);
-          onClose();
         }}
       />
     );
   if (action.kind === "rename")
     return (
       <NamePrompt
-        label="Rename interest"
+        label="Rename folder"
         initial={action.interest.name}
         onClose={onClose}
         onSubmit={(name) => {
@@ -81,7 +85,7 @@ export default function InterestActionDialog({
               onClose();
             }}
           >
-            Remove interest
+            Remove folder
           </button>
         </div>
       </Dialog>

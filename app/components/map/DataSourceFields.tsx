@@ -1,3 +1,4 @@
+import LoadingSpinner from "../controls/LoadingSpinner";
 import {
   dataSources,
   type DatasetSelection,
@@ -39,8 +40,12 @@ export default function DataSourceFields({
           disabled={busy}
           title="Reuses fresh data; refreshes expired sources."
         >
-          <RefreshCw size={14} />
-          {busy ? "Refreshing" : "Refresh sources"}
+          {busy ? (
+            <LoadingSpinner size={24} label="Refreshing sources" />
+          ) : (
+            <RefreshCw size={14} />
+          )}
+          Refresh sources
         </button>
       </div>
       {error && !problem && (

@@ -1,4 +1,5 @@
 "use client";
+import LoadingRegion from "../controls/LoadingRegion";
 import { useEffect, useRef, useState } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useNarrowLayout } from "../../state/useNarrowLayout";
@@ -17,6 +18,7 @@ import ConcernDetails from "./ConcernDetails";
 import styles from "./GlobeCanvas.module.css";
 export default function GlobeCanvas({
   geography,
+  loading = false,
   points,
   issues,
   focusRequest,
@@ -31,6 +33,7 @@ export default function GlobeCanvas({
   mapViewSettings: mapView,
 }: {
   geography: ReturnType<typeof useMapGeography>;
+  loading?: boolean;
   points: OverlayPoint[];
   issues: MapItem[];
   focusRequest: number;
@@ -113,10 +116,8 @@ export default function GlobeCanvas({
           <button onClick={geography.retry}>Retry boundaries</button>
         </div>
       )}
-      {!ready && !error && (
-        <div className={styles.loading} role="status">
-          Loading globe
-        </div>
+      {(!ready || loading) && !error && !geography.error && (
+        <LoadingRegion overlay label="Loading globe" />
       )}
       {error && (
         <div className={styles.error} role="alert">

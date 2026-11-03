@@ -129,6 +129,7 @@ export function hapiIndicators(
   countries: Country[],
   resources: HapiResource[],
   reviewed: string,
+  retainHistory = false,
 ) {
   const rows = z
     .object({ data: z.array(hapiRowSchemas[dataset]) })
@@ -296,14 +297,32 @@ export function hapiIndicators(
             ? row.assessment_type
             : undefined,
     };
-    const previous = latest.get(id);
+    const observationKey = retainHistory
+      ? JSON.stringify([id, row.reference_period_start])
+      : id;
+    const previous = latest.get(observationKey);
+    if (
+      retainHistory &&
+      previous &&
+      resource.update_date === previous.source.published &&
+      measurements.some((measurement) =>
+        previous.measurements?.some(
+          (value) =>
+            value.metric === measurement.metric &&
+            value.value !== measurement.value,
+        ),
+      )
+    )
+      throw new Error(
+        "Conflicting historical measurements. Check source revisions.",
+      );
     if (
       !previous ||
       row.reference_period_start > previous.referencePeriod!.start ||
       (row.reference_period_start === previous.referencePeriod!.start &&
         resource.update_date > previous.source.published!)
     )
-      latest.set(id, item);
+      latest.set(observationKey, item);
   }
   return { issues: [...latest.values()], skipped };
 }

@@ -1,3 +1,4 @@
+import { samePinTarget } from "../lib/pins";
 import { saveChatRecords } from "../lib/saveChatRecords";
 import type { SaveRecordsAction } from "../lib/chatWorkspace";
 import { issueKinds } from "../lib/catalogue";
@@ -40,10 +41,13 @@ export function useTracking() {
     issueId?: string,
     categoryId?: string,
     parentId?: string,
+    target?: import("../lib/tracking").PinTarget,
   ) {
     const existing = storage.state.interests.find(
       (interest) =>
-        interest.name === name &&
+        (target
+          ? samePinTarget(interest.target, target)
+          : !interest.target && interest.name === name) &&
         (!interest.categoryId || interest.categoryId === categoryId) &&
         interest.parentId === parentId,
     );
@@ -71,6 +75,7 @@ export function useTracking() {
           id,
           name,
           categoryId,
+          target,
           parentId,
           hiddenKinds: [],
           issueIds: issueId

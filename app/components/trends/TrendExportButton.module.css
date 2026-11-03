@@ -1,0 +1,10 @@
+.export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export span {
+  color: var(--danger);
+  font-size: 11px;
+}

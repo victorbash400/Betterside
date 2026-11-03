@@ -10,7 +10,6 @@
   position: absolute;
   inset: 0;
 }
-.loading,
 .error {
   position: absolute;
   z-index: 5;

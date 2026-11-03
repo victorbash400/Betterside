@@ -1,0 +1,48 @@
+.choices {
+  max-height: 140px;
+  overflow-y: auto;
+}
+.choices button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.choices button:hover {
+  background: var(--hover);
+}
+.choices small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 2px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+button[aria-checked="true"] .check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+}
+.choices button:focus-visible {
+  outline: 2px solid var(--icon);
+  outline-offset: -2px;
+}

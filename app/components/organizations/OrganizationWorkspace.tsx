@@ -1,3 +1,5 @@
+import { samePinTarget } from "../../lib/pins";
+import LoadingRegion from "../controls/LoadingRegion";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import type { useOrganizations } from "../../state/useOrganizations";
@@ -11,6 +13,7 @@ import OrganizationIssues from "./OrganizationIssues";
 import styles from "./OrganizationWorkspace.module.css";
 const OrganizationList = dynamic(() => import("./OrganizationList"), {
   ssr: false,
+  loading: () => <LoadingRegion label="Loading organization table" />,
 });
 export default function OrganizationWorkspace({
   state,
@@ -25,6 +28,9 @@ export default function OrganizationWorkspace({
   geography,
   crisis,
   onOverlay,
+  pins,
+  canPin,
+  onPin,
 }: {
   state: ReturnType<typeof useOrganizations>;
   query: string;
@@ -38,7 +44,22 @@ export default function OrganizationWorkspace({
   geography: ReturnType<typeof useMapGeography>;
   crisis: ReturnType<typeof useOrganizationCrisisMap>;
   onOverlay: (value: OverlaySettings) => void;
+  pins: import("../../lib/tracking").Interest[];
+  canPin: boolean;
+  onPin: (name: string, target: import("../../lib/tracking").PinTarget) => void;
 }) {
+  const pinCountry = state.countries.find(
+    (country) => country.code === state.countryCode,
+  );
+  const target = state.organization
+    ? {
+        kind: "organization" as const,
+        organizationId: state.organization.id,
+        ...(pinCountry
+          ? { countryCode: pinCountry.code, country: pinCountry.name }
+          : {}),
+      }
+    : undefined;
   const [details, setDetails] = useState<string>();
   const [settings, setSettings] = useState(false);
   function country(country: string) {
@@ -50,6 +71,7 @@ export default function OrganizationWorkspace({
     <div className={styles.workspace} data-map={mode === "map"}>
       {mode === "list" ? (
         <OrganizationList
+          loading={state.busy}
           organizations={state.visible}
           selected={state.selected}
           onSelect={(id) => {
@@ -61,6 +83,7 @@ export default function OrganizationWorkspace({
         <>
           <OrganizationRail
             open={organizationsOpen}
+            loading={state.busy}
             onClose={onCloseOrganizations}
             query={query}
             onQuery={onQuery}
@@ -104,10 +127,8 @@ export default function OrganizationWorkspace({
           showAppearance={mode === "map"}
         />
       )}
-      {state.busy && (
-        <span className={styles.status} role="status">
-          Loading organizations
-        </span>
+      {state.busy && mode === "map" && (
+        <LoadingRegion overlay label="Loading organizations" />
       )}
       {state.error && (
         <div className={styles.error} role="alert">
@@ -119,6 +140,17 @@ export default function OrganizationWorkspace({
         <OrganizationDetails
           key={state.organization.id}
           organization={state.organization}
+          pinned={pins.some((pin) => samePinTarget(pin.target, target))}
+          canPin={canPin}
+          onPin={() => {
+            if (target)
+              onPin(
+                pinCountry
+                  ? `${state.organization!.name} · ${pinCountry.name}`
+                  : state.organization!.name,
+                target,
+              );
+          }}
           onClose={() => setDetails(undefined)}
           onCountry={country}
         />

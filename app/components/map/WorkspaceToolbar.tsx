@@ -1,4 +1,4 @@
-import { Building2 } from "lucide-react";
+import { Building2, ChartNoAxesCombined } from "lucide-react";
 import OverlayModeControl from "./OverlayModeControl";
 import CountryFilter from "./CountryFilter";
 import DiscoveryFilterFields from "./DiscoveryFilterFields";
@@ -27,6 +27,7 @@ export default function WorkspaceToolbar({
   busy,
   onRefresh,
   onOrganizations,
+  onTrends,
   onAdd,
 }: {
   overlay: OverlaySettings;
@@ -45,6 +46,7 @@ export default function WorkspaceToolbar({
   busy: boolean;
   onRefresh: () => void;
   onOrganizations?: () => void;
+  onTrends?: () => void;
   onAdd?: () => void;
 }) {
   return (
@@ -105,6 +107,7 @@ export default function WorkspaceToolbar({
             : []),
         ]}
       />
+      {onTrends && <button className={styles.control} onClick={onTrends} aria-label="Country trends"><ChartNoAxesCombined size={15}/></button>}
       {onOrganizations && (
         <button
           className={styles.control}

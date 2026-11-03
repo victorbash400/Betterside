@@ -68,6 +68,7 @@ export async function loadHapi(
   countries: Country[],
   resources: HapiResource[],
   reviewed: string,
+  history?: { countryCode: string; years: number },
 ) {
   const now = new Date(reviewed),
     start = new Date(now);
@@ -81,10 +82,15 @@ export async function loadHapi(
             ? 730
             : 365),
   );
+  if (history) start.setUTCFullYear(now.getUTCFullYear() - history.years);
   const parameters: Record<string, string> = {
     start_date: start.toISOString().slice(0, 10),
     end_date: reviewed.slice(0, 10),
   };
+  if (history)
+    parameters[
+      dataset === "hapi-refugees" ? "asylum_location_code" : "location_code"
+    ] = history.countryCode;
   if (!["hapi-refugees", "hapi-funding", "hapi-risk"].includes(dataset))
     parameters.admin_level = dataset === "hapi-rainfall" ? "1" : "0";
   if (dataset === "hapi-food")
@@ -127,7 +133,14 @@ export async function loadHapi(
     feed.truncated ||= districts.truncated;
   }
   return {
-    ...hapiIndicators(dataset, feed, countries, resources, reviewed),
+    ...hapiIndicators(
+      dataset,
+      feed,
+      countries,
+      resources,
+      reviewed,
+      Boolean(history),
+    ),
     truncated: feed.truncated,
   };
 }

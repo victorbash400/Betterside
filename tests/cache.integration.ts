@@ -94,7 +94,19 @@ test("discovery routes share provider requests, isolate organization lookups, an
     const snapshots = await Promise.all(
       responses.map((response) => response.json()),
     );
-    assert.ok(snapshots.every((snapshot) => snapshot.issues.length === 1));
+    assert.ok(
+      snapshots.every(
+        (snapshot) =>
+          snapshot.issues.filter(
+            (item: { dataset: string }) => item.dataset === "usgs",
+          ).length === 1,
+      ),
+    );
+    assert.ok(
+      snapshots.every(
+        (snapshot) => snapshot.issues.length === snapshots[0].issues.length,
+      ),
+    );
     assert.ok(
       snapshots.every(
         (snapshot) =>

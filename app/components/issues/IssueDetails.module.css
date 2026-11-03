@@ -44,3 +44,5 @@
   color: var(--ink);
   text-underline-offset: 3px;
 }
+
+.sources button { gap: 6px; }

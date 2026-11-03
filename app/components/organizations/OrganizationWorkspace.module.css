@@ -7,7 +7,6 @@
   overflow: hidden;
   border-radius: 10px;
 }
-.status,
 .error {
   position: absolute;
   bottom: 16px;

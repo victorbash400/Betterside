@@ -7,6 +7,7 @@ import {
   MessageCircle,
   MapPin,
   BookmarkMinus,
+  Pin,
   ArrowUpRight,
 } from "lucide-react";
 import ContextMenu from "../controls/ContextMenu";
@@ -19,6 +20,7 @@ export default function InterestContextMenu({
   interest,
   item,
   interestId,
+  pinned = true,
   onAction,
   onClose,
 }: {
@@ -27,6 +29,7 @@ export default function InterestContextMenu({
   interest?: Interest;
   item?: MapItem;
   interestId?: string;
+  pinned?: boolean;
   onAction: (action: InterestAction) => void;
   onClose: () => void;
 }) {
@@ -35,7 +38,7 @@ export default function InterestContextMenu({
       x={x}
       y={y}
       onClose={onClose}
-      label={item ? "Tracked item actions" : "Interest actions"}
+      label={item ? "Pinned item actions" : "Pin actions"}
       entries={
         item
           ? [
@@ -54,11 +57,16 @@ export default function InterestContextMenu({
                 action: () =>
                   window.open(item.source.url, "_blank", "noopener,noreferrer"),
               },
-              {
-                label: "Move to…",
-                icon: FolderInput,
-                action: () => onAction({ kind: "move-item", item }),
-              },
+              ...(pinned
+                ? [
+                    {
+                      label: "Move to…",
+                      icon: FolderInput,
+                      action: () =>
+                        onAction({ kind: "move-item" as const, item }),
+                    },
+                  ]
+                : []),
               {
                 label: "Chat about this",
                 icon: MessageCircle,
@@ -67,7 +75,7 @@ export default function InterestContextMenu({
               ...(interestId
                 ? [
                     {
-                      label: "Remove from interest",
+                      label: "Remove from folder",
                       icon: BookmarkMinus,
                       action: () =>
                         onAction({
@@ -79,46 +87,55 @@ export default function InterestContextMenu({
                   ]
                 : []),
               {
-                label: "Stop tracking",
+                label: pinned ? "Unpin" : "Pin",
                 icon: BookmarkMinus,
-                action: () => onAction({ kind: "remove-item", item }),
-                danger: true,
+                action: () =>
+                  onAction({ kind: pinned ? "remove-item" : "pin-item", item }),
+                danger: pinned,
               },
             ]
           : interest
-            ? [
-                {
-                  label: "Add items…",
-                  icon: FilePlus,
-                  action: () => onAction({ kind: "add", interest }),
-                },
-                {
-                  label: "New folder…",
-                  icon: FolderPlus,
-                  action: () => onAction({ kind: "new", interest }),
-                },
-                {
-                  label: "Rename…",
-                  icon: Pencil,
-                  action: () => onAction({ kind: "rename", interest }),
-                },
-                {
-                  label: "Move to…",
-                  icon: FolderInput,
-                  action: () => onAction({ kind: "move-folder", interest }),
-                },
-                {
-                  label: "Chat about this",
-                  icon: MessageCircle,
-                  action: () => onAction({ kind: "chat", interest }),
-                },
-                {
-                  label: "Remove interest",
-                  icon: Archive,
-                  action: () => onAction({ kind: "archive", interest }),
-                  danger: true,
-                },
-              ]
+            ? interest.target
+              ? [
+                  {
+                    label: "Unpin",
+                    icon: BookmarkMinus,
+                    action: () => onAction({ kind: "archive", interest }),
+                  },
+                ]
+              : [
+                  {
+                    label: "Add items…",
+                    icon: FilePlus,
+                    action: () => onAction({ kind: "add", interest }),
+                  },
+                  {
+                    label: "New folder…",
+                    icon: FolderPlus,
+                    action: () => onAction({ kind: "new", interest }),
+                  },
+                  {
+                    label: "Rename…",
+                    icon: Pencil,
+                    action: () => onAction({ kind: "rename", interest }),
+                  },
+                  {
+                    label: "Move to…",
+                    icon: FolderInput,
+                    action: () => onAction({ kind: "move-folder", interest }),
+                  },
+                  {
+                    label: "Chat about this",
+                    icon: MessageCircle,
+                    action: () => onAction({ kind: "chat", interest }),
+                  },
+                  {
+                    label: "Remove folder",
+                    icon: Archive,
+                    action: () => onAction({ kind: "archive", interest }),
+                    danger: true,
+                  },
+                ]
             : []
       }
     />

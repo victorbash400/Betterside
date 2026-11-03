@@ -10,7 +10,9 @@ import type { InterestAction } from "../../lib/interestActions";
 import styles from "./InterestContents.module.css";
 export default function InterestContents({
   interest,
+  following,
   discovery = false,
+  loading = false,
   items,
   onAdd,
   onSelect,
@@ -18,7 +20,9 @@ export default function InterestContents({
   canEdit,
 }: {
   interest?: Interest;
+  following: string[];
   discovery?: boolean;
+  loading?: boolean;
   items: MapItem[];
   onAdd: () => void;
   onSelect: (item: MapItem) => void;
@@ -44,7 +48,7 @@ export default function InterestContents({
           ? `${interest.name} contents`
           : discovery
             ? "Data contents"
-            : "Following contents"
+            : "Pinned contents"
       }
       onContextMenu={(event) => {
         if (event.defaultPrevented || !canEdit) return;
@@ -59,6 +63,12 @@ export default function InterestContents({
     >
       <DataGrid
         label="Cause records"
+        emptyMessage={
+          discovery
+            ? "Select a source or adjust filters to view causes and projects."
+            : ""
+        }
+        loading={loading}
         rows={items}
         columns={columns}
         onOpen={onSelect}
@@ -69,7 +79,8 @@ export default function InterestContents({
       {itemMenu && (
         <InterestContextMenu
           {...itemMenu}
-          interestId={interest?.id}
+          pinned={following.includes(itemMenu.item.id)}
+          interestId={interest?.target ? undefined : interest?.id}
           onAction={onAction}
           onClose={() => setItemMenu(undefined)}
         />

@@ -21,7 +21,7 @@ export default function Dialog({
   animated?: boolean;
   compact?: boolean;
   centered?: boolean;
-  size?: "standard" | "profile" | "payment" | "history";
+  size?: "standard" | "profile" | "payment" | "history" | "analysis" | "insights";
   footer?: ReactNode;
   modal?: boolean;
 }) {
