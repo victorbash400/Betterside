@@ -6,6 +6,7 @@ import LayerSelect from "../map/LayerSelect";
 import SettingsInlineButton from "../settings/SettingsInlineButton";
 import ContributionTotalsWidget, { type ContributionTotalsConfig } from "./ContributionTotalsWidget";
 import styles from "./ChatContributionReport.module.css";
+import resultStyles from "./ChatResult.module.css";
 
 if (process.env.NEXT_PUBLIC_AG_STUDIO_LICENSE_KEY)
   AgStudioLicenseManager.setLicenseKey(process.env.NEXT_PUBLIC_AG_STUDIO_LICENSE_KEY);
@@ -64,6 +65,8 @@ const receiptGrid = {
     ],
   },
 } as const;
+const trackHeight = 24;
+const chartTracks = 12;
 
 export default function ChatContributionReport({ report }: { report: ContributionReport }) {
   const studio = useRef<AgStudio<ContributionRegistry>>(null);
@@ -73,6 +76,12 @@ export default function ChatContributionReport({ report }: { report: Contributio
   const [project, setProject] = useState("");
   const projects = useMemo(() => [...new Set(report.rows.map((row) => row.project))].sort(), [report.rows]);
   const hasRefunds = report.rows.some((row) => row.refundCents > 0);
+  function receiptTracks(filter: string) {
+    const count = filter
+      ? report.rows.filter((row) => row.project === filter).length
+      : report.rows.length;
+    return Math.min(9, Math.ceil((52 + count * 34) / trackHeight));
+  }
   const data = useMemo<AgDataSourcesDefinition<ContributionRegistry>>(() => ({
     sources: [{
       id: "ledger",
@@ -100,7 +109,7 @@ export default function ChatContributionReport({ report }: { report: Contributio
     selectedPageId: "contributions",
     pages: [{
       id: "contributions",
-      layout: { columns: 1, minWidth: 0, rowHeight: 24, pagePadding: 0, widgetPadding: 0 },
+      layout: { columns: 1, minWidth: 0, rowHeight: trackHeight, pagePadding: 0, widgetPadding: 0 },
       widgets: {
         totals: {
           type: "contribution-totals",
@@ -136,6 +145,8 @@ export default function ChatContributionReport({ report }: { report: Contributio
     page.filter = value ? {
       page: [{ field: { id: "ledger.project" }, model: { operator: "equals", value } }],
     } : undefined;
+    const receiptLayout = page.widgetLayout?.receipts;
+    if (receiptLayout) receiptLayout.ySpan = receiptTracks(value);
     api.setState(state);
     setProject(value);
   }
@@ -154,14 +165,14 @@ export default function ChatContributionReport({ report }: { report: Contributio
         ...receiptGrid,
         dataMapping: { cols: [...receiptGrid.dataMapping.cols] },
       };
-      page.widgetLayout.receipts = { xTrack: 0, xSpan: 1, yTrack: 12, ySpan: 9 };
+      page.widgetLayout.receipts = { xTrack: 0, xSpan: 1, yTrack: chartTracks, ySpan: receiptTracks(project) };
     }
     api.setState(state);
     setReceipts(!receipts);
   }
 
   return (
-    <section className={styles.report} aria-label="PayPal sandbox contribution report">
+    <section className={resultStyles.analysis} aria-label="PayPal sandbox contribution report">
       <div className={styles.header}>
         <strong>Sandbox contributions by {report.groupBy}</strong>
         {report.rows.length > 0 && (
@@ -185,7 +196,7 @@ export default function ChatContributionReport({ report }: { report: Contributio
         />
       )}
       {report.rows.length > 0 && !error && (
-        <div className={styles.studio} data-receipts={receipts}>
+        <div className={styles.studio} style={{ height: trackHeight * (chartTracks + (receipts ? receiptTracks(project) : 0)) }}>
           <AgStudio<ContributionRegistry>
             ref={studio}
             style={{ height: "100%", width: "100%" }}

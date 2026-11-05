@@ -10,7 +10,7 @@ import {
 import LoadingRegion from "../controls/LoadingRegion";
 import EmptyState from "../controls/EmptyState";
 import RecordPagination from "../collections/RecordPagination";
-import { gridTheme } from "./gridTheme";
+import { compactGridTheme, gridTheme } from "./gridTheme";
 import styles from "./DataGrid.module.css";
 
 const modules = [AllCommunityModule];
@@ -43,6 +43,7 @@ export default function DataGrid<T extends { id: string }>({
   rows,
   columns,
   rowHeight,
+  compact = false,
   loading = false,
   emptyMessage = "Adjust filters to view records.",
   selected,
@@ -54,6 +55,7 @@ export default function DataGrid<T extends { id: string }>({
   rows: T[];
   columns: ColDef<T>[];
   rowHeight?: number;
+  compact?: boolean;
   loading?: boolean;
   emptyMessage?: string;
   selected?: string;
@@ -74,6 +76,7 @@ export default function DataGrid<T extends { id: string }>({
     pages: 1,
     count: rows.length,
   });
+  const fitRows = compact && pagination.count > 0 && pagination.count <= 6;
   const syncPagination = ({ api }: { api: GridApi<T> }) => {
     const next = {
       page: api.paginationGetCurrentPage(),
@@ -89,12 +92,13 @@ export default function DataGrid<T extends { id: string }>({
     );
   };
   return (
-    <div className={styles.surface} aria-busy={loading || !ready}>
-      <div className={styles.grid}>
+    <div className={styles.surface} data-compact={compact} aria-busy={loading || !ready}>
+      <div className={styles.grid} data-fit-rows={fitRows} data-empty={pagination.count === 0}>
         <AgGridReact<T>
           ref={grid}
           modules={modules}
-          theme={gridTheme}
+          theme={compact ? compactGridTheme : gridTheme}
+          domLayout={fitRows ? "autoHeight" : "normal"}
           rowData={rows}
           loading={false}
           rowHeight={rowHeight}

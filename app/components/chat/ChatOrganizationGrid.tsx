@@ -18,7 +18,7 @@ export default function ChatOrganizationGrid({
   busy: boolean;
 }) {
   return (
-    <div className={`${styles.result} ${styles.tableResult}`}>
+    <div className={styles.analysis}>
       <div className={styles.heading}>
         <span>{total.toLocaleString("en")} matching organizations</span>
         {nextOffset !== null && (
@@ -27,20 +27,14 @@ export default function ChatOrganizationGrid({
           </button>
         )}
       </div>
-      <div
-        className={styles.grid}
-        style={{
-          height: Math.min(300, 82 + Math.max(1, organizations.length) * 34),
-        }}
-      >
-        <DataGrid
-          label="Chat organization results"
-          rows={organizations}
-          columns={organizationColumns}
-          rowHeight={34}
-          onOpen={(org) => onSelect(org.id)}
-        />
-      </div>
+      <DataGrid
+        label="Chat organization results"
+        rows={organizations}
+        columns={organizationColumns}
+        rowHeight={34}
+        compact
+        onOpen={(org) => onSelect(org.id)}
+      />
     </div>
   );
 }

@@ -17,6 +17,10 @@
   min-height: 0;
   min-width: 0;
 }
+.surface[data-compact="true"] { height: auto; }
+.surface[data-compact="true"] .grid { flex: none; height: 260px; }
+.surface[data-compact="true"] .grid[data-empty="true"] { height: 100px; }
+.surface[data-compact="true"] .grid[data-fit-rows="true"] { height: auto; }
 .grid :global(.ag-cell) {
   display: flex;
   align-items: center;

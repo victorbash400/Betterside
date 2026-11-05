@@ -2,6 +2,7 @@ import type { ChatMessageAction } from "../../lib/chatActions";
 import type { ChatTrendsResult } from "../../lib/chatTrends";
 import TrendResults from "../trends/TrendResults";
 import SettingsInlineButton from "../settings/SettingsInlineButton";
+import styles from "./ChatResult.module.css";
 export default function ChatTrendsWidget({ result, onMessage, busy }: {
   result: ChatTrendsResult;
   onMessage: ChatMessageAction;
@@ -10,8 +11,8 @@ export default function ChatTrendsWidget({ result, onMessage, busy }: {
   function request(offset: number) {
     onMessage(offset ? "Show more trend series." : "Reload trend history.", { kind: "show-trends", scopes: result.scopes, view: result.view, offset });
   }
-  return <section aria-label="Chat trends">
-    <TrendResults history={{ result, busy: false, error: "", retry: () => request(0) }} initialView={result.view}/>
+  return <section className={styles.analysis} aria-label="Chat trends">
+    <TrendResults history={{ result, busy: false, error: "", retry: () => request(0) }} initialView={result.view} compact/>
     {result.nextOffset !== null && <SettingsInlineButton disabled={busy} onClick={() => request(result.nextOffset!)}>More series</SettingsInlineButton>}
   </section>;
 }

@@ -4,7 +4,7 @@ import { AllCommunityModule, type ColDef, type SideBarDef } from "ag-grid-commun
 import { CellSelectionModule, RowGroupingModule, RowGroupingPanelModule, SideBarModule, PivotModule, ColumnsToolPanelModule, ExcelExportModule, IntegratedChartsModule, ContextMenuModule, LicenseManager } from "ag-grid-enterprise";
 import { AgChartsEnterpriseModule } from "ag-charts-enterprise";
 import SettingsInlineButton from "../settings/SettingsInlineButton";
-import { gridTheme } from "../grid/gridTheme";
+import { compactGridTheme } from "../grid/gridTheme";
 import styles from "./ChatAnalysisGrid.module.css";
 const license = process.env.NEXT_PUBLIC_AG_GRID_LICENSE_KEY;
 if (license) LicenseManager.setLicenseKey(license);
@@ -22,6 +22,8 @@ export default function ChatAnalysisGrid<T extends { id: string }>({ rows, colum
   const grid = useRef<AgGridReact<T>>(null);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+  const [displayedRows, setDisplayedRows] = useState(rows.length);
+  const fitRows = !open && displayedRows <= 6;
   function exportExcel() {
     try {
       const data = grid.current?.api.getDataAsExcel();
@@ -48,11 +50,13 @@ export default function ChatAnalysisGrid<T extends { id: string }>({ rows, colum
       }}>Columns</SettingsInlineButton>
       <SettingsInlineButton onClick={exportExcel}>Export Excel</SettingsInlineButton>
     </div>
-    <div className={styles.grid}>
-      <AgGridReact<T> ref={grid} modules={modules} theme={gridTheme} rowData={rows} columnDefs={columns}
+    <div className={styles.grid} data-fit-rows={fitRows}>
+      <AgGridReact<T> ref={grid} modules={modules} theme={compactGridTheme} rowData={rows} columnDefs={columns}
         defaultColDef={defaultColDef}
         getRowId={({ data }) => data.id} enableCharts cellSelection suppressNoRowsOverlay rowGroupPanelShow="onlyWhenGrouping"
         sideBar={sideBar}
+        domLayout={fitRows ? "autoHeight" : "normal"}
+        onModelUpdated={({ api }) => setDisplayedRows(api.getDisplayedRowCount())}
         onToolPanelVisibleChanged={({ api }) => setOpen(api.isToolPanelShowing())}
         onGridReady={({ api }) => api.setGridAriaProperty("label", label)}
         onRowClicked={({ data, event }) => {

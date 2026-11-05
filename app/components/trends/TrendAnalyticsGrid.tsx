@@ -19,7 +19,7 @@ import {
 import { AgChartsEnterpriseModule } from "ag-charts-enterprise";
 import TrendExportButton from "./TrendExportButton";
 import type { TrendSeries } from "../../lib/trends";
-import { gridTheme } from "../grid/gridTheme";
+import { compactGridTheme, gridTheme } from "../grid/gridTheme";
 import styles from "./TrendAnalyticsGrid.module.css";
 const license = process.env.NEXT_PUBLIC_AG_GRID_LICENSE_KEY;
 if (license) LicenseManager.setLicenseKey(license);
@@ -53,11 +53,14 @@ interface TrendRow {
 }
 export default function TrendAnalyticsGrid({
   series,
+  compact = false,
 }: {
   series: TrendSeries[];
+  compact?: boolean;
 }) {
   const grid = useRef<AgGridReact<TrendRow>>(null);
   const [columnsOpen, setColumnsOpen] = useState(false);
+  const fitRows = compact && !columnsOpen && series.length <= 4;
   const rows = useMemo<TrendRow[]>(
     () =>
       series
@@ -164,7 +167,7 @@ export default function TrendAnalyticsGrid({
     [],
   );
   return (
-    <div className={styles.surface}>
+    <div className={styles.surface} data-compact={compact}>
       <div className={styles.actions}>
         <span>{series[0]?.unit}</span>
         <TrendExportButton grid={grid} />
@@ -178,16 +181,17 @@ export default function TrendAnalyticsGrid({
           Columns
         </SettingsInlineButton>
       </div>
-      <div className={styles.grid}>
+      <div className={styles.grid} data-fit-rows={fitRows}>
         <AgGridReact
           ref={grid}
           modules={modules}
-          theme={gridTheme}
+          theme={compact ? compactGridTheme : gridTheme}
           rowData={rows}
           columnDefs={columns}
           defaultColDef={{ sortable: true, filter: true, resizable: true }}
           getRowId={({ data }) => data.id}
           masterDetail
+          domLayout={fitRows ? "autoHeight" : "normal"}
           detailRowHeight={230}
           detailCellRendererParams={{
             detailGridOptions: {
@@ -230,7 +234,7 @@ export default function TrendAnalyticsGrid({
           }}
           cellSelection
           enableCharts
-          rowGroupPanelShow="always"
+          rowGroupPanelShow={compact ? "onlyWhenGrouping" : "always"}
           sideBar={{ toolPanels: ["columns"], hiddenByDefault: true }}
           suppressAggFuncInHeader
           rowHeight={40}

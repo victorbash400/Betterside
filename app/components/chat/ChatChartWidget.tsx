@@ -5,6 +5,7 @@ import type { ChatChart } from "../../lib/chatCharts";
 import ChatAnalysisGrid from "./ChatAnalysisGrid";
 import SettingsInlineButton from "../settings/SettingsInlineButton";
 import styles from "./ChatChartWidget.module.css";
+import resultStyles from "./ChatResult.module.css";
 export default function ChatChartWidget({ chart }: { chart: ChatChart }) {
   const [table, setTable] = useState(false);
   const options = useMemo<AgChartOptions>(() => {
@@ -49,7 +50,7 @@ export default function ChatChartWidget({ chart }: { chart: ChatChart }) {
     return { ...common, series: [{ ...series, type: "bar", direction: chart.type === "bar" ? "horizontal" : "vertical" }] };
   }, [chart]);
   return (
-    <section className={styles.widget} aria-label={chart.title}>
+    <section className={resultStyles.analysis} aria-label={chart.title}>
       <div className={styles.heading}>
         <strong>{chart.title}</strong>
         {chart.type !== "summary" && (

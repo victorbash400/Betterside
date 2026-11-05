@@ -27,3 +27,5 @@ export const gridTheme = themeQuartz.withParams({
   oddRowBackgroundColor: "var(--surface)",
   spacing: 5,
 });
+
+export const compactGridTheme = gridTheme.withParams({ autoHeightMinBodyHeight: 0 });

@@ -20,10 +20,12 @@ export default function TrendResults({
   history,
   recordId,
   initialView = "Chart",
+  compact = false,
 }: {
   history: { result?: TrendsResponse; busy: boolean; error: string; retry: () => void };
   recordId?: string;
   initialView?: "Chart" | "Compare data";
+  compact?: boolean;
 }) {
   const [metric, setMetric] = useState("");
   const [selection, setSelection] = useState<string[]>();
@@ -106,7 +108,7 @@ export default function TrendResults({
               />
               {visible.length > 0 &&
                 (table ? (
-                  <TrendAnalyticsGrid series={visible} />
+                  <TrendAnalyticsGrid series={visible} compact={compact} />
                 ) : (
                   <TrendChart series={visible} />
                 ))}
