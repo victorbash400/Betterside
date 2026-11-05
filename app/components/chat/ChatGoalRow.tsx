@@ -29,13 +29,17 @@ export default function ChatGoalRow({ goal, subscription, revision, actions, onM
       <span>{format(goal.targetCents)}{goal.period === "monthly" ? " / month" : ""}</span>
       <SettingsInlineButton aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>Details</SettingsInlineButton>
     </SettingsRow>
+    {approval && (
+      <div className={styles.approval}>
+        <a href={approval} target="_blank" rel="noopener noreferrer">Continue in PayPal</a>
+      </div>
+    )}
     {expanded && <div className={styles.details}>
       <SettingsRow label="Contributed"><span>{format(goal.contributedCents)}</span></SettingsRow>
       <SettingsRow label="Status"><span>{subscription?.status ?? goal.status ?? "active"}</span></SettingsRow>
       {subscription?.nextBillingTime && <SettingsRow label="Next payment"><span>{new Date(subscription.nextBillingTime).toLocaleDateString("en", { timeZone })}</span></SettingsRow>}
       {subscription?.pendingChange && <SettingsRow label="Pending amount"><span>{subscription.pendingChange.amount} USD</span></SettingsRow>}
       <div className={styles.actions}>
-        {approval && <a href={approval} target="_blank" rel="noopener noreferrer">Continue in PayPal</a>}
         {subscription?.status === "ACTIVE" && <SettingsInlineButton disabled={busy} onClick={() => manage("pause")}>Pause</SettingsInlineButton>}
         {subscription?.status === "SUSPENDED" && <SettingsInlineButton disabled={busy} onClick={() => manage("resume")}>Resume</SettingsInlineButton>}
         {subscription && <SettingsInlineButton disabled={busy} onClick={() => manage("refresh")}>Refresh status</SettingsInlineButton>}

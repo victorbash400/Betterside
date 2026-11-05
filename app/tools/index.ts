@@ -1,5 +1,6 @@
 import { getPayPalStatusTool } from "./get-paypal-status.ts";
 import { showContributionChartTool } from "./show-contribution-chart.ts";
+import { showContributionReportTool } from "./show-contribution-report.ts";
 import { manageGoalTool } from "./manage-goal.ts";
 import { getContributionTool } from "./get-contribution.ts";
 import { showTrendsTool } from "./show-trends.ts";
@@ -43,6 +44,7 @@ export function workspaceTools(context: WorkspaceToolContext) {
     show_trends: showTrendsTool(context),
     show_summary: showSummaryTool(context),
     show_contribution_chart: showContributionChartTool(context),
+    show_contribution_report: showContributionReportTool(context),
     show_chart: showChartTool(context),
     open_checkout: openCheckoutTool,
     prepare_payment: preparePaymentTool(context),

@@ -12,6 +12,7 @@ import ChatGoalsWidget from "./ChatGoalsWidget";
 import { goalsResultSchema } from "../../lib/chatGoals";
 import dynamic from "next/dynamic";
 import { chartResultSchema } from "../../lib/chatCharts";
+import { contributionReportSchema } from "../../lib/contributionReport";
 import { useState } from "react";
 import type { UIMessage } from "ai";
 import {
@@ -36,6 +37,10 @@ import styles from "./ChatResult.module.css";
 const ChatChartWidget = dynamic(() => import("./ChatChartWidget"), {
   ssr: false,
   loading: () => <LoadingRegion compact label="Loading chart" />,
+});
+const ChatContributionReport = dynamic(() => import("./ChatContributionReport"), {
+  ssr: false,
+  loading: () => <LoadingRegion compact label="Loading contribution report" />,
 });
 export default function ChatToolResult({
   part,
@@ -95,6 +100,7 @@ export default function ChatToolResult({
       "tool-focus_organization": "Selecting organization",
       "tool-calculate": "Calculating",
       "tool-show_contribution_chart": "Reading contribution history",
+      "tool-show_contribution_report": "Preparing contribution report",
       "tool-show_trends": "Reading trend history",
       "tool-show_summary": "Preparing summary",
       "tool-show_chart": "Preparing chart",
@@ -107,6 +113,12 @@ export default function ChatToolResult({
   }
   const output = part.output;
   switch (part.type) {
+    case "tool-show_contribution_report": {
+      const parsed = contributionReportSchema.safeParse(output);
+      return parsed.success
+        ? <ChatContributionReport report={parsed.data} />
+        : <span role="alert">Contribution report unavailable.</span>;
+    }
     case "tool-get_paypal_status": {
       const parsed = paypalStatusResultSchema.safeParse(output);
       return parsed.success ? <ChatPayPalStatus status={parsed.data} actions={actions}/> : <span role="alert">PayPal status unavailable.</span>;

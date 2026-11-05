@@ -1,0 +1,27 @@
+.report {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin-block: 12px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+.header strong {
+  font-weight: 500;
+}
+.note {
+  color: var(--muted);
+  font-size: 11px;
+}
+.studio {
+  min-width: 0;
+  height: 300px;
+}
+.studio[data-receipts="true"] {
+  height: 528px;
+}
