@@ -1,5 +1,5 @@
 import type { ChatMessageAction } from "../../lib/chatActions";
-import { visibleChatParts } from "../../lib/chatRenderPolicy";
+import { showThinkingIndicator, visibleChatParts } from "../../lib/chatRenderPolicy";
 import { goalsResultSchema } from "../../lib/chatGoals";
 import { useEffect, useRef } from "react";
 import type { UIMessage } from "ai";
@@ -73,7 +73,7 @@ export default function MessageList({
           )}
         </article>
       ))}
-      {busy && <ChatLoadingIndicator />}
+      {showThinkingIndicator(messages, busy) && <ChatLoadingIndicator />}
     </div>
   );
 }

@@ -94,6 +94,13 @@ test("history routes coalesce country/source requests and preserve dated measure
     assert.deepEqual(output.summaries[0].highest, { date: "2024-01-01T00:00:00.000Z", value: 100 });
     assert.deepEqual(output.summaries[0].latest, { date: "2025-01-01T00:00:00.000Z", value: 0 });
     assert.deepEqual(calls, initial);
+    const named = await showTrendsTool({ donor: "history-test", records: [], origin: "http://localhost" }).execute!(
+      { scopes: [{ countries: ["PAK"], concern: "hunger", seriesLabel: result.series[0].label.slice("Pakistan · ".length) }], view: "Chart", offset: 0 },
+      { toolCallId: "named-history", messages: [], context: {} },
+    ) as { series: unknown[] };
+    assert.deepEqual(named.series, result.series);
+    const unmatched = await GET(new Request(`${request().url}&seriesLabel=Unrelated`));
+    assert.deepEqual((await unmatched.json()).series, []);
     const conditional = await GET(
       new Request(request().url, {
         headers: { "If-None-Match": responses[0].headers.get("etag")! },

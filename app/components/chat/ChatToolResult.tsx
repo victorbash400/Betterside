@@ -6,7 +6,6 @@ import { chatTrendsResultSchema } from "../../lib/chatTrends";
 import ChatTrendsWidget from "./ChatTrendsWidget";
 import ChatPinsWidget from "./ChatPinsWidget";
 import { pinsResultSchema } from "../../lib/chatPins";
-import ChatLoadingIndicator from "./ChatLoadingIndicator";
 import LoadingRegion from "../controls/LoadingRegion";
 import ChatGoalsWidget from "./ChatGoalsWidget";
 import { goalsResultSchema } from "../../lib/chatGoals";
@@ -83,6 +82,7 @@ export default function ChatToolResult({
       </p>
     );
   if (part.state !== "output-available") {
+    if (!busy) return null;
     const names: Record<string, string> = {
       "tool-get_paypal_status": "Reading PayPal status",
       "tool-list_pins": "Reading pins",
@@ -109,7 +109,7 @@ export default function ChatToolResult({
       "tool-list_contributions": "Reading contribution records",
       "tool-show_analysis": "Preparing analysis",
     };
-    return <ChatLoadingIndicator label={names[part.type] ?? "Working"} />;
+    return <span role="status" className={styles.muted}>{names[part.type] ?? "Working"}</span>;
   }
   const output = part.output;
   switch (part.type) {

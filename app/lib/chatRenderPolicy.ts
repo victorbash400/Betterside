@@ -8,6 +8,14 @@ const goalTools = new Set([
 ]);
 const tableTools = new Set(["tool-search_records", "tool-search_organizations"]);
 
+export function showThinkingIndicator(messages: UIMessage[], busy: boolean) {
+  if (!busy) return false;
+  const latest = messages.at(-1);
+  return latest?.role !== "assistant" || !latest.parts.some((part) =>
+    part.type === "text" ? Boolean(part.text.trim()) : "toolCallId" in part,
+  );
+}
+
 export function visibleChatParts(parts: UIMessage["parts"]) {
   const latestGoal = parts.findLastIndex((part) =>
     goalTools.has(part.type) && "state" in part && part.state === "output-available",

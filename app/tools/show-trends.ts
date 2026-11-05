@@ -8,7 +8,7 @@ import type { TrendScope } from "../lib/trends.ts";
 import type { WorkspaceToolContext } from "./context.ts";
 export function showTrendsTool(context: WorkspaceToolContext) {
   return tool({
-    description: "Show actual dated provider measurements inline as trends or a comparison grid. Use exact ISO3 country codes and concern IDs, or saved pin IDs. Supports up to four countries. For prose, use the exact latest, previous and highest dated observations in summaries. These describe reported observations and cannot establish causes, humanitarian improvement, or changes in access. Never sum overlapping populations. Offset paginates series, not observations.",
+    description: "Show dated provider measurements inline. Call directly with ISO3 country codes and concern IDs, or saved pin IDs. For a named series, pass its title as seriesLabel in the country scope, for example Armed Clashes in Sudan (Overview) with SDN and displacement. Record IDs are optional. Use the exact dated observations in the result and never infer causes or sum overlapping populations. Supports up to four countries. Offset paginates series, not observations.",
     inputSchema: chatTrendsInputSchema,
     outputSchema: chatTrendsResultSchema,
     execute: async (input) => {

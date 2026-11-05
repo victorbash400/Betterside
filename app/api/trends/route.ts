@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     concern: query.get("concern") ?? undefined,
     dataset: query.get("dataset") ?? undefined,
     recordId: query.get("recordId") ?? undefined,
+    seriesLabel: query.get("seriesLabel") ?? undefined,
   });
   if (!parsed.success)
     return Response.json(

@@ -1,7 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { UIMessage } from "ai";
-import { visibleChatParts } from "../app/lib/chatRenderPolicy.ts";
+import { showThinkingIndicator, visibleChatParts } from "../app/lib/chatRenderPolicy.ts";
+
+test("the thinking dot stops when the current assistant turn emits text or starts a tool", () => {
+  const user: UIMessage = { id: "user", role: "user", parts: [{ type: "text", text: "Show a trend" }] };
+  const assistant: UIMessage = { id: "assistant", role: "assistant", parts: [{ type: "step-start" }] };
+  assert.equal(showThinkingIndicator([user, assistant], true), true);
+  assert.equal(showThinkingIndicator([user, assistant], false), false);
+  for (const part of [
+    { type: "text", text: "Here is the trend", state: "streaming" },
+    { type: "tool-show_trends", toolCallId: "trend", state: "input-streaming" },
+  ] as UIMessage["parts"]) {
+    assert.equal(showThinkingIndicator([user, { ...assistant, parts: [part] }], true), false);
+  }
+});
 
 test("chat preserves text around tool results and hides repeated tables and lookups", () => {
   const table = { kind: "records", total: 1, records: [{ id: "water" }], nextOffset: null };

@@ -15,6 +15,7 @@ const cache = createAsyncCache<TrendsResponse>({
   maxBytes: 32 * 1024 * 1024,
 });
 export async function loadTrends(scope: TrendScope) {
+  const seriesLabel = scope.seriesLabel?.toLowerCase();
   const normalized = {
     ...scope,
     countries: [...new Set(scope.countries)].sort(),
@@ -60,7 +61,11 @@ export async function loadTrends(scope: TrendScope) {
               "History contains unresolved geography or sources.",
             );
           return buildTrendSeries(result.issues, scope.concern).filter(
-            (series) => !scope.recordId || series.recordId === scope.recordId,
+            (series) =>
+              (!scope.recordId || series.recordId === scope.recordId) &&
+              (!seriesLabel ||
+                series.label.toLowerCase() === seriesLabel ||
+                series.label.toLowerCase() === `${series.country.toLowerCase()} · ${seriesLabel}`),
           );
         }),
       );

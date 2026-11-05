@@ -18,6 +18,7 @@ export const trendScopeSchema = z.object({
   concern: z.enum(concerns.map((item) => item.id)).optional(),
   dataset: z.enum(datasetIds).optional(),
   recordId: z.string().min(1).max(160).optional(),
+  seriesLabel: z.string().trim().min(1).max(200).optional(),
 });
 export type TrendScope = z.infer<typeof trendScopeSchema>;
 const sourceSchema = z.object({
