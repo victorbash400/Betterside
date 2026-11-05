@@ -12,7 +12,7 @@ import type { WorkspaceToolContext } from "./context.ts";
 export function createGoalTool(context: WorkspaceToolContext) {
   return tool({
     description:
-      "Prepare a monthly PayPal sandbox subscription only when the user requests it. Search records with projectsOnly first and require an exact supported project, its cause, and a user-specified USD monthly amount. Read list_goals for revision. Returns a goal card with Continue in PayPal; this does not approve or charge the subscription. Never claim it is active before PayPal approval.",
+      "Prepare a monthly PayPal sandbox subscription only when explicitly requested. Reuse the exact project ID from earlier results. If unknown, search records once with projectsOnly and presentation lookup. Read list_goals for the revision. Require the supported project, its cause, and a user-specified USD monthly amount. Returns the new goal card with Continue in PayPal. PayPal approval is required.",
     inputSchema: z.object({
       projectId: z.string().min(1),
       category: contributionGoalSchema.shape.category,
@@ -39,7 +39,7 @@ export function createGoalTool(context: WorkspaceToolContext) {
         { goalId: id, projectId, category, amount: decimalAmount(targetCents) },
         context.origin,
       );
-      return goalState(context);
+      return goalState(context, id);
     },
   });
 }

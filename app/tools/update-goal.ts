@@ -28,7 +28,7 @@ export function updateGoalTool(context: WorkspaceToolContext) {
         decimalAmount(targetCents),
         context.origin,
       );
-      return goalState(context);
+      return goalState(context, goalId);
     },
   });
 }

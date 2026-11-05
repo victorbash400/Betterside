@@ -30,7 +30,7 @@ export function manageGoalTool(context: WorkspaceToolContext) {
         const updated = await refreshSubscription(stored);
         if (updated.status !== "APPROVAL_PENDING") await syncSubscriptionPayments(updated);
       } else await manageSubscription(context.donor, goalId, action);
-      return goalState(context);
+      return goalState(context, action === "remove" ? undefined : goalId);
     },
   });
 }

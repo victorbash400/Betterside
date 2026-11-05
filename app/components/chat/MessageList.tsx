@@ -1,5 +1,5 @@
 import type { ChatMessageAction } from "../../lib/chatActions";
-import { hasInlineResult } from "../../lib/chatRenderPolicy";
+import { visibleChatParts } from "../../lib/chatRenderPolicy";
 import { goalsResultSchema } from "../../lib/chatGoals";
 import { useEffect, useRef } from "react";
 import type { UIMessage } from "ai";
@@ -50,45 +50,29 @@ export default function MessageList({
             80;
       }}
     >
-      {messages.map((message) => {
-        const goalTools = [
-          "tool-list_goals",
-          "tool-create_goal",
-          "tool-update_goal",
-          "tool-manage_goal",
-        ];
-        const latestGoal = message.parts.findLastIndex(
-          (part) =>
-            goalTools.includes(part.type) &&
-            "state" in part &&
-            part.state === "output-available",
-        );
-        return (
-          <article
-            key={message.id}
-            className={message.role === "user" ? styles.user : styles.assistant}
-          >
-            {message.parts.map((part, index) =>
-              (index < latestGoal && goalTools.includes(part.type)) ||
-              (hasInlineResult(message.parts) && part.type === "text") ? null :
-              part.type === "text" ? (
-                <MessageText key={index} text={part.text} />
-              ) : (
-                <ChatToolResult
-                  key={index}
-                  part={part}
-                  onSelect={onSelect}
-                  onMessage={onMessage}
-                  actions={actions}
-                  busy={busy}
-                  onApprove={onApprove}
-                  goalNames={goalNames}
-                />
-              ),
-            )}
-          </article>
-        );
-      })}
+      {messages.map((message) => (
+        <article
+          key={message.id}
+          className={message.role === "user" ? styles.user : styles.assistant}
+        >
+          {visibleChatParts(message.parts).map(({ part, index }) =>
+            part.type === "text" ? (
+              <MessageText key={index} text={part.text} />
+            ) : (
+              <ChatToolResult
+                key={index}
+                part={part}
+                onSelect={onSelect}
+                onMessage={onMessage}
+                actions={actions}
+                busy={busy}
+                onApprove={onApprove}
+                goalNames={goalNames}
+              />
+            ),
+          )}
+        </article>
+      ))}
       {busy && <ChatLoadingIndicator />}
     </div>
   );

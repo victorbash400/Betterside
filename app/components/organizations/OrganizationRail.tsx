@@ -38,7 +38,7 @@ export default function OrganizationRail({
       style={{
         height: loading
           ? 280
-          : Math.min(520, 116 + Math.min(100, organizations.length) * 34),
+          : Math.min(520, 174 + Math.min(100, organizations.length) * 34),
       }}
     >
       <div className={styles.heading}>

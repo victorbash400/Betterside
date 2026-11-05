@@ -9,9 +9,9 @@ export function searchRecordsTool({
 }: WorkspaceToolContext) {
   return tool({
     description:
-      "Search real sourced crisis records and demonstration projects; display results as an inline sortable grid. Use scope all to discover data even when the map has no causes selected. Literal query terms only; structured country/kind/dataset filters are preferred. Page size 20, use nextOffset. projectsOnly finds sandbox funding projects; do not add query terms like demonstration or project unless they occur in the project name. Omit dataset when finding projects. Use sort funding-gap with projectsOnly true for the largest sandbox funding gaps; name and country sorting are also available.",
+      "Search sourced crisis records and sandbox projects. Use presentation table when the user requests a grid or table; use lookup for evidence gathering or resolving project IDs before checkout. Use scope all to discover data even when the map has no causes selected. Literal query terms only; structured country/kind/dataset filters are preferred. Page size 20, use nextOffset. projectsOnly finds sandbox funding projects; omit dataset and words like demonstration unless they occur in the project name. Use sort funding-gap for sandbox funding gaps.",
     inputSchema: searchInputSchema,
-    execute: async ({ scope, projectsOnly, ...query }) => {
+    execute: async ({ scope, projectsOnly, presentation = "table", ...query }) => {
       const ids = new Set(selectedIds ?? []);
       const candidates = records.filter(
         (record) =>
@@ -20,6 +20,7 @@ export function searchRecordsTool({
       );
       return {
         kind: "records" as const,
+        ...(presentation === "lookup" ? { presentation } : {}),
         ...searchRecords(candidates, query),
       };
     },

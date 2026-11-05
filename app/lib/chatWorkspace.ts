@@ -18,6 +18,7 @@ export const searchInputSchema = z.object({
   scope: z.enum(["all", "selection"]).default("all"),
   offset: z.number().int().min(0).max(20000).default(0),
   projectsOnly: z.boolean().default(false),
+  presentation: z.enum(["table", "lookup"]).optional(),
   sort: z.enum(["recent", "name", "country", "funding-gap"]).default("recent"),
 });
 export const mapFilterSchema = z.object({

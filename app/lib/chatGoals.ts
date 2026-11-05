@@ -6,6 +6,7 @@ export const goalsResultSchema = z.object({
   revision: z.number().int().nonnegative(),
   timeZone: z.string(),
   asOf: z.iso.datetime(),
+  focusedGoalId: z.string().optional(),
   availableCategories: z.array(z.enum(goalCategories)),
   subscriptions: z.array(subscriptionSchema).default([]),
   goals: z.array(contributionGoalSchema.extend({
