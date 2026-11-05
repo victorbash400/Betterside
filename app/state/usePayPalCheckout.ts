@@ -1,3 +1,4 @@
+import { useAccount } from "./AccountContext";
 import { useEffect, useRef, useState } from "react";
 import {
   loadCoreSdkScript,
@@ -18,8 +19,8 @@ const completionSchema = z.object({
   projectName: z.string(),
 });
 export type PaymentCompletion = z.infer<typeof completionSchema>;
-async function post(path: string, input: unknown) {
-  const response = await fetch(path, {
+async function post(transport: typeof fetch, path: string, input: unknown) {
+  const response = await transport(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -44,6 +45,7 @@ export function usePayPalCheckout({
   onBusy: (busy: boolean) => void;
   onComplete: (result: PaymentCompletion) => void;
 }) {
+  const { fetch } = useAccount();
   const container = useRef<HTMLDivElement>(null);
   const current = useRef({
     projectId,
@@ -62,7 +64,7 @@ export function usePayPalCheckout({
   const approvedOrder = useRef<string | undefined>(undefined);
   async function confirm(orderId: string) {
     const result = completionSchema.parse(
-      await post("/api/paypal/capture", { orderId }),
+      await post(fetch, "/api/paypal/capture", { orderId }),
     );
     current.current.onComplete(result);
   }
@@ -81,7 +83,7 @@ export function usePayPalCheckout({
     async function createOrder() {
       const input = current.current;
       const order = paymentResultSchema.parse(
-        await post("/api/paypal/orders", {
+        await post(fetch, "/api/paypal/orders", {
           projectId: input.projectId,
           goalId: input.goalId,
           amount: decimalAmount(amountInCents(input.amount)),
@@ -89,7 +91,7 @@ export function usePayPalCheckout({
       );
       pendingOrder = order.id;
       if (cancelled) {
-        await post("/api/paypal/cancel", { orderId: order.id });
+        await post(fetch, "/api/paypal/cancel", { orderId: order.id });
         throw new Error("Payment cancelled.");
       }
       return { orderId: order.id };
@@ -163,7 +165,7 @@ export function usePayPalCheckout({
           void (async () => {
             try {
               if (pendingOrder)
-                await post("/api/paypal/cancel", { orderId: pendingOrder });
+                await post(fetch, "/api/paypal/cancel", { orderId: pendingOrder });
               if (active) setNotice("Payment cancelled");
             } catch (failure) {
               if (active)

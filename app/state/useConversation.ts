@@ -1,5 +1,7 @@
 "use client";
 import { pinItemsSchema, unpinItemsSchema } from "../lib/chatPins";
+import { useAccount } from "./AccountContext";
+import { accountStorageKey } from "../lib/accountStorage";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import {
@@ -39,6 +41,8 @@ export function useConversation({
   actions: ChatWorkspaceActions;
   context: WorkspaceChatContext;
 }) {
+  const { user, fetch } = useAccount();
+  const owner = user!.id;
   const [draft, setDraft] = useState("");
   const transport = useMemo(
     () =>
@@ -56,7 +60,7 @@ export function useConversation({
           return response;
         },
       }),
-    [areaId, model, recordIds, context],
+    [areaId, model, recordIds, context, fetch],
   );
   const executeAction = useEffectEvent(
     async (name: string, input: unknown, callId: string) => {
@@ -150,8 +154,9 @@ export function useConversation({
     async function restore() {
       setStorageError("");
       try {
-        const saved = localStorage.getItem(`betterside-chat:${conversationId}`)
-          ?? (conversationId === "default" ? localStorage.getItem("betterside-chat") : null);
+        const saved = localStorage.getItem(
+          accountStorageKey(owner, `chat:${conversationId}`),
+        );
         if (saved) {
           const raw = JSON.parse(saved);
           const snapshot = Array.isArray(raw)
@@ -174,8 +179,9 @@ export function useConversation({
         }
         if (active)
           setDraft(
-            localStorage.getItem(`betterside-draft:${conversationId}`)
-              ?? (conversationId === "default" ? localStorage.getItem("betterside-draft") : null) ?? "",
+            localStorage.getItem(
+              accountStorageKey(owner, `draft:${conversationId}`),
+            ) ?? "",
           );
       } catch {
         if (active) setStorageError("Could not restore conversation.");
@@ -187,16 +193,16 @@ export function useConversation({
     return () => {
       active = false;
     };
-  }, [setMessages, conversationId]);
+  }, [setMessages, conversationId, owner]);
   useEffect(() => {
     if (storageError || !hydrated || chat.status === "streaming") return;
     try {
       localStorage.setItem(
-        `betterside-chat:${conversationId}`,
+        accountStorageKey(owner, `chat:${conversationId}`),
         JSON.stringify({ version: 1, messages: chat.messages }),
       );
       localStorage.setItem(
-        `betterside-draft:${conversationId}`,
+        accountStorageKey(owner, `draft:${conversationId}`),
         draft,
       );
     } catch {
@@ -208,6 +214,7 @@ export function useConversation({
     hydrated,
     chat.status,
     conversationId,
+    owner,
     storageError,
   ]);
   const latest = useRef({
@@ -223,18 +230,18 @@ export function useConversation({
       if (!saved.hydrated || saved.storageError) return;
       try {
         localStorage.setItem(
-          `betterside-chat:${conversationId}`,
+          accountStorageKey(owner, `chat:${conversationId}`),
           JSON.stringify({ version: 1, messages: saved.messages }),
         );
         localStorage.setItem(
-          `betterside-draft:${conversationId}`,
+          accountStorageKey(owner, `draft:${conversationId}`),
           saved.draft,
         );
       } catch {
         console.error("Could not save chat before closing.");
       }
     },
-    [conversationId],
+    [conversationId, owner],
   );
   return {
     ...chat,

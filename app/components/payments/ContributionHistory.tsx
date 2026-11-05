@@ -1,4 +1,6 @@
 "use client";
+import LoadingSpinner from "../controls/LoadingSpinner";
+import EmptyState from "../controls/EmptyState";
 import { useState } from "react";
 import { RefreshCw, Download, ChevronDown } from "lucide-react";
 import IconButton from "../controls/IconButton";
@@ -44,7 +46,7 @@ export default function ContributionHistory({
       style={
         compact
           ? {
-              height: `min(${Math.min(420, 164 + Math.max(1, visible.length) * 48)}px, calc(100dvh - 140px))`,
+              height: `min(${Math.min(420, 111 + (visible.length || 3) * 48)}px, calc(100dvh - 140px))`,
               flex: "none",
             }
           : undefined
@@ -69,7 +71,11 @@ export default function ContributionHistory({
             disabled={busy}
             onClick={refresh}
           >
-            <RefreshCw />
+            {busy ? (
+              <LoadingSpinner size={24} label="Refreshing contributions" />
+            ) : (
+              <RefreshCw />
+            )}
           </IconButton>
           <IconButton
             label="Export contributions"
@@ -81,29 +87,32 @@ export default function ContributionHistory({
         </div>
       </div>
       <div className={styles.content}>
-        {busy ? (
-          <span className={styles.notice} role="status">
-            Loading contributions
-          </span>
-        ) : error ? (
+        {error ? (
           <div className={styles.notice} role="alert">
             {error}
             <button onClick={refresh}>Retry</button>
           </div>
+        ) : !busy && !visible.length ? (
+          <EmptyState>
+            <span>
+              {records.length
+                ? "Choose another payment status."
+                : "Explore projects to contribute."}
+            </span>
+            <button
+              onClick={records.length ? () => setStatus("All payments") : onExplore}
+            >
+              {records.length ? "All payments" : "Explore projects"}
+            </button>
+          </EmptyState>
         ) : (
-          <>
-            <DataGrid
-              label="Contribution history"
-              rows={visible}
-              columns={contributionColumns}
-              onOpen={setSelected}
-            />
-            {!visible.length && (
-              <button className={styles.explore} onClick={onExplore}>
-                Explore projects
-              </button>
-            )}
-          </>
+          <DataGrid
+            label="Contribution history"
+            loading={busy}
+            rows={visible}
+            columns={contributionColumns}
+            onOpen={setSelected}
+          />
         )}
       </div>
       {menu && (

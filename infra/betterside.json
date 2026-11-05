@@ -29,6 +29,7 @@
             "KeyType": "RANGE"
           }
         ],
+        "TimeToLiveSpecification": { "AttributeName": "expiresAt", "Enabled": true },
         "PointInTimeRecoverySpecification": {
           "PointInTimeRecoveryEnabled": true
         },

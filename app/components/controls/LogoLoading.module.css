@@ -1,0 +1,6 @@
+.indicator {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  background: url("/betterside-loading.svg") center / contain no-repeat;
+}

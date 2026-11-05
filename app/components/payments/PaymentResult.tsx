@@ -1,4 +1,5 @@
 "use client";
+import LoadingRegion from "../controls/LoadingRegion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, X } from "lucide-react";
@@ -51,9 +52,11 @@ export default function PaymentResult({
     <main className={styles.page}>
       <section className={styles.result}>
         {busy ? (
-          <span role="status">
-            {cancelled ? "Recording cancellation" : "Confirming contribution"}
-          </span>
+          <LoadingRegion
+            label={
+              cancelled ? "Recording cancellation" : "Confirming contribution"
+            }
+          />
         ) : error ? (
           <>
             <p role="alert">{error}</p>

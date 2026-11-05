@@ -1,5 +1,6 @@
 import { pinItemsSchema, unpinItemsSchema } from "../lib/chatPins";
 import { fetchOrganizationDirectory } from "./useOrganizationDirectory";
+import { useAccount } from "./AccountContext";
 import { fetchChatRecords } from "./fetchChatRecords";
 import type { ChatWorkspaceActions } from "../lib/chatWorkspace";
 import {
@@ -21,6 +22,7 @@ export function useChatWorkspaceActions(
   onOrganizationDrawer: () => void,
   onCheckout: (input: CheckoutInput) => void,
 ): ChatWorkspaceActions {
+  const { fetch } = useAccount();
   return {
     isPinned: (id) => state.interests.some((pin) => pin.id === id) || state.following.includes(id),
     pinItems: async (raw, callId) => {

@@ -11,6 +11,7 @@ import type { Analysis } from "../../lib/analysis";
 import type { MapItem as Issue } from "../../lib/types";
 import { projectCellRenderer } from "./projectCellRenderer";
 import styles from "./StudioDashboard.module.css";
+import EmptyState from "../controls/EmptyState";
 const license = process.env.NEXT_PUBLIC_AG_STUDIO_LICENSE_KEY;
 if (license) AgStudioLicenseManager.setLicenseKey(license);
 const theme = studioTheme.withParams({
@@ -252,33 +253,37 @@ export default function StudioDashboard({
         aria-label={`${widget === "funding" ? "Funding chart" : "Projects table"} content`}
         tabIndex={0}
       >
-        <AgStudio
-          style={{ width: "100%", height: "100%", minHeight: 320 }}
-          key={`${analysis?.id ?? "overview"}-${narrow ? "mobile" : "desktop"}`}
-          onStateUpdated={(event) =>
-            setSavedStates((previous) => ({
-              ...previous,
-              [narrow ? "mobile" : "desktop"]: event.api.getState(),
-            }))
-          }
-          widgets={(config) => ({
-            ...config,
-            widgets: config.widgets.map((widget) =>
-              widget.id === "grid"
-                ? { ...widget, options: widgets.overrides[0].options }
-                : widget,
-            ),
-          })}
-          panels={{
-            view: { left: [], right: [] },
-            edit: { left: [], right: ["edit", "data", "filters"] },
-          }}
-          theme={theme}
-          data={data}
-          mode={editing ? "edit" : "view"}
-          initialState={initialState}
-          onErrorRaised={() => setError("Dashboard could not render.")}
-        />
+        {!issues.length ? (
+          <EmptyState>Select a project source to view {widget}.</EmptyState>
+        ) : (
+          <AgStudio
+            style={{ width: "100%", height: "100%", minHeight: 320 }}
+            key={`${analysis?.id ?? "overview"}-${narrow ? "mobile" : "desktop"}`}
+            onStateUpdated={(event) =>
+              setSavedStates((previous) => ({
+                ...previous,
+                [narrow ? "mobile" : "desktop"]: event.api.getState(),
+              }))
+            }
+            widgets={(config) => ({
+              ...config,
+              widgets: config.widgets.map((widget) =>
+                widget.id === "grid"
+                  ? { ...widget, options: widgets.overrides[0].options }
+                  : widget,
+              ),
+            })}
+            panels={{
+              view: { left: [], right: [] },
+              edit: { left: [], right: ["edit", "data", "filters"] },
+            }}
+            theme={theme}
+            data={data}
+            mode={editing ? "edit" : "view"}
+            initialState={initialState}
+            onErrorRaised={() => setError("Dashboard could not render.")}
+          />
+        )}
       </div>
     </section>
   );

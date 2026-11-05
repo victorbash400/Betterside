@@ -1,8 +1,12 @@
+import { useAccount } from "./AccountContext";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { profileResponseSchema, type DonorProfile } from "../lib/profile";
+import { goalsSnapshotSchema } from "../lib/goalsSnapshot";
+import { subscriptionSchema } from "../lib/paypalSubscription";
 import { contributionRecordSchema } from "../lib/chatWorkspace";
 export function useDonorProfile() {
+  const { fetch } = useAccount();
   const [snapshot, setSnapshot] =
     useState<z.infer<typeof profileResponseSchema>>();
   const current = useRef(snapshot);
@@ -10,59 +14,57 @@ export function useDonorProfile() {
   const [payments, setPayments] = useState<
     z.infer<typeof contributionRecordSchema>[]
   >([]);
+  const [subscriptions, setSubscriptions] = useState<
+    z.infer<typeof subscriptionSchema>[]
+  >([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const writing = useRef(false);
   const requestVersion = useRef(0);
   const [attempt, setAttempt] = useState(0);
-  const load = useCallback(async (signal: AbortSignal) => {
-    const version = ++requestVersion.current;
-    setError("");
-    try {
-      const responses = await Promise.all([
-        fetch("/api/profile", { cache: "no-store", signal }),
-        fetch("/api/contributions", { cache: "no-store", signal }),
-      ]);
-      const [profile, contributionData] = await Promise.all(
-        responses.map(async (response) => {
-          const body = await response.json();
-          if (!response.ok)
-            throw new Error(body.error ?? "Profile unavailable.");
-          return body;
-        }),
-      );
-      const parsed = profileResponseSchema.parse(profile);
-      const ledger = z
-        .object({ contributions: z.array(contributionRecordSchema) })
-        .parse(contributionData);
-      if (
-        !signal.aborted &&
-        version === requestVersion.current &&
-        !writing.current
-      ) {
-        current.current = parsed;
-        setSnapshot(parsed);
-        setPayments(ledger.contributions);
+  const load = useCallback(
+    async (signal: AbortSignal) => {
+      const version = ++requestVersion.current;
+      setError("");
+      try {
+        const response = await fetch("/api/goals", {
+          cache: "no-store",
+          signal,
+        });
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error ?? "Goals unavailable.");
+        const parsed = goalsSnapshotSchema.parse(body);
+        if (
+          !signal.aborted &&
+          version === requestVersion.current &&
+          !writing.current
+        ) {
+          current.current = parsed;
+          setSnapshot(parsed);
+          setPayments(parsed.contributions);
+          setSubscriptions(parsed.subscriptions);
+        }
+      } catch (failure) {
+        if (!signal.aborted && version === requestVersion.current)
+          setError(
+            failure instanceof Error ? failure.message : "Profile unavailable.",
+          );
       }
-    } catch (failure) {
-      if (!signal.aborted && version === requestVersion.current)
-        setError(
-          failure instanceof Error ? failure.message : "Profile unavailable.",
-        );
-    }
-  }, [fetch]);
+    },
+    [fetch],
+  );
   useEffect(() => {
     const controller = new AbortController();
     void load(controller.signal);
-    const focus = () => {
+    const reload = () => {
       if (!writing.current) void load(controller.signal);
     };
-    window.addEventListener("focus", focus);
-    window.addEventListener("betterside-profile-changed", focus);
+    window.addEventListener("betterside-profile-changed", reload);
+    window.addEventListener("betterside-payments-changed", reload);
     return () => {
       controller.abort();
-      window.removeEventListener("focus", focus);
-      window.removeEventListener("betterside-profile-changed", focus);
+      window.removeEventListener("betterside-profile-changed", reload);
+      window.removeEventListener("betterside-payments-changed", reload);
     };
   }, [load, attempt]);
   async function save(profile: DonorProfile) {
@@ -98,6 +100,7 @@ export function useDonorProfile() {
   return {
     profile: snapshot?.profile,
     payments,
+    subscriptions,
     error,
     saving,
     save,

@@ -1,63 +1,78 @@
 import { useState } from "react";
-import {
-  contributionGoalSchema,
-  goalCategories,
-  type ContributionGoal,
-} from "../../lib/profile";
+import SettingsGroup from "../settings/SettingsGroup";
 import SettingsRow from "../settings/SettingsRow";
 import SettingsPicker from "../settings/SettingsPicker";
+import LoadingSpinner from "../controls/LoadingSpinner";
+import { useAccount } from "../../state/AccountContext";
+import { subscriptionSchema } from "../../lib/paypalSubscription";
+import { subscriptionProjects } from "../../lib/subscriptionSetup";
+import { amountInCents, decimalAmount } from "../../lib/payment";
+import type { ContributionGoal } from "../../lib/profile";
+import type { MapItem } from "../../lib/types";
 import styles from "./GoalEditor.module.css";
+
 export default function GoalEditor({
   goal,
-  busy,
-  onSave,
+  projects,
   onClose,
+  onPrepared,
 }: {
   goal?: ContributionGoal;
-  busy: boolean;
-  onSave: (goal: ContributionGoal) => Promise<void>;
+  projects: MapItem[];
   onClose: () => void;
+  onPrepared: () => void;
 }) {
-  const [category, setCategory] = useState(goal?.category ?? "All causes");
+  const { fetch } = useAccount();
+  const [goalId] = useState(() => goal?.id ?? crypto.randomUUID());
+  const causes = Array.from(
+    new Set(projects.filter((item) => item.project).map((item) => item.kind)),
+  );
+  const [cause, setCause] = useState<string>(
+    goal && causes.includes(goal.category as MapItem["kind"])
+      ? goal.category
+      : "",
+  );
+  const matching = subscriptionProjects(projects, cause);
+  const [selected, setSelected] = useState(goal?.projectId ?? "");
+  const project = matching.find((item) => item.project?.id === selected);
   const [amount, setAmount] = useState(
-    goal ? String(goal.targetCents / 100) : "100",
+    goal ? String(goal.targetCents / 100) : "25",
   );
-  const [period, setPeriod] = useState<ContributionGoal["period"]>(
-    goal?.period ?? "monthly",
-  );
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   async function submit() {
+    setBusy(true);
     setError("");
     try {
-      const parts = amount.split(".");
-      if (
-        parts.length > 2 ||
-        parts[0].length === 0 ||
-        parts.some(
-          (part) =>
-            part.length === 0 ||
-            !Array.from(part).every((char) => char >= "0" && char <= "9"),
-        ) ||
-        (parts[1]?.length ?? 0) > 2
-      )
-        throw new Error("Enter a valid USD target.");
-      const targetCents =
-        Number(parts[0]) * 100 + Number((parts[1] ?? "").padEnd(2, "0"));
-      const next = contributionGoalSchema.parse({
-        id: goal?.id ?? crypto.randomUUID(),
-        category,
-        period,
-        targetCents,
-        createdAt: goal?.createdAt ?? new Date().toISOString(),
+      if (!project?.project) throw new Error("Choose a payment recipient.");
+      const validatedAmount = decimalAmount(amountInCents(amount));
+      const response = await fetch("/api/paypal/subscriptions/setup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          goalId,
+          category: cause,
+          projectId: project.project.id,
+          amount: validatedAmount,
+        }),
       });
-      await onSave(next);
-      onClose();
+      const body = await response.json();
+      if (!response.ok)
+        throw new Error(body.error ?? "PayPal setup failed. Retry.");
+      const record = subscriptionSchema.parse(body.subscription);
+      if (record.approvalUrl) window.location.assign(record.approvalUrl);
+      else {
+        onPrepared();
+        onClose();
+      }
     } catch (failure) {
       setError(
-        failure instanceof Error && failure.name !== "ZodError"
+        failure instanceof Error
           ? failure.message
-          : "Enter a target from $1 to $1,000,000.",
+          : "PayPal setup failed. Retry.",
       );
+    } finally {
+      setBusy(false);
     }
   }
   return (
@@ -68,57 +83,79 @@ export default function GoalEditor({
         void submit();
       }}
     >
-      <SettingsRow label="Cause">
-        {goal ? (
-          <strong>{goal.category}</strong>
-        ) : (
+      <SettingsGroup>
+        <SettingsRow label="Cause">
           <SettingsPicker
-            label="Goal cause"
-            disabled={busy}
-            value={category}
-            options={goalCategories.map((value) => ({ value, label: value }))}
-            onChange={(value) =>
-              setCategory(contributionGoalSchema.shape.category.parse(value))
-            }
-            width={240}
+            label="Subscription cause"
+            width="100%"
+            value={cause}
+            disabled={busy || !causes.length}
+            options={[
+              { value: "", label: "Choose a cause" },
+              ...causes.map((value) => ({ value, label: value })),
+            ]}
+            onChange={(value) => {
+              setCause(value);
+              setSelected("");
+            }}
           />
+        </SettingsRow>
+        <SettingsRow label="Project">
+          <SettingsPicker
+            label="Subscription project"
+            width="100%"
+            value={project?.project?.id ?? ""}
+            disabled={busy || !matching.length}
+            options={[
+              { value: "", label: "Choose a project" },
+              ...matching.flatMap((item) =>
+                item.project
+                  ? [
+                      {
+                        value: item.project.id,
+                        label: `${item.project.name} · ${item.country}`,
+                      },
+                    ]
+                  : [],
+              ),
+            ]}
+            onChange={setSelected}
+          />
+        </SettingsRow>
+        {project?.project && (
+          <SettingsRow label="Recipient">
+            <span>{project.project.organisation}</span>
+          </SettingsRow>
         )}
-      </SettingsRow>
-      <SettingsRow label="Target · USD">
-        <input
-          id="goal-target"
-          aria-label="Goal target in USD"
-          type="number"
-          min="1"
-          max="1000000"
-          step="0.01"
-          required
-          disabled={busy}
-          value={amount}
-          onChange={(event) => setAmount(event.target.value)}
-        />
-      </SettingsRow>
-      <SettingsRow label="Period">
-        <SettingsPicker
-          label="Goal period"
-          disabled={busy}
-          value={period}
-          options={[
-            { value: "monthly", label: "Monthly" },
-            { value: "once", label: "One-time" },
-          ]}
-          onChange={(value) =>
-            setPeriod(contributionGoalSchema.shape.period.parse(value))
-          }
-        />
-      </SettingsRow>
+        <SettingsRow label="Monthly · USD">
+          <input
+            className={styles.input}
+            aria-label="Monthly amount in USD"
+            inputMode="decimal"
+            required
+            value={amount}
+            disabled={busy}
+            onChange={(event) => setAmount(event.target.value)}
+          />
+        </SettingsRow>
+        <SettingsRow label="Payment">
+          <span>PayPal · Sandbox</span>
+        </SettingsRow>
+      </SettingsGroup>
       {error && <span role="alert">{error}</span>}
+      {!projects.length && (
+        <span role="alert">No payment recipients available.</span>
+      )}
       <div className={styles.actions}>
         <button type="button" disabled={busy} onClick={onClose}>
           Cancel
         </button>
-        <button type="submit" disabled={busy}>
-          {busy ? "Saving" : "Save goal"}
+        <button type="submit" disabled={busy || !project} aria-busy={busy}>
+          {busy ? (
+            <LoadingSpinner size={18} label="Preparing PayPal approval" />
+          ) : (
+            "Set up with PayPal"
+          )}
         </button>
       </div>
     </form>

@@ -1,0 +1,8 @@
+.danger {
+  color: var(--danger);
+}
+.link {
+  color: var(--ink);
+  font-size: 13px;
+  text-underline-offset: 3px;
+}

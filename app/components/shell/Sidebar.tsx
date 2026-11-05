@@ -1,3 +1,4 @@
+import { useAccount } from "../../state/AccountContext";
 import SidebarDrawerToggle from "./SidebarDrawerToggle";
 import SettingsNavigation from "../settings/SettingsNavigation";
 import type { SettingsSection } from "../../lib/settings";
@@ -8,10 +9,12 @@ import {
   House,
   PanelLeftClose,
   Heart,
+  Flag,
   Building2,
   Layers,
   CircleUserRound,
   Settings,
+  LogOut,
   Search,
   X,
 } from "lucide-react";
@@ -30,6 +33,8 @@ export default function Sidebar({
   organizationsOpen,
   causesOpen,
   contributionsOpen,
+  goalsOpen,
+  onToggleGoals,
   onToggleContributions,
   onToggleOrganizations,
   onToggleCauses,
@@ -59,6 +64,8 @@ export default function Sidebar({
   organizationsOpen: boolean;
   causesOpen: boolean;
   contributionsOpen: boolean;
+  goalsOpen: boolean;
+  onToggleGoals: () => void;
   onToggleContributions: () => void;
   onToggleOrganizations: () => void;
   onToggleCauses: () => void;
@@ -85,6 +92,7 @@ export default function Sidebar({
   settingsSection: SettingsSection;
   onSettingsSection: (value: SettingsSection) => void;
 }) {
+  const account = useAccount();
   const narrow = useNarrowLayout(),
     sidebar = useRef<HTMLElement>(null);
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
@@ -195,6 +203,17 @@ export default function Sidebar({
                     <span>Workspace</span>
                   </div>
                   <SidebarDrawerToggle
+                    label="Goals"
+                    Icon={Flag}
+                    side="left"
+                    controls="goals-dialog"
+                    open={goalsOpen}
+                    onToggle={() => {
+                      onToggleGoals();
+                      onClose();
+                    }}
+                  />
+                  <SidebarDrawerToggle
                     label="Contributions"
                     Icon={Heart}
                     side="left"
@@ -257,11 +276,12 @@ export default function Sidebar({
               aria-expanded={Boolean(menu)}
               onClick={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
-                setMenu(menu ? null : { x: rect.left, y: rect.top - 96 });
+                setMenu(menu ? null : { x: rect.left, y: rect.top - 136 });
               }}
             >
               <CircleUserRound size={24} strokeWidth={1.8} />
             </button>
+            {account.error && <span role="alert">{account.error}</span>}
           </footer>
         </div>
       </aside>
@@ -273,6 +293,14 @@ export default function Sidebar({
           entries={[
             { label: "Profile", icon: CircleUserRound, action: onProfile },
             { label: "Settings", icon: Settings, action: onSettings },
+            {
+              label: "Sign out",
+              icon: LogOut,
+              disabled: account.busy,
+              action: () => {
+                void account.signOut();
+              },
+            },
           ]}
           onClose={() => setMenu(null)}
         />

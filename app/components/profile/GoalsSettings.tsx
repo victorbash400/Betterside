@@ -1,3 +1,4 @@
+import LoadingRegion from "../controls/LoadingRegion";
 import ProfileGoals from "./ProfileGoals";
 import { useDonorProfile } from "../../state/useDonorProfile";
 import type { MapItem } from "../../lib/types";
@@ -22,15 +23,17 @@ export default function GoalsSettings({
         </div>
       )}
       {!state.profile && !state.error && (
-        <span role="status">Loading goals</span>
+        <LoadingRegion label="Loading goals" />
       )}
       {state.profile && (
         <ProfileGoals
           profile={state.profile}
           payments={state.payments}
+          subscriptions={state.subscriptions}
           records={records}
           busy={state.saving}
           onSave={state.save}
+          onRefresh={state.retry}
           onContribute={onContribute}
         />
       )}

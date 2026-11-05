@@ -5,13 +5,13 @@ import { trackingSchema } from "../../lib/tracking";
 import { apiError, sameOrigin } from "../../server/http";
 export async function GET() {
   try {
-    const donor = await donorSession(true);
+    const donor = await donorSession();
     if (!donor) throw new Error("Visitor session unavailable.");
     return Response.json(await loadTracking(donor), {
       headers: { "Cache-Control": "no-store" },
     });
-  } catch {
-    return apiError(new Error("Could not load saved interests."), 503);
+  } catch (error) {
+    return apiError(error, 503);
   }
 }
 export async function PUT(request: Request) {
@@ -42,6 +42,6 @@ export async function PUT(request: Request) {
         new Error("Interests changed in another tab. Reload to review."),
         409,
       );
-    return apiError(new Error("Could not save interests. Retry."), 503);
+    return apiError(error, 503);
   }
 }

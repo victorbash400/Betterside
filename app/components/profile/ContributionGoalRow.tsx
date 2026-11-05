@@ -1,73 +1,48 @@
-import { Pencil, Trash2 } from "lucide-react";
-import IconButton from "../controls/IconButton";
+import { ChevronRight, Flag } from "lucide-react";
+import SettingsActionRow from "../settings/SettingsActionRow";
 import type { ContributionGoal } from "../../lib/profile";
+import type { GoalSubscription } from "../../lib/paypalSubscription";
 import styles from "./ContributionGoalRow.module.css";
-const money = (cents: number) =>
-  new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 2,
-  }).format(cents / 100);
+const statuses: Record<GoalSubscription["status"], string> = {
+  APPROVAL_PENDING: "Awaiting approval",
+  APPROVED: "Approved",
+  ACTIVE: "Active",
+  SUSPENDED: "Paused",
+  CANCELLED: "Cancelled",
+  EXPIRED: "Expired",
+};
 export default function ContributionGoalRow({
   goal,
-  cents,
-  percent,
-  busy,
-  canContribute,
-  onEdit,
-  onDelete,
-  onContribute,
+  subscription,
+  onOpen,
 }: {
   goal: ContributionGoal;
-  cents: number;
-  percent: number;
-  busy: boolean;
-  canContribute: boolean;
-  onEdit: () => void;
-  onDelete: () => void;
-  onContribute: () => void;
+  subscription?: GoalSubscription;
+  onOpen: () => void;
 }) {
+  const name = goal.targetText || goal.category;
+  const status = subscription ? statuses[subscription.status] : "Not set up";
   return (
-    <div className={styles.goal}>
-      <div className={styles.heading}>
-        <strong>{goal.category}</strong>
-        <span>{goal.period === "monthly" ? "Monthly" : "One-time"}</span>
-        <IconButton
-          label={`Edit ${goal.category} goal`}
-          disabled={busy}
-          onClick={onEdit}
-        >
-          <Pencil size={14} />
-        </IconButton>
-        <IconButton
-          label={`Delete ${goal.category} goal`}
-          disabled={busy}
-          onClick={onDelete}
-        >
-          <Trash2 size={14} />
-        </IconButton>
-      </div>
-      <div
-        className={styles.progress}
-        role="progressbar"
-        aria-label={`${goal.category} contribution goal`}
-        aria-valuemin={0}
-        aria-valuemax={goal.targetCents / 100}
-        aria-valuenow={Math.min(cents, goal.targetCents) / 100}
-        aria-valuetext={`${money(cents)} of ${money(goal.targetCents)}`}
-      >
-        <span style={{ width: `${percent}%` }} />
-      </div>
-      <div className={styles.amounts}>
-        <span>
-          {money(cents)} / {money(goal.targetCents)}
+    <SettingsActionRow onClick={onOpen}>
+      <span className={styles.row}>
+        <Flag size={18} aria-hidden="true" />
+        <span className={styles.name}>
+          <span>{name}</span>
+          <small>
+            {goal.category === name ? status : `${goal.category} · ${status}`}
+          </small>
         </span>
-        {canContribute && (
-          <button disabled={busy} onClick={onContribute}>
-            Contribute
-          </button>
-        )}
-      </div>
-    </div>
+        <span className={styles.amount}>
+          {new Intl.NumberFormat("en", {
+            style: "currency",
+            currency: "USD",
+          }).format(
+            subscription ? Number(subscription.amount) : goal.targetCents / 100,
+          )}
+          {goal.period === "monthly" && <small>/ mo</small>}
+        </span>
+        <ChevronRight size={16} aria-hidden="true" />
+      </span>
+    </SettingsActionRow>
   );
 }

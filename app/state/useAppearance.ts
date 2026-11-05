@@ -1,3 +1,5 @@
+import { useAccount } from "./AccountContext";
+import { accountStorageKey } from "../lib/accountStorage";
 import { useEffect, useState } from "react";
 import {
   defaultAppearance,
@@ -38,6 +40,8 @@ function restore(raw: string): Appearance {
   return parseAppearance(raw);
 }
 export function useAppearance() {
+  const { user } = useAccount();
+  const storageKey = accountStorageKey(user!.id, "appearance");
   const [value, setValue] = useState<Appearance>(defaultAppearance);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
@@ -46,14 +50,14 @@ export function useAppearance() {
   const dark = value.mode === "system" ? systemDark : value.mode === "dark";
   useEffect(() => {
     try {
-      const stored = localStorage.getItem("betterside-appearance");
+      const stored = localStorage.getItem(storageKey);
       setValue(stored ? restore(stored) : defaultAppearance);
       setLoaded(true);
       setError("");
     } catch {
       setError("Could not restore appearance. Retry.");
     }
-  }, [attempt]);
+  }, [attempt, storageKey]);
   useEffect(() => {
     if (!loaded) return;
     const root = document.documentElement;
@@ -64,11 +68,11 @@ export function useAppearance() {
     ))
       root.style.setProperty(key, color);
     try {
-      localStorage.setItem("betterside-appearance", JSON.stringify(value));
+      localStorage.setItem(storageKey, JSON.stringify(value));
     } catch {
       setError("Could not save appearance. Retry.");
     }
-  }, [value, dark, loaded]);
+  }, [value, dark, loaded, storageKey]);
   return {
     value,
     error,

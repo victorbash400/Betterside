@@ -11,12 +11,12 @@ export async function POST(request: Request) {
     const input = z
       .object({
         projectId: z.string(),
-        goalId: z.string().min(1).max(100).optional(),
         amount: z.string(),
+        goalId: z.string().max(100).optional(),
       })
       .strict()
       .parse(await request.json());
-    const donor = await donorSession(true);
+    const donor = await donorSession();
     if (!donor) throw new Error("Could not create donor session.");
     return Response.json(
       await createPayPalOrder({

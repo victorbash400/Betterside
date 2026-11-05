@@ -7,7 +7,7 @@ import {
 } from "../../../server/paypalAccount";
 export async function GET() {
   try {
-    const owner = await donorSession(true);
+    const owner = await donorSession();
     if (!owner) return apiError(new Error("Sign in to connect PayPal."), 401);
     return Response.json(await paypalAccountStatus(owner), {
       headers: { "Cache-Control": "no-store" },

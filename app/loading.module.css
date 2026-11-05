@@ -1,0 +1,6 @@
+.page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  background: var(--surface);
+}

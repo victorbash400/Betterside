@@ -29,6 +29,10 @@
   outline: 2px solid var(--icon);
   outline-offset: 2px;
 }
+.switch:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 @media (prefers-reduced-motion: reduce) {
   .switch > span {
     transition: none;

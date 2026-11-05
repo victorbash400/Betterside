@@ -1,3 +1,4 @@
+import LoadingRegion from "../controls/LoadingRegion";
 import ProfileSettings from "../profile/ProfileSettings";
 import type { MapItem } from "../../lib/types";
 import type { CheckoutInput } from "../../lib/chatWorkspace";
@@ -73,7 +74,7 @@ export default function SettingsDialog({
               <button onClick={configuration.retry}>Retry settings</button>
             </div>
           ) : !configuration.data ? (
-            <span role="status">Loading settings</span>
+            <LoadingRegion label="Loading settings" />
           ) : section === "models" ? (
             <ModelSettings
               value={model}

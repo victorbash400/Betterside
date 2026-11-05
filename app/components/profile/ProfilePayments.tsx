@@ -1,3 +1,4 @@
+import LoadingSpinner from "../controls/LoadingSpinner";
 import { usePayPalAccount } from "../../state/usePayPalAccount";
 import SettingsGroup from "../settings/SettingsGroup";
 import SettingsRow from "../settings/SettingsRow";
@@ -31,11 +32,17 @@ export default function ProfilePayments({
               disabled={paypal.busy}
               onClick={() => void paypal.connect()}
             >
-              {paypal.busy ? "Connecting" : "Connect PayPal"}
+              {paypal.busy ? (
+                <LoadingSpinner size={24} label="Connecting PayPal" />
+              ) : (
+                "Connect PayPal"
+              )}
             </SettingsInlineButton>
-          ) : (
-            <span>{paypal.account ? "Not configured" : "Loading"}</span>
-          )}
+          ) : paypal.account ? (
+            <span>Not configured</span>
+          ) : !paypal.error ? (
+            <LoadingSpinner size={24} label="Loading PayPal account" />
+          ) : null}
         </SettingsRow>
         <SettingsActionRow onClick={onCheckout}>Contribute</SettingsActionRow>
         <SettingsActionRow onClick={onContributions}>

@@ -1,4 +1,4 @@
-import Workspace from "./components/shell/Workspace";
+import AccountApp from "./components/account/AccountApp";
 export default function Page() {
-  return <Workspace />;
+  return <AccountApp />;
 }

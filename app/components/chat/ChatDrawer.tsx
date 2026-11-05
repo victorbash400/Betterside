@@ -1,4 +1,5 @@
 "use client";
+import LoadingRegion from "../controls/LoadingRegion";
 import type {
   ChatWorkspaceActions,
   WorkspaceChatContext,
@@ -58,6 +59,9 @@ export default function ChatDrawer({
         onDelete={() => sessions.remove(sessions.activeId)}
       />
       <div className={styles.body}>
+        {!sessions.ready && !sessions.error && (
+          <LoadingRegion label="Loading chats" />
+        )}
         {sessions.ready && (
           <ChatThread
             key={sessions.activeId}

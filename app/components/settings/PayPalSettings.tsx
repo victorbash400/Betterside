@@ -14,14 +14,6 @@ export default function PayPalSettings({
       <SettingsRow label="Currency">
         <span>USD</span>
       </SettingsRow>
-      <SettingsRow label="Credentials">
-        <span>
-          {configuration.credentials ? "Configured" : "Not configured"}
-        </span>
-      </SettingsRow>
-      <SettingsRow label="Webhook">
-        <span>{configuration.webhook ? "Configured" : "Not configured"}</span>
-      </SettingsRow>
     </SettingsGroup>
   );
 }

@@ -19,6 +19,7 @@ export const maxDuration = 120;
 export async function POST(request: Request) {
   try {
     sameOrigin(request);
+    const donor = await donorSession();
     const input = z
       .object({
         messages: z.array(z.unknown()).min(1).max(80),
@@ -38,7 +39,6 @@ export async function POST(request: Request) {
       loadCatalogue(),
       loadDiscovery(),
     ]);
-    const donor = await donorSession(true);
     if (!donor) throw new Error("Visitor session unavailable.");
     const saved = donor
       ? ((await loadTracking(donor)).snapshot?.savedItems ?? [])

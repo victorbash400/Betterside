@@ -1,3 +1,4 @@
+import { useAccount } from "../../state/AccountContext";
 import { useCallback, useEffect, useState } from "react";
 import {
   paymentResultSchema,
@@ -18,6 +19,7 @@ export default function PayPalLinkCheckout({
   disabled: boolean;
   onBusy: (busy: boolean) => void;
 }) {
+  const { fetch } = useAccount();
   const [error, setError] = useState("");
   const [order, setOrder] = useState<{
     id: string;

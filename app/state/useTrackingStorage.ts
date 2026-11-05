@@ -1,3 +1,4 @@
+import { useAccount } from "../state/AccountContext";
 import { useEffect, useRef, useState } from "react";
 import { interestCategories } from "../lib/interestCategories";
 import { z } from "zod";
@@ -14,6 +15,7 @@ async function responseData(response: Response) {
   return trackingResponseSchema.parse(body);
 }
 export function useTrackingStorage() {
+  const { fetch, beforeSignOut } = useAccount();
   const [state, setState] = useState<Tracking>(emptyTracking),
     [ready, setReady] = useState(false),
     [error, setError] = useState("");
@@ -38,18 +40,7 @@ export function useTrackingStorage() {
         let snapshot = remote.snapshot;
         revision.current = remote.revision;
         persisted.current = snapshot ?? emptyTracking;
-        if (!snapshot) {
-          const saved = localStorage.getItem("betterside-tracking"),
-            legacy = localStorage.getItem("betterside-following");
-          snapshot = saved
-            ? trackingSchema.parse(JSON.parse(saved))
-            : legacy
-              ? trackingSchema.parse({
-                  ...emptyTracking,
-                  following: JSON.parse(legacy),
-                })
-              : emptyTracking;
-        }
+        snapshot ??= emptyTracking;
         if (
           snapshot.interests.some(
             (interest) =>
@@ -82,7 +73,7 @@ export function useTrackingStorage() {
           setError(
             error instanceof Error
               ? error.message
-              : "Could not restore interests.",
+              : "Could not restore pins.",
           );
       }
     }
@@ -91,7 +82,16 @@ export function useTrackingStorage() {
       live.current = false;
       controller.abort();
     };
-  }, []);
+  }, [fetch]);
+  useEffect(
+    () =>
+      beforeSignOut(async () => {
+        if (desired.current === persisted.current) return;
+        if (error) throw new Error(error);
+        await flush();
+      }),
+    [beforeSignOut, error, fetch],
+  );
   function flush(): Promise<void> {
     if (writing.current) return writing.current;
     const operation = drain().finally(() => {
@@ -103,7 +103,7 @@ export function useTrackingStorage() {
   async function drain() {
     try {
       // Drain changes triggered by user actions; failures wait for explicit retry.
-      while (desired.current !== persisted.current) {
+      while (live.current && desired.current !== persisted.current) {
         const snapshot = desired.current;
         const response = await fetch("/api/tracking", {
           method: "PUT",
@@ -114,13 +114,12 @@ export function useTrackingStorage() {
         const saved = await responseData(response);
         revision.current = saved.revision;
         persisted.current = snapshot;
-        localStorage.setItem("betterside-tracking", JSON.stringify(snapshot));
       }
       if (live.current) setError("");
     } catch (error) {
       if (live.current)
         setError(
-          error instanceof Error ? error.message : "Could not save interests.",
+          error instanceof Error ? error.message : "Could not save pins.",
         );
       throw error;
     }
@@ -133,7 +132,7 @@ export function useTrackingStorage() {
       setState(next);
       void flush().catch(() => {});
     } catch {
-      setError("Could not update interests.");
+      setError("Could not update pins.");
     }
   }
   function retry() {
@@ -145,7 +144,7 @@ export function useTrackingStorage() {
   }
   async function commit(transform: (previous: Tracking) => Tracking) {
     if (!ready || error)
-      throw new Error(error || "Saved interests unavailable.");
+      throw new Error(error || "Saved pins unavailable.");
     const next = trackingSchema.parse(transform(desired.current));
     desired.current = next;
     setState(next);

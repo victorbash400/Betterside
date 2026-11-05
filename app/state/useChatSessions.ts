@@ -1,3 +1,5 @@
+import { useAccount } from "./AccountContext";
+import { accountStorageKey } from "../lib/accountStorage";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 const schema = z.object({
@@ -15,12 +17,14 @@ const initial = {
   items: [{ id: "default", title: "Chat" }],
 };
 export function useChatSessions() {
+  const { user } = useAccount();
+  const key = accountStorageKey(user!.id, "chats");
   const [state, setState] = useState(initial),
     [ready, setReady] = useState(false),
     [error, setError] = useState("");
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("betterside-chats");
+      const raw = localStorage.getItem(key);
       if (raw) {
         const saved = schema.parse(JSON.parse(raw));
         if (!saved.items.some((item) => item.id === saved.activeId))
@@ -31,15 +35,15 @@ export function useChatSessions() {
       setError("Could not restore chats.");
     }
     setReady(true);
-  }, []);
+  }, [key]);
   useEffect(() => {
     if (!ready || error) return;
     try {
-      localStorage.setItem("betterside-chats", JSON.stringify(state));
+      localStorage.setItem(key, JSON.stringify(state));
     } catch {
       setError("Could not save chats.");
     }
-  }, [state, ready, error]);
+  }, [state, ready, error, key]);
   function create() {
     const id = crypto.randomUUID();
     setState((previous) => ({

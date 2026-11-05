@@ -1,4 +1,5 @@
-import { LoaderCircle, Square, X } from "lucide-react";
+import LoadingSpinner from "../controls/LoadingSpinner";
+import { Square, X } from "lucide-react";
 import IconButton from "../controls/IconButton";
 import VoiceWaveform from "./VoiceWaveform";
 import styles from "./VoiceRecording.module.css";
@@ -35,15 +36,12 @@ export default function VoiceRecording({
           <Square size={16} fill="currentColor" />
         </IconButton>
       ) : (
-        <span
-          className={styles.processing}
-          role="status"
-          aria-label={
+        <LoadingSpinner
+          size={28}
+          label={
             phase === "transcribing" ? "Transcribing" : "Connecting microphone"
           }
-        >
-          <LoaderCircle size={17} />
-        </span>
+        />
       )}
     </div>
   );

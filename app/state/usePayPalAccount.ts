@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import { useAccount } from "./AccountContext";
 import { paypalAccountStatusSchema } from "../lib/paypalAccount";
 export function usePayPalAccount() {
+  const { fetch } = useAccount();
   const [account, setAccount] =
     useState<z.infer<typeof paypalAccountStatusSchema>>();
   const [error, setError] = useState("");

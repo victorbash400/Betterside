@@ -1,0 +1,25 @@
+.detail {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--on-accent);
+  background: var(--accent);
+  text-decoration: none;
+  font-size: 12px;
+}
+.error {
+  display: block;
+  color: var(--danger);
+  font-size: 12px;
+  padding: 12px 4px;
+}

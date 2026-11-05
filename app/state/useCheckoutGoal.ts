@@ -1,6 +1,8 @@
+import { useAccount } from "./AccountContext";
 import { useEffect, useState } from "react";
 import { profileResponseSchema, type ContributionGoal } from "../lib/profile";
 export function useCheckoutGoal(id?: string) {
+  const { fetch } = useAccount();
   const [result, setResult] = useState<{
     id: string;
     goal?: ContributionGoal;

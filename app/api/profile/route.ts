@@ -5,7 +5,7 @@ import { profileSchema } from "../../lib/profile";
 import { apiError, sameOrigin } from "../../server/http";
 export async function GET() {
   try {
-    const donor = await donorSession(true);
+    const donor = await donorSession();
     if (!donor) throw new Error("Profile session unavailable.");
     return Response.json(await loadProfile(donor), {
       headers: { "Cache-Control": "no-store" },

@@ -1,3 +1,4 @@
+import LoadingRegion from "../controls/LoadingRegion";
 import {
   usePayPalCheckout,
   type PaymentCompletion,
@@ -22,9 +23,7 @@ export default function PayPalCheckoutButton(props: {
         hidden={Boolean(checkout.error)}
       />
       {!checkout.ready && !checkout.error && (
-        <span role="status" className={styles.status}>
-          Loading PayPal
-        </span>
+        <LoadingRegion compact label="Loading PayPal" />
       )}
       {checkout.notice && (
         <span role="status" className={styles.status}>

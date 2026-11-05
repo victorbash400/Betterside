@@ -1,99 +1,115 @@
 import { useState } from "react";
+import { Plus } from "lucide-react";
+import EmptyState from "../controls/EmptyState";
 import SettingsGroup from "../settings/SettingsGroup";
-import SettingsRow from "../settings/SettingsRow";
 import SettingsInlineButton from "../settings/SettingsInlineButton";
-import GoalEditor from "./GoalEditor";
+import GoalSetup from "./GoalSetup";
+import GoalDetails from "./GoalDetails";
 import ContributionGoalRow from "./ContributionGoalRow";
 import {
-  goalMatchesProject,
   goalProgress,
   type ContributionGoal,
   type DonorProfile,
 } from "../../lib/profile";
+import type { GoalSubscription } from "../../lib/paypalSubscription";
 import type { Contribution, MapItem } from "../../lib/types";
 import styles from "./ProfileGoals.module.css";
+
+type View =
+  | { kind: "list" }
+  | { kind: "detail"; id: string }
+  | { kind: "setup"; id?: string };
 export default function ProfileGoals({
   profile,
   payments,
-  records = [],
-  availableCategories,
+  subscriptions,
   busy,
   onSave,
-  onContribute,
 }: {
   profile: DonorProfile;
   payments: Contribution[];
+  subscriptions: GoalSubscription[];
   records?: MapItem[];
   availableCategories?: string[];
   busy: boolean;
   onSave: (profile: DonorProfile) => Promise<void>;
   onContribute: (goal: ContributionGoal) => void;
+  onRefresh?: () => void;
 }) {
-  const [editor, setEditor] = useState<ContributionGoal | "new">();
-  const [error, setError] = useState("");
+  const [view, setView] = useState<View>({ kind: "list" });
+  const selected =
+    view.kind !== "list"
+      ? profile.goals.find((goal) => goal.id === view.id)
+      : undefined;
+  if (view.kind === "setup")
+    return (
+      <GoalSetup
+        goal={selected}
+        onBack={() =>
+          setView(
+            selected ? { kind: "detail", id: selected.id } : { kind: "list" },
+          )
+        }
+        onPrepared={() =>
+          window.dispatchEvent(new Event("betterside-profile-changed"))
+        }
+      />
+    );
+  if (view.kind === "detail" && selected)
+    return (
+      <GoalDetails
+        key={selected.id}
+        goal={selected}
+        subscription={subscriptions.find((item) => item.goalId === selected.id)}
+        contributedCents={
+          goalProgress(selected, payments, profile.timeZone).cents
+        }
+        saving={busy}
+        onBack={() => setView({ kind: "list" })}
+        onSetup={() => setView({ kind: "setup", id: selected.id })}
+        onDelete={async () => {
+          await onSave({
+            ...profile,
+            goals: profile.goals.filter((goal) => goal.id !== selected.id),
+          });
+          setView({ kind: "list" });
+        }}
+      />
+    );
   return (
-    <section className={styles.goals} aria-label="Contribution goals">
-      <SettingsGroup>
-        <SettingsRow label="Contribution goals">
-          <span>USD · Sandbox</span>
-          <SettingsInlineButton
-            disabled={busy || profile.goals.length >= 30 || Boolean(editor)}
-            onClick={() => setEditor("new")}
-          >
-            New goal
-          </SettingsInlineButton>
-        </SettingsRow>
-        {profile.goals.map((goal) =>
-          editor !== "new" && editor?.id === goal.id ? null : (
-            <ContributionGoalRow
-              key={goal.id}
-              goal={goal}
-              {...goalProgress(goal, payments, profile.timeZone)}
-              busy={busy}
-              canContribute={
-                availableCategories
-                  ? availableCategories.includes(goal.category)
-                  : records.some((record) => goalMatchesProject(goal, record))
-              }
-              onEdit={() => setEditor(goal)}
-              onDelete={() => {
-                setError("");
-                void onSave({
-                  ...profile,
-                  goals: profile.goals.filter((item) => item.id !== goal.id),
-                }).catch((failure) =>
-                  setError(
-                    failure instanceof Error
-                      ? failure.message
-                      : "Could not delete goal.",
-                  ),
-                );
-              }}
-              onContribute={() => onContribute(goal)}
-            />
-          ),
-        )}
-        {editor && (
-          <GoalEditor
-            key={editor === "new" ? "new" : editor.id}
-            goal={editor === "new" ? undefined : editor}
-            busy={busy}
-            onClose={() => setEditor(undefined)}
-            onSave={async (goal) => {
-              await onSave({
-                ...profile,
-                goals:
-                  editor === "new"
-                    ? [...profile.goals, goal]
-                    : profile.goals.map((item) =>
-                        item.id === goal.id ? goal : item,
-                      ),
-              });
-            }}
-          />
-        )}
-      </SettingsGroup>
-      {error && <span role="alert">{error}</span>}
+    <section className={styles.goals} aria-label="Goals list">
+      <div className={styles.toolbar}>
+        <span>
+          {profile.goals.length} {profile.goals.length === 1 ? "goal" : "goals"}
+        </span>
+        <SettingsInlineButton
+          disabled={busy || profile.goals.length >= 30}
+          onClick={() => setView({ kind: "setup" })}
+        >
+          <Plus size={14} />
+          New goal
+        </SettingsInlineButton>
+      </div>
+      <div className={styles.list}>
+        <SettingsGroup>
+          {profile.goals.length ? (
+            profile.goals.map((goal) => (
+              <ContributionGoalRow
+                key={goal.id}
+                goal={goal}
+                subscription={subscriptions.find(
+                  (item) => item.goalId === goal.id,
+                )}
+                onOpen={() => setView({ kind: "detail", id: goal.id })}
+              />
+            ))
+          ) : (
+            <EmptyState>
+              Select New goal to set up a recurring contribution.
+            </EmptyState>
+          )}
+        </SettingsGroup>
+      </div>
     </section>
   );
 }

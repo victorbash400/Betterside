@@ -1,3 +1,4 @@
+import LoadingSpinner from "../controls/LoadingSpinner";
 import { useState } from "react";
 import SettingsRow from "../settings/SettingsRow";
 import SettingsInlineButton from "../settings/SettingsInlineButton";
@@ -50,7 +51,7 @@ export default function ProfileIdentity({
               Cancel
             </SettingsInlineButton>
             <SettingsInlineButton type="submit" disabled={busy}>
-              Save
+              {busy ? <LoadingSpinner size={24} label="Saving name" /> : "Save"}
             </SettingsInlineButton>
           </form>
         ) : (

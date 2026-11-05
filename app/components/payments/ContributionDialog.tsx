@@ -1,3 +1,4 @@
+import LoadingRegion from "../controls/LoadingRegion";
 import { useCheckoutGoal } from "../../state/useCheckoutGoal";
 import { goalMatchesProject } from "../../lib/profile";
 import { useState } from "react";
@@ -110,7 +111,7 @@ export default function ContributionDialog({
               {goalState.goal.period === "monthly" ? "Monthly" : "One-time"}
             </span>
           )}
-          {goalState.loading && <span role="status">Loading goal</span>}
+          {goalState.loading && <LoadingRegion compact label="Loading goal" />}
           {goalState.error && (
             <span className={styles.error} role="alert">
               {goalState.error}

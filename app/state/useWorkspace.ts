@@ -1,4 +1,6 @@
 "use client";
+import { useAccount } from "./AccountContext";
+import { accountStorageKey } from "../lib/accountStorage";
 import { useEffect, useMemo, useState } from "react";
 import {
   concerns,
@@ -24,6 +26,8 @@ import { filterIssues, issueKinds } from "../lib/catalogue";
 import type { Analysis } from "../lib/analysis";
 import type { Filters, MapItem as Issue, View } from "../lib/types";
 export function useWorkspace() {
+  const { user } = useAccount();
+  const modelKey = accountStorageKey(user!.id, "model");
   const tracking = useTracking();
   const appearance = useAppearance();
   const following = tracking.following;
@@ -71,22 +75,22 @@ export function useWorkspace() {
     [loaded, setLoaded] = useState(false);
   useEffect(() => {
     try {
-      const savedModel = localStorage.getItem("betterside-model");
+      const savedModel = localStorage.getItem(modelKey);
       if (savedModel === "fast" || savedModel === "reasoning")
         setModel(savedModel);
     } catch {
       setError("Could not restore saved preferences.");
     }
     setLoaded(true);
-  }, []);
+  }, [modelKey]);
   useEffect(() => {
     if (!loaded) return;
     try {
-      localStorage.setItem("betterside-model", model);
+      localStorage.setItem(modelKey, model);
     } catch {
       setError("Could not save preferences.");
     }
-  }, [model, loaded]);
+  }, [model, loaded, modelKey]);
   const activeInterest = tracking.interests.find(
     (item) => item.id === selectedInterestId,
   );

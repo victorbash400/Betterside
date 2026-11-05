@@ -1,5 +1,6 @@
 "use client";
 import LoadingRegion from "../controls/LoadingRegion";
+import ChatDrawerLoading from "../chat/ChatDrawerLoading";
 import type { CheckoutInput } from "../../lib/chatWorkspace";
 import type { SettingsSection } from "../../lib/settings";
 import { useEffect, useState } from "react";
@@ -25,6 +26,7 @@ import AddItemsDialog from "../interests/AddItemsDialog";
 import NewInterestDialog from "../interests/NewInterestDialog";
 import SettingsDialog from "../settings/SettingsDialog";
 import ContributionsModal from "../payments/ContributionsModal";
+import GoalsModal from "../profile/GoalsModal";
 import ContributionDialog from "../payments/ContributionDialog";
 import { useWorkspace } from "../../state/useWorkspace";
 import { issueKinds } from "../../lib/catalogue";
@@ -39,7 +41,10 @@ const InterestContents = dynamic(
   () => import("../collections/InterestContents"),
   { ssr: false, loading: () => <LoadingRegion label="Loading table" /> },
 );
-const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), { ssr: false });
+const ChatDrawer = dynamic(() => import("../chat/ChatDrawer"), {
+  ssr: false,
+  loading: () => <ChatDrawerLoading />,
+});
 export default function Workspace() {
   const state = useWorkspace();
   const [scopeDetails, setScopeDetails] = useState<ScopeSelection>();
@@ -49,6 +54,10 @@ export default function Workspace() {
   }
   const [chatCheckout, setChatCheckout] = useState<CheckoutInput>();
   const [contributionsOpen, setContributionsOpen] = useState(false);
+  const [goalsOpen, setGoalsOpen] = useState(false);
+  useEffect(() => {
+    if (new URL(window.location.href).searchParams.get("goals") === "1") setGoalsOpen(true);
+  }, []);
   const narrow = useNarrowLayout();
   const [organizationsOpen, setOrganizationsOpen] = useState(false);
   const [requestedCausesOpen, setCausesOpen] = useState<boolean>();
@@ -215,7 +224,15 @@ export default function Workspace() {
       <Sidebar
         view={state.view}
         contributionsOpen={contributionsOpen}
-        onToggleContributions={() => setContributionsOpen((open) => !open)}
+        goalsOpen={goalsOpen}
+        onToggleGoals={() => {
+          setContributionsOpen(false);
+          setGoalsOpen((open) => !open);
+        }}
+        onToggleContributions={() => {
+          setGoalsOpen(false);
+          setContributionsOpen((open) => !open);
+        }}
         organizationsOpen={
           state.view === "Organizations" &&
           state.collectionMode === "map" &&
@@ -595,6 +612,16 @@ export default function Workspace() {
           onClose={() => {
             state.setCheckout(undefined);
             setChatCheckout(undefined);
+          }}
+        />
+      )}
+      {goalsOpen && (
+        <GoalsModal
+          records={state.allRecords}
+          onClose={() => setGoalsOpen(false)}
+          onContribute={(goal) => {
+            setGoalsOpen(false);
+            setChatCheckout({ goalId: goal.id });
           }}
         />
       )}
