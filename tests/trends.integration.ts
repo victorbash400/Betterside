@@ -86,11 +86,13 @@ test("history routes coalesce country/source requests and preserve dated measure
     const output = await showTrendsTool({ donor: "history-test", records: [], origin: "http://localhost" }).execute!(
       { scopes: [{ countries: ["PAK"], concern: "hunger" }], view: "Compare data", offset: 0 },
       { toolCallId: "history-tool", messages: [], context: {} },
-    ) as { kind: string; view: string; total: number; series: unknown[] };
+    ) as { kind: string; view: string; total: number; series: unknown[]; summaries: Array<{ highest: { date: string; value: number }; latest: { date: string; value: number } }> };
     assert.equal(output.kind, "trends");
     assert.equal(output.view, "Compare data");
     assert.equal(output.total, 1);
     assert.deepEqual(output.series, result.series);
+    assert.deepEqual(output.summaries[0].highest, { date: "2024-01-01T00:00:00.000Z", value: 100 });
+    assert.deepEqual(output.summaries[0].latest, { date: "2025-01-01T00:00:00.000Z", value: 0 });
     assert.deepEqual(calls, initial);
     const conditional = await GET(
       new Request(request().url, {

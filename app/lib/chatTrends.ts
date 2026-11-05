@@ -12,5 +12,12 @@ export const chatTrendsResultSchema = trendsResponseSchema.extend({
   view: z.enum(["Chart", "Compare data"]),
   total: z.number().int().nonnegative(),
   nextOffset: z.number().int().nullable(),
+  summaries: z.array(z.object({
+    seriesId: z.string(),
+    label: z.string(),
+    latest: z.object({ date: z.iso.datetime(), value: z.number().finite() }),
+    previous: z.object({ date: z.iso.datetime(), value: z.number().finite() }).optional(),
+    highest: z.object({ date: z.iso.datetime(), value: z.number().finite() }),
+  })).optional(),
 });
 export type ChatTrendsResult = z.infer<typeof chatTrendsResultSchema>;

@@ -8,7 +8,7 @@ import type { TrendScope } from "../lib/trends.ts";
 import type { WorkspaceToolContext } from "./context.ts";
 export function showTrendsTool(context: WorkspaceToolContext) {
   return tool({
-    description: "Show actual dated provider measurements inline as trends or a comparison grid with sparklines, grouping, pivot, range charts and Excel export. Use scopes with exact ISO3 country codes and concern IDs, or saved pin IDs from list_pins. Supports up to four countries total. Values retain source, metric, geography and population; never sum overlapping populations. Missing history is explicit, not estimated. Cached provider history is reused. Offset paginates series, not observations.",
+    description: "Show actual dated provider measurements inline as trends or a comparison grid. Use exact ISO3 country codes and concern IDs, or saved pin IDs. Supports up to four countries. For prose, use the exact latest, previous and highest dated observations in summaries. These describe reported observations and cannot establish causes, humanitarian improvement, or changes in access. Never sum overlapping populations. Offset paginates series, not observations.",
     inputSchema: chatTrendsInputSchema,
     outputSchema: chatTrendsResultSchema,
     execute: async (input) => {
@@ -28,9 +28,21 @@ export function showTrendsTool(context: WorkspaceToolContext) {
         throw new Error("Compare up to four countries.");
       const results = await Promise.all(scopes.map((scope) => loadTrends(scope)));
       const series = [...new Map(results.flatMap((result) => result.value.series).map((series) => [series.id, series])).values()];
+      const page = series.slice(input.offset, input.offset + 12);
       return chatTrendsResultSchema.parse({
         kind: "trends", scopes, view: input.view,
-        series: series.slice(input.offset, input.offset + 12),
+        series: page,
+        summaries: page.flatMap(({ id, label, points }) => {
+          const latest = points.at(-1);
+          if (!latest) return [];
+          return [{
+            seriesId: id,
+            label,
+            latest,
+            previous: points.at(-2),
+            highest: points.reduce((highest, point) => point.value > highest.value ? point : highest),
+          }];
+        }),
         total: series.length,
         nextOffset: input.offset + 12 < series.length ? input.offset + 12 : null,
         failures: results.flatMap((result) => result.value.failures),
