@@ -8,7 +8,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-transform-types --test tests/*.test.ts",
-    "test:tools": "node --conditions=react-server --experimental-transform-types --import ./scripts/test-runtime.mjs --test tests/agentTools.integration.ts tests/chatTools.integration.ts tests/cache.integration.ts tests/trends.integration.ts tests/cachedResponse.integration.ts",
+    "test:tools": "node --conditions=react-server --experimental-transform-types --import ./scripts/test-runtime.mjs --test tests/agentTools.integration.ts tests/chatTools.integration.ts tests/cache.integration.ts tests/organizationDirectory.integration.ts tests/sharedFeedCache.integration.ts tests/trends.integration.ts tests/cachedResponse.integration.ts",
     "test:goals": "node --env-file=.env.local --conditions=react-server --experimental-transform-types --import ./scripts/test-runtime.mjs --test tests/goalTools.integration.ts",
     "seed": "node --env-file=.env.local --experimental-transform-types scripts/seed-catalogue.mjs",
     "test:integration": "node --env-file=.env.local --conditions=react-server --experimental-transform-types --test tests/aws.integration.ts"

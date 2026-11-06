@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     return cachedResponse(
       request,
       result.value,
-      result.value.failures.length ? 120 : 6 * 60 * 60,
+      Math.max(0, Math.floor((result.expiresAt - Date.now()) / 1000)),
     );
   } catch (error) {
     return Response.json(

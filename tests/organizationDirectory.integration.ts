@@ -1,3 +1,4 @@
+import "./helpers/feedCacheDatabase.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -39,11 +40,11 @@ test("organization directory serves real snapshots, caches concurrent requests a
     );
     assert.equal(calls, 5);
     const initialCalls = calls;
-    const repeat = await GET(request());
+    const repeat = await GET(new Request("http://localhost/api/organization-directory"));
     assert.equal(calls, initialCalls);
     assert.equal(repeat.headers.get("etag"), responses[0].headers.get("etag"));
     const conditional = await GET(
-      new Request(request().url, {
+      new Request("http://localhost/api/organization-directory", {
         headers: { "If-None-Match": responses[0].headers.get("etag")! },
       }),
     );

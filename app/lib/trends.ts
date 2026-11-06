@@ -53,6 +53,7 @@ export const trendsResponseSchema = z.object({
       countryCode: z.string(),
       dataset: z.string(),
       error: z.string(),
+      retryAt: z.iso.datetime().optional(),
     }),
   ),
   fetchedAt: z.iso.datetime(),

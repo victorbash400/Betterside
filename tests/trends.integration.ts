@@ -1,3 +1,4 @@
+import "./helpers/feedCacheDatabase.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 

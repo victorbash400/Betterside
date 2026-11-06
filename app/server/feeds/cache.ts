@@ -3,7 +3,7 @@ import { createAsyncCache } from "../../lib/asyncCache";
 import { createRequestQueue } from "../../lib/requestQueue";
 function createFeedCache() {
   return {
-    responses: createAsyncCache<unknown>({
+    responses: createAsyncCache<{ value: unknown; validUntil: number }>({
       maxEntries: 128,
       maxBytes: 32 * 1024 * 1024,
     }),
@@ -12,6 +12,6 @@ function createFeedCache() {
 }
 // Public provider requests share their cache and concurrency limit across route bundles.
 const shared = globalThis as typeof globalThis & {
-  bettersidePublicFeeds?: ReturnType<typeof createFeedCache>;
+  bettersidePublicFeedsV2?: ReturnType<typeof createFeedCache>;
 };
-export const publicFeeds = (shared.bettersidePublicFeeds ??= createFeedCache());
+export const publicFeeds = (shared.bettersidePublicFeedsV2 ??= createFeedCache());

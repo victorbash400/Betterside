@@ -1,5 +1,5 @@
 import "server-only";
-import { createAsyncCache } from "../lib/asyncCache";
+import { CachedLoadError, createAsyncCache } from "../lib/asyncCache";
 import { cacheLifetimes } from "../lib/feedCachePolicy";
 import {
   buildTrendSeries,
@@ -76,6 +76,8 @@ export async function loadTrends(scope: TrendScope) {
         else
           failures.push({
             ...requests[index],
+            ...(result.reason instanceof CachedLoadError
+              ? { retryAt: new Date(result.reason.retryAt).toISOString() } : {}),
             error:
               result.reason instanceof Error
                 ? result.reason.message
@@ -87,7 +89,8 @@ export async function loadTrends(scope: TrendScope) {
     {
       ttlMs: (result) =>
         result.failures.length
-          ? cacheLifetimes.failure
+          ? Math.max(1, Math.min(...result.failures.map((failure) => failure.retryAt
+            ? new Date(failure.retryAt).getTime() - Date.now() : cacheLifetimes.failure)))
           : cacheLifetimes.metadata,
       errorTtlMs: cacheLifetimes.failure,
     },

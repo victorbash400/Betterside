@@ -4,6 +4,7 @@ import { CachedLoadError } from "../../lib/asyncCache";
 import { publicFeeds } from "./cache";
 import { feedRequestKey } from "../../lib/feedRequestKey";
 import { cacheLifetimes } from "../../lib/feedCachePolicy";
+import { assertProviderAvailable, sharedFeed, storeProviderCooldown } from "./sharedCache.ts";
 const { responses, hapiQueue } = publicFeeds;
 export async function feedJson(
   url: string | URL,
@@ -14,7 +15,10 @@ export async function feedJson(
   const key = createHash("sha256")
     .update(feedRequestKey(url, headers))
     .digest("hex");
+  const hapi = new URL(url).hostname === "hapi.humdata.org";
+  const provider = createHash("sha256").update(feedRequestKey(new URL(url).origin, headers)).digest("hex");
   const request = async () => {
+    if (hapi) await assertProviderAvailable(provider);
     let response: Response;
     try {
       response = await fetch(url, {
@@ -50,15 +54,18 @@ export async function feedJson(
             : Number.isFinite(date) && date > now
               ? date
               : now + cacheLifetimes.failure;
-        throw new CachedLoadError(
+        const error = new CachedLoadError(
           new Error(
             `Source rate limited. Retry after ${new Date(retryAt).toISOString()}.`,
           ),
           now,
           retryAt,
         );
+        if (hapi) await storeProviderCooldown(provider, error);
+        throw error;
       }
-      throw new Error(`Source returned HTTP ${response.status}. Retry.`);
+      throw new CachedLoadError(new Error(`Source returned HTTP ${response.status}. Retry.`),
+        Date.now(), Date.now() + cacheLifetimes.failure);
     }
     const body = response.status === 204 ? "null" : await response.text();
     const value: unknown = JSON.parse(body);
@@ -67,11 +74,9 @@ export async function feedJson(
   };
   const result = await responses.get(
     key,
-    () =>
-      new URL(url).hostname === "hapi.humdata.org"
-        ? hapiQueue(request)
-        : request(),
-    { ttlMs, errorTtlMs: cacheLifetimes.failure },
+    () => hapi ? hapiQueue(() => sharedFeed(key, ttlMs, request)) : sharedFeed(key, ttlMs, request),
+    { ttlMs: (entry) => Math.max(1, entry.validUntil - Date.now()), errorTtlMs: cacheLifetimes.failure },
   );
-  return result.value;
+  validate?.(result.value.value);
+  return result.value.value;
 }
