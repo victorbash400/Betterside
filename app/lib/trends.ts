@@ -6,6 +6,20 @@ import { datasetIds } from "./dataSources.ts";
 import type { HapiDataset } from "./feeds/hapi.ts";
 import type { MapItem } from "./types.ts";
 
+const datasetsByConcern: Record<string, HapiDataset[]> = {
+  hunger: ["hapi-food"],
+  famine: ["hapi-famine"],
+  water: ["hapi-needs"],
+  health: ["hapi-needs"],
+  needs: ["hapi-needs"],
+  shelter: ["hapi-needs"],
+  displacement: ["hapi-idps"],
+  refugees: ["hapi-refugees"],
+  war: ["hapi-conflict"],
+  rainfall: ["hapi-rainfall"],
+  risk: ["hapi-risk"],
+};
+
 export const countryCodeSchema = z
   .string()
   .length(3)
@@ -19,6 +33,13 @@ export const trendScopeSchema = z.object({
   dataset: z.enum(datasetIds).optional(),
   recordId: z.string().min(1).max(160).optional(),
   seriesLabel: z.string().trim().min(1).max(200).optional(),
+}).superRefine((scope, ctx) => {
+  if (!scope.concern || !scope.dataset) return;
+  const supported = datasetsByConcern[scope.concern] ?? [];
+  if (!supported.includes(scope.dataset as HapiDataset)) ctx.addIssue({
+    code: "custom", path: ["dataset"],
+    message: `Dataset ${scope.dataset} does not provide ${scope.concern} history. ${supported.length ? `Choose ${supported.join(", ")}.` : "No historical dataset supports this concern."}`,
+  });
 });
 export type TrendScope = z.infer<typeof trendScopeSchema>;
 const sourceSchema = z.object({
@@ -60,19 +81,7 @@ export const trendsResponseSchema = z.object({
 });
 export type TrendsResponse = z.infer<typeof trendsResponseSchema>;
 
-const datasetsByConcern: Record<string, HapiDataset[]> = {
-  hunger: ["hapi-food"],
-  famine: ["hapi-famine"],
-  water: ["hapi-needs"],
-  health: ["hapi-needs"],
-  needs: ["hapi-needs"],
-  shelter: ["hapi-needs"],
-  displacement: ["hapi-idps"],
-  refugees: ["hapi-refugees"],
-  war: ["hapi-conflict"],
-  rainfall: ["hapi-rainfall"],
-  risk: ["hapi-risk"],
-};
+
 export function trendDatasets(scope: TrendScope): HapiDataset[] {
   const datasets = scope.concern
     ? (datasetsByConcern[scope.concern] ?? [])

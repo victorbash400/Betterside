@@ -9,6 +9,14 @@ import {
 import { hapiIndicators } from "../app/lib/feeds/hapi.ts";
 import { samePinTarget, pinTrendScope } from "../app/lib/pins.ts";
 import { createAsyncCache } from "../app/lib/asyncCache.ts";
+
+test("history rejects a refugee dataset for internal displacement instead of silently returning no series", () => {
+  const wrong = trendScopeSchema.safeParse({ countries: ["SDN"], concern: "displacement", dataset: "hapi-refugees" });
+  assert.equal(wrong.success, false);
+  if (!wrong.success) assert.ok(wrong.error.issues[0].message.includes("Choose hapi-idps"));
+  assert.equal(trendScopeSchema.safeParse({ countries: ["SDN"], concern: "displacement", dataset: "hapi-idps" }).success, true);
+  assert.equal(trendScopeSchema.safeParse({ countries: ["SDN"], concern: "refugees", dataset: "hapi-refugees" }).success, true);
+});
 const countries = [
   {
     id: 1,

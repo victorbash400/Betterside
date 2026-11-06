@@ -100,6 +100,12 @@ test("history routes coalesce country/source requests and preserve dated measure
       { toolCallId: "named-history", messages: [], context: {} },
     ) as { series: unknown[] };
     assert.deepEqual(named.series, result.series);
+    const byId = await showTrendsTool({ donor: "history-test", records: [], origin: "http://localhost" }).execute!(
+      { scopes: [{ countries: ["PAK"], concern: "hunger", recordId: result.series[0].recordId, seriesLabel: "An imprecise model-generated title" }], view: "Chart", offset: 0 },
+      { toolCallId: "record-history", messages: [], context: {} },
+    ) as { scopes: unknown[]; series: unknown[] };
+    assert.deepEqual(byId.series, result.series);
+    assert.deepEqual(byId.scopes, [{ countries: ["PAK"], concern: "hunger", recordId: result.series[0].recordId }]);
     const unmatched = await GET(new Request(`${request().url}&seriesLabel=Unrelated`));
     assert.deepEqual((await unmatched.json()).series, []);
     const conditional = await GET(
@@ -114,6 +120,10 @@ test("history routes coalesce country/source requests and preserve dated measure
         .status,
       400,
     );
+    const incompatible = await GET(new Request("http://localhost/api/trends?countries=SDN&concern=displacement&dataset=hapi-refugees"));
+    assert.equal(incompatible.status, 400);
+    assert.ok((await incompatible.json()).error.includes("Choose hapi-idps"));
+    assert.deepEqual(calls, initial);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalIdentifier === undefined)

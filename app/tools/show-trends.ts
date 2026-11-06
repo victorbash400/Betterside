@@ -24,6 +24,9 @@ export function showTrendsTool(context: WorkspaceToolContext) {
           return scope;
         });
       }
+      // An exact record ID identifies the series; a model-supplied title must not override it.
+      scopes = scopes.map(({ seriesLabel, ...scope }) => scope.recordId
+        ? scope : { ...scope, ...(seriesLabel ? { seriesLabel } : {}) });
       if (new Set(scopes.flatMap((scope) => scope.countries)).size > 4)
         throw new Error("Compare up to four countries.");
       const results = await Promise.all(scopes.map((scope) => loadTrends(scope)));

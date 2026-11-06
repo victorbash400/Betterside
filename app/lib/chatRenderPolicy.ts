@@ -37,6 +37,15 @@ export function visibleChatParts(parts: UIMessage["parts"]) {
   return parts.map((part, index) => {
     let showResult = true;
     if ("state" in part && part.state === "output-available") {
+      if (part.type === "tool-show_trends" && "output" in part && part.output && typeof part.output === "object") {
+        const output = part.output;
+        if ("series" in output && "view" in output) {
+          const key = JSON.stringify([part.type, output.view, output.series,
+            "failures" in output ? output.failures : undefined]);
+          if (tables.has(key)) showResult = false;
+          tables.add(key);
+        }
+      }
       if (index < latestGoal && goalTools.has(part.type)) showResult = false;
       if ("output" in part && tableTools.has(part.type)) {
         const output = part.output;

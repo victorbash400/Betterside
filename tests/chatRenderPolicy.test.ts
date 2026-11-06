@@ -59,3 +59,13 @@ test("chat retains approval controls and the newest goal snapshot", () => {
   assert.equal(visibleChatParts(parts).length, parts.length);
   assert.deepEqual(visibleChatParts(parts).filter(({ showResult }) => showResult).map(({ index }) => index), [1, 2, 3]);
 });
+
+test("repeated history calls keep their tool indicators without duplicating the same chart", () => {
+  const output = { kind: "trends", view: "Chart", series: [{ id: "sudan" }], failures: [] };
+  const parts = [
+    { type: "tool-show_trends", toolCallId: "history", input: {}, state: "output-available", output: { ...output, fetchedAt: "first" } },
+    { type: "tool-show_trends", toolCallId: "history", input: {}, state: "output-available", output: { ...output, fetchedAt: "second" } },
+    { type: "tool-show_trends", toolCallId: "history", input: {}, state: "output-available", output: { ...output, view: "Compare data" } },
+  ] as UIMessage["parts"];
+  assert.deepEqual(visibleChatParts(parts).map(({ showResult }) => showResult), [true, false, true]);
+});

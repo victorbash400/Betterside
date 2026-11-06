@@ -3,6 +3,7 @@ import { CachedLoadError, createAsyncCache } from "../lib/asyncCache";
 import { cacheLifetimes } from "../lib/feedCachePolicy";
 import {
   buildTrendSeries,
+  trendScopeSchema,
   trendDatasets,
   type TrendScope,
   type TrendsResponse,
@@ -15,6 +16,7 @@ const cache = createAsyncCache<TrendsResponse>({
   maxBytes: 32 * 1024 * 1024,
 });
 export async function loadTrends(scope: TrendScope) {
+  scope = trendScopeSchema.parse(scope);
   const seriesLabel = scope.seriesLabel?.toLowerCase();
   const normalized = {
     ...scope,
@@ -62,8 +64,7 @@ export async function loadTrends(scope: TrendScope) {
             );
           return buildTrendSeries(result.issues, scope.concern).filter(
             (series) =>
-              (!scope.recordId || series.recordId === scope.recordId) &&
-              (!seriesLabel ||
+              scope.recordId ? series.recordId === scope.recordId : (!seriesLabel ||
                 series.label.toLowerCase() === seriesLabel ||
                 series.label.toLowerCase() === `${series.country.toLowerCase()} · ${seriesLabel}`),
           );

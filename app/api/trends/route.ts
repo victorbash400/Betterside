@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   });
   if (!parsed.success)
     return Response.json(
-      { error: "Select up to four countries." },
+      { error: parsed.error.issues[0]?.message ?? "Invalid history scope." },
       { status: 400 },
     );
   try {
