@@ -35,6 +35,7 @@ export function chatEvidence({ records, areaId, selectedIds, context }: ChatAgen
     } : null,
     selectedMeasurements: selectedRecord?.measurements?.map(measurement => ({
       ...measurement, label: measurementLabels[measurement.metric],
+      displayValue: measurement.value.toLocaleString("en", { maximumFractionDigits: 20 }),
     })) ?? [],
     selectedHistoryScope: scope?.success ? scope.data : null,
     workspaceRecords: context?.country || context?.causes.length ? scopedRecords.slice(0, 8) : [],

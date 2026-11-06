@@ -22,7 +22,7 @@ test("selected record evidence includes exact measurements, assessment dates, so
   assert.deepEqual(evidence.selectedRecord?.source, {
     label: idps.source.label, url: idps.source.url, updatedAt: "2026-09-01", loadedAt: "2026-11-06",
   });
-  assert.deepEqual(evidence.selectedMeasurements, [{ metric: "idps", value: 123, label: "Internally displaced people" }]);
+  assert.deepEqual(evidence.selectedMeasurements, [{ metric: "idps", value: 123, label: "Internally displaced people", displayValue: "123" }]);
   assert.deepEqual(evidence.selectedHistoryScope, { countries: ["SDN"], dataset: "hapi-idps", concern: "displacement", recordId: idps.id });
   assert.ok(chatInstructions({ ...context, areaId: idps.id }).includes(JSON.stringify(evidence)));
 });
