@@ -81,36 +81,7 @@ export default function ChatToolResult({
         {part.errorText}
       </p>
     );
-  if (part.state !== "output-available") {
-    if (!busy) return null;
-    const names: Record<string, string> = {
-      "tool-get_paypal_status": "Reading PayPal status",
-      "tool-list_pins": "Reading pins",
-      "tool-pin_items": "Saving pins",
-      "tool-unpin_items": "Removing pins",
-      "tool-manage_goal": "Updating subscription",
-      "tool-get_contribution": "Reading receipt",
-      "tool-list_goals": "Reading goals",
-      "tool-create_goal": "Saving goal",
-      "tool-update_goal": "Updating goal",
-      "tool-search_records": "Searching records",
-      "tool-search_organizations": "Searching organizations",
-      "tool-filter_map": "Updating map",
-      "tool-save_records": "Saving records",
-      "tool-focus_organization": "Selecting organization",
-      "tool-calculate": "Calculating",
-      "tool-show_contribution_chart": "Reading contribution history",
-      "tool-show_contribution_report": "Preparing contribution report",
-      "tool-show_trends": "Reading trend history",
-      "tool-show_summary": "Preparing summary",
-      "tool-show_chart": "Preparing chart",
-      "tool-open_checkout": "Opening checkout",
-      "tool-prepare_payment": "Creating sandbox order",
-      "tool-list_contributions": "Reading contribution records",
-      "tool-show_analysis": "Preparing analysis",
-    };
-    return <span role="status" className={styles.muted}>{names[part.type] ?? "Working"}</span>;
-  }
+  if (part.state !== "output-available") return null;
   const output = part.output;
   switch (part.type) {
     case "tool-show_contribution_report": {

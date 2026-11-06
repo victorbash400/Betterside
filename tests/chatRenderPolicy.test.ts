@@ -16,7 +16,7 @@ test("the thinking dot stops when the current assistant turn emits text or start
   }
 });
 
-test("chat preserves text around tool results and hides repeated tables and lookups", () => {
+test("chat retains every tool indicator while hiding repeated tables and lookups", () => {
   const table = { kind: "records", total: 1, records: [{ id: "water" }], nextOffset: null };
   const parts = [
     { type: "text", text: "Here is what was reported." },
@@ -28,7 +28,8 @@ test("chat preserves text around tool results and hides repeated tables and look
     { type: "text", text: "Compare the most recent observations." },
     { type: "tool-search_records", state: "output-available", output: { ...table, records: [{ id: "shelter" }] } },
   ] as UIMessage["parts"];
-  assert.deepEqual(visibleChatParts(parts).map(({ index }) => index), [0, 1, 2, 5, 6, 7]);
+  assert.equal(visibleChatParts(parts).length, parts.length);
+  assert.deepEqual(visibleChatParts(parts).filter(({ showResult }) => showResult).map(({ index }) => index), [0, 1, 2, 5, 6, 7]);
 });
 
 test("chat retains approval controls and the newest goal snapshot", () => {
@@ -38,5 +39,6 @@ test("chat retains approval controls and the newest goal snapshot", () => {
     { type: "tool-create_goal", state: "output-available", output: {} },
     { type: "text", text: "Continue in PayPal to approve." },
   ] as UIMessage["parts"];
-  assert.deepEqual(visibleChatParts(parts).map(({ index }) => index), [1, 2, 3]);
+  assert.equal(visibleChatParts(parts).length, parts.length);
+  assert.deepEqual(visibleChatParts(parts).filter(({ showResult }) => showResult).map(({ index }) => index), [1, 2, 3]);
 });

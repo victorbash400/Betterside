@@ -1,10 +1,11 @@
 import type { ChatMessageAction } from "../../lib/chatActions";
 import { showThinkingIndicator, visibleChatParts } from "../../lib/chatRenderPolicy";
 import { goalsResultSchema } from "../../lib/chatGoals";
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import type { UIMessage } from "ai";
 import type { ChatWorkspaceActions } from "../../lib/chatWorkspace";
 import type { MapItem } from "../../lib/types";
+import ToolCallIndicator from "./ToolCallIndicator";
 import ChatToolResult from "./ChatToolResult";
 import ChatLoadingIndicator from "./ChatLoadingIndicator";
 import MessageText from "./MessageText";
@@ -55,20 +56,22 @@ export default function MessageList({
           key={message.id}
           className={message.role === "user" ? styles.user : styles.assistant}
         >
-          {visibleChatParts(message.parts).map(({ part, index }) =>
+          {visibleChatParts(message.parts).map(({ part, index, showResult }) =>
             part.type === "text" ? (
               <MessageText key={index} text={part.text} />
             ) : (
-              <ChatToolResult
-                key={index}
-                part={part}
-                onSelect={onSelect}
-                onMessage={onMessage}
-                actions={actions}
-                busy={busy}
-                onApprove={onApprove}
-                goalNames={goalNames}
-              />
+              <Fragment key={index}>
+                <ToolCallIndicator part={part} busy={busy && message === messages.at(-1)} />
+                {showResult && <ChatToolResult
+                  part={part}
+                  onSelect={onSelect}
+                  onMessage={onMessage}
+                  actions={actions}
+                  busy={busy}
+                  onApprove={onApprove}
+                  goalNames={goalNames}
+                />}
+              </Fragment>
             ),
           )}
         </article>

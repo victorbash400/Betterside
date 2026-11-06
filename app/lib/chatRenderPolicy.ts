@@ -21,18 +21,19 @@ export function visibleChatParts(parts: UIMessage["parts"]) {
     goalTools.has(part.type) && "state" in part && part.state === "output-available",
   );
   const tables = new Set<string>();
-  return parts.flatMap((part, index) => {
+  return parts.map((part, index) => {
+    let showResult = true;
     if ("state" in part && part.state === "output-available") {
-      if (index < latestGoal && goalTools.has(part.type)) return [];
+      if (index < latestGoal && goalTools.has(part.type)) showResult = false;
       if ("output" in part && tableTools.has(part.type)) {
         const output = part.output;
         if (part.type === "tool-search_records" && output && typeof output === "object" &&
-            "presentation" in output && output.presentation === "lookup") return [];
+            "presentation" in output && output.presentation === "lookup") showResult = false;
         const key = JSON.stringify([part.type, output]);
-        if (tables.has(key)) return [];
+        if (tables.has(key)) showResult = false;
         tables.add(key);
       }
     }
-    return [{ part, index }];
+    return { part, index, showResult };
   });
 }
