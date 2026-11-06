@@ -1,7 +1,24 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { UIMessage } from "ai";
-import { showThinkingIndicator, visibleChatParts } from "../app/lib/chatRenderPolicy.ts";
+import { showThinkingIndicator, toolCallStatus, visibleChatParts } from "../app/lib/chatRenderPolicy.ts";
+
+test("only active unfinished tools shimmer, including across approval and cancellation", () => {
+  const part = { type: "tool-manage_goal", toolCallId: "manage" };
+  for (const state of ["input-streaming", "input-available"]) {
+    assert.equal(toolCallStatus({ ...part, state } as UIMessage["parts"][number], true), "running");
+    assert.equal(toolCallStatus({ ...part, state } as UIMessage["parts"][number], false), "stopped");
+  }
+  for (const [state, expected] of [["output-available", "done"], ["output-error", "error"],
+    ["output-denied", "cancelled"], ["approval-requested", "approval"]]) {
+    for (const busy of [true, false]) assert.equal(toolCallStatus({ ...part, state } as UIMessage["parts"][number], busy), expected);
+  }
+  for (const busy of [true, false]) assert.equal(toolCallStatus({ ...part, state: "approval-responded",
+    approval: { id: "approval", approved: false } } as UIMessage["parts"][number], busy), "cancelled");
+  assert.equal(toolCallStatus({ ...part, state: "approval-responded",
+    approval: { id: "approval", approved: true } } as UIMessage["parts"][number], true), "running");
+  assert.equal(toolCallStatus({ type: "text", text: "Answer" }, true), undefined);
+});
 
 test("the thinking dot stops when the current assistant turn emits text or starts a tool", () => {
   const user: UIMessage = { id: "user", role: "user", parts: [{ type: "text", text: "Show a trend" }] };

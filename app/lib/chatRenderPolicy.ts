@@ -8,6 +8,19 @@ const goalTools = new Set([
 ]);
 const tableTools = new Set(["tool-search_records", "tool-search_organizations"]);
 
+export function toolCallStatus(part: UIMessage["parts"][number], busy: boolean) {
+  if (!("toolCallId" in part) || !("state" in part)) return undefined;
+  switch (part.state) {
+    case "output-error": return "error";
+    case "output-available": return "done";
+    case "output-denied": return "cancelled";
+    case "approval-requested": return "approval";
+    case "approval-responded":
+      if (part.approval.approved === false) return "cancelled";
+  }
+  return busy ? "running" : "stopped";
+}
+
 export function showThinkingIndicator(messages: UIMessage[], busy: boolean) {
   if (!busy) return false;
   const latest = messages.at(-1);

@@ -1,5 +1,6 @@
 import { SquareTerminal } from "lucide-react";
 import type { UIMessage } from "ai";
+import { toolCallStatus } from "../../lib/chatRenderPolicy";
 import styles from "./ToolCallIndicator.module.css";
 
 const names: Record<string, string> = {
@@ -34,11 +35,7 @@ export default function ToolCallIndicator({ part, busy }: {
   busy: boolean;
 }) {
   if (!("toolCallId" in part) || !("state" in part)) return null;
-  const status = part.state === "output-error" ? "error"
-    : part.state === "output-available" ? "done"
-    : part.state === "output-denied" ? "cancelled"
-    : part.state === "approval-requested" ? "approval"
-    : busy ? "running" : "stopped";
+  const status = toolCallStatus(part, busy);
   const name = part.type === "dynamic-tool" ? part.toolName.replaceAll("_", " ")
     : names[part.type] ?? part.type.slice(5).replaceAll("_", " ");
   return (
