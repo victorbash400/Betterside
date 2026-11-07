@@ -14,7 +14,7 @@ export const manageGoalInputSchema = z.object({
 });
 export function manageGoalTool(context: WorkspaceToolContext) {
   return tool({
-    description: "Manage an explicitly requested existing goal using exact goal ID and revision from list_goals. Pause/resume/cancel affect its PayPal subscription and require confirmation in chat. Refresh reads current PayPal status and ledger payments without changing billing. Remove deletes an unlocked goal only; it cannot silently cancel an active subscription. Returns current goal cards and authoritative subscription states.",
+    description: "Manage an explicitly requested existing goal using exact goal ID and revision from list_goals. Pause/resume/cancel affect its PayPal subscription and require confirmation in chat. Refresh reads current PayPal status and ledger payments without changing billing. Remove deletes an unlocked goal or discards a pending approval; it cannot silently cancel an active subscription. Returns current goal cards and authoritative subscription states.",
     inputSchema: manageGoalInputSchema,
     outputSchema: goalsResultSchema,
     needsApproval: (input) => input.action !== "refresh",

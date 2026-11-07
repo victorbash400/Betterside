@@ -24,3 +24,8 @@
   flex: 1;
   min-height: 0;
 }
+.error {
+  margin-top: 8px;
+  color: var(--danger);
+  font-size: 12px;
+}

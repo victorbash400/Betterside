@@ -4,7 +4,7 @@ import SettingsRow from "../settings/SettingsRow";
 import SettingsPicker from "../settings/SettingsPicker";
 import LoadingSpinner from "../controls/LoadingSpinner";
 import { useAccount } from "../../state/AccountContext";
-import { subscriptionSchema } from "../../lib/paypalSubscription";
+import { pendingApprovalPath, subscriptionSchema } from "../../lib/paypalSubscription";
 import { subscriptionProjects } from "../../lib/subscriptionSetup";
 import { amountInCents, decimalAmount } from "../../lib/payment";
 import type { ContributionGoal } from "../../lib/profile";
@@ -60,7 +60,7 @@ export default function GoalEditor({
       if (!response.ok)
         throw new Error(body.error ?? "PayPal setup failed. Retry.");
       const record = subscriptionSchema.parse(body.subscription);
-      if (record.approvalUrl) window.location.assign(record.approvalUrl);
+      if (record.approvalUrl) window.location.assign(pendingApprovalPath(record.goalId));
       else {
         onPrepared();
         onClose();

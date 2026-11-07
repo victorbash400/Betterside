@@ -36,11 +36,19 @@ export default function ProfileGoals({
   onContribute: (goal: ContributionGoal) => void;
   onRefresh?: () => void;
 }) {
+  const [deleteError, setDeleteError] = useState("");
   const [view, setView] = useState<View>({ kind: "list" });
   const selected =
     view.kind !== "list"
       ? profile.goals.find((goal) => goal.id === view.id)
       : undefined;
+  async function deleteGoal(id: string) {
+    await onSave({
+      ...profile,
+      goals: profile.goals.filter((goal) => goal.id !== id),
+    });
+    setView({ kind: "list" });
+  }
   if (view.kind === "setup")
     return (
       <GoalSetup
@@ -67,13 +75,7 @@ export default function ProfileGoals({
         saving={busy}
         onBack={() => setView({ kind: "list" })}
         onSetup={() => setView({ kind: "setup", id: selected.id })}
-        onDelete={async () => {
-          await onSave({
-            ...profile,
-            goals: profile.goals.filter((goal) => goal.id !== selected.id),
-          });
-          setView({ kind: "list" });
-        }}
+        onDelete={() => deleteGoal(selected.id)}
       />
     );
   return (
@@ -100,7 +102,19 @@ export default function ProfileGoals({
                 subscription={subscriptions.find(
                   (item) => item.goalId === goal.id,
                 )}
-                onOpen={() => setView({ kind: "detail", id: goal.id })}
+                onOpen={() => {
+                  setDeleteError("");
+                  setView({ kind: "detail", id: goal.id });
+                }}
+                busy={busy}
+                onDelete={async () => {
+                  setDeleteError("");
+                  try {
+                    await deleteGoal(goal.id);
+                  } catch (error) {
+                    setDeleteError(error instanceof Error ? error.message : "Could not delete goal.");
+                  }
+                }}
               />
             ))
           ) : (
@@ -110,6 +124,7 @@ export default function ProfileGoals({
           )}
         </SettingsGroup>
       </div>
+      {deleteError && <span className={styles.error} role="alert">{deleteError}</span>}
     </section>
   );
 }

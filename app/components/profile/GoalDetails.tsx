@@ -62,7 +62,7 @@ export default function GoalDetails({
       await onDelete();
     } catch (failure) {
       setError(
-        failure instanceof Error ? failure.message : "Could not remove goal.",
+        failure instanceof Error ? failure.message : "Could not delete goal.",
       );
     }
   }
@@ -187,6 +187,7 @@ export default function GoalDetails({
           </SettingsRow>
         )}
         <GoalDetailActions
+          name={goal.targetText || goal.category}
           subscription={subscription}
           external={Boolean(goal.organization)}
           busy={busy}

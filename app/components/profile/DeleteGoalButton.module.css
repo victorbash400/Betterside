@@ -1,0 +1,12 @@
+.confirmation {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 0 8px;
+  font-size: 12px;
+}
+.delete {
+  color: var(--danger);
+}

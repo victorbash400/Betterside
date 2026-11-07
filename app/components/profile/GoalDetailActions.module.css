@@ -6,3 +6,8 @@
   font-size: 13px;
   text-underline-offset: 3px;
 }
+.delete {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px;
+}

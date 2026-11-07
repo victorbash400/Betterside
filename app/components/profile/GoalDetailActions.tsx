@@ -1,14 +1,17 @@
+import DeleteGoalButton from "./DeleteGoalButton";
 import { useState } from "react";
 import SettingsRow from "../settings/SettingsRow";
 import SettingsActionRow from "../settings/SettingsActionRow";
 import SettingsInlineButton from "../settings/SettingsInlineButton";
 import {
-  subscriptionLocked,
+  canDeleteGoal,
+  pendingApprovalPath,
   type GoalSubscription,
 } from "../../lib/paypalSubscription";
 import styles from "./GoalDetailActions.module.css";
 
 export default function GoalDetailActions({
+  name,
   subscription,
   external,
   busy,
@@ -16,6 +19,7 @@ export default function GoalDetailActions({
   onDelete,
   onCancel,
 }: {
+  name: string;
   subscription?: GoalSubscription;
   external: boolean;
   busy: boolean;
@@ -24,18 +28,9 @@ export default function GoalDetailActions({
   onCancel: () => Promise<void>;
 }) {
   const [confirming, setConfirming] = useState(false);
-  const locked = Boolean(
-    subscription && subscriptionLocked(subscription.status),
-  );
   const cancellable =
     subscription &&
     ["ACTIVE", "SUSPENDED", "APPROVED"].includes(subscription.status);
-  const label = locked ? "Cancel subscription" : "Remove goal";
-  async function confirm() {
-    if (locked) await onCancel();
-    else await onDelete();
-    setConfirming(false);
-  }
   return (
     <>
       {!subscription && !external && (
@@ -48,7 +43,7 @@ export default function GoalDetailActions({
       {subscription?.status === "APPROVAL_PENDING" &&
         subscription.approvalUrl && (
           <SettingsRow label="Approval">
-            <a className={styles.link} href={subscription.approvalUrl}>
+            <a className={styles.link} href={pendingApprovalPath(subscription.goalId)}>
               Continue in PayPal
             </a>
           </SettingsRow>
@@ -61,9 +56,19 @@ export default function GoalDetailActions({
             </SettingsInlineButton>
           </SettingsRow>
         )}
-      {(!locked || cancellable) &&
+      {canDeleteGoal(subscription) && (
+        <div className={styles.delete}>
+          <DeleteGoalButton
+            name={name}
+            pendingApproval={subscription?.status === "APPROVAL_PENDING"}
+            busy={busy}
+            onDelete={onDelete}
+          />
+        </div>
+      )}
+      {cancellable &&
         (confirming ? (
-          <SettingsRow label={`${label}?`}>
+          <SettingsRow label="Cancel subscription?">
             <SettingsInlineButton
               disabled={busy}
               onClick={() => setConfirming(false)}
@@ -72,9 +77,9 @@ export default function GoalDetailActions({
             </SettingsInlineButton>
             <SettingsInlineButton
               disabled={busy}
-              onClick={() => void confirm()}
+              onClick={() => void onCancel().then(() => setConfirming(false))}
             >
-              {locked ? "Cancel subscription" : "Remove"}
+              Cancel subscription
             </SettingsInlineButton>
           </SettingsRow>
         ) : (
@@ -82,7 +87,7 @@ export default function GoalDetailActions({
             disabled={busy}
             onClick={() => setConfirming(true)}
           >
-            <span className={styles.danger}>{label}</span>
+            <span className={styles.danger}>Cancel subscription</span>
           </SettingsActionRow>
         ))}
     </>

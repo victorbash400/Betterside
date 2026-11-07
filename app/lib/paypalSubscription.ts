@@ -38,3 +38,12 @@ export type GoalSubscription = z.infer<typeof subscriptionSchema>;
 export function subscriptionLocked(status: GoalSubscription["status"]) {
   return !["CANCELLED", "EXPIRED"].includes(status);
 }
+
+export function canDeleteGoal(subscription?: GoalSubscription) {
+  return !subscription || subscription.status === "APPROVAL_PENDING" ||
+    !subscriptionLocked(subscription.status);
+}
+
+export function pendingApprovalPath(goalId: string) {
+  return `/api/paypal/subscriptions?${new URLSearchParams({ goalId, approve: "1" })}`;
+}

@@ -1,9 +1,13 @@
-import { assertSubscriptionEditable } from "./subscriptionStore.ts";
+import {
+  assertSubscriptionEditable,
+  discardPendingSubscription,
+} from "./subscriptionStore.ts";
 import "server-only";
 import {
   GetCommand,
   PutCommand,
   TransactWriteCommand,
+  type TransactWriteCommandInput,
 } from "@aws-sdk/lib-dynamodb";
 import { database, requireTable } from "./aws.ts";
 import {
@@ -36,21 +40,26 @@ export async function saveProfile(
   const previous = await loadProfile(donor);
   if (previous.revision !== revision)
     throw new Error("Profile changed in another tab. Reload to review.");
-  await Promise.all(
-    previous.profile.goals.map(async (existing) => {
-      const goal = input.goals.find((item) => item.id === existing.id);
-      if (
-        goal &&
-        goal.targetCents === existing.targetCents &&
-        goal.period === existing.period &&
-        (goal.status ?? "active") === (existing.status ?? "active") &&
-        goal.organization?.id === existing.organization?.id &&
-        goal.projectId === existing.projectId &&
-        goal.category === existing.category
-      )
-        return;
-      await assertSubscriptionEditable(donor, existing.id);
-    }),
+  const changed = previous.profile.goals.filter((existing) => {
+    const goal = input.goals.find((item) => item.id === existing.id);
+    return (
+      !goal ||
+      goal.targetCents !== existing.targetCents ||
+      goal.period !== existing.period ||
+      (goal.status ?? "active") !== (existing.status ?? "active") ||
+      goal.organization?.id !== existing.organization?.id ||
+      goal.projectId !== existing.projectId ||
+      goal.category !== existing.category
+    );
+  });
+  const discarded = await Promise.all(
+    changed.map((goal) =>
+      assertSubscriptionEditable(
+        donor,
+        goal.id,
+        !input.goals.some((item) => item.id === goal.id),
+      ),
+    ),
   );
   const organizations = input.goals.some(
     (goal) =>
@@ -160,37 +169,29 @@ export async function saveProfile(
       ? {}
       : { ExpressionAttributeValues: { ":revision": revision } }),
   };
-  const changed = previous.profile.goals.filter((existing) => {
-    const goal = input.goals.find((item) => item.id === existing.id);
-    return (
-      !goal ||
-      goal.targetCents !== existing.targetCents ||
-      goal.period !== existing.period ||
-      (goal.status ?? "active") !== (existing.status ?? "active") ||
-      goal.organization?.id !== existing.organization?.id ||
-      goal.projectId !== existing.projectId ||
-      goal.category !== existing.category
-    );
-  });
   if (changed.length) {
     await database.send(
       new TransactWriteCommand({
         TransactItems: [
           { Put: write },
-          ...changed.map((goal) => ({
-            ConditionCheck: {
-              TableName: requireTable(),
-              Key: { pk: `DONOR#${donor}`, sk: `SUBSCRIPTION#${goal.id}` },
-              ConditionExpression:
-                "(attribute_not_exists(creatingUntil) OR creatingUntil < :now) AND (attribute_not_exists(#id) OR #status IN (:cancelled,:expired))",
-              ExpressionAttributeNames: { "#id": "id", "#status": "status" },
-              ExpressionAttributeValues: {
-                ":now": Date.now(),
-                ":cancelled": "CANCELLED",
-                ":expired": "EXPIRED",
+          ...changed.flatMap<NonNullable<TransactWriteCommandInput["TransactItems"]>[number]>((goal, index) => {
+            const pending = discarded[index];
+            if (pending) return discardPendingSubscription(pending);
+            return [{
+              ConditionCheck: {
+                TableName: requireTable(),
+                Key: { pk: `DONOR#${donor}`, sk: `SUBSCRIPTION#${goal.id}` },
+                ConditionExpression:
+                  "(attribute_not_exists(creatingUntil) OR creatingUntil < :now) AND (attribute_not_exists(#id) OR #status IN (:cancelled,:expired))",
+                ExpressionAttributeNames: { "#id": "id", "#status": "status" },
+                ExpressionAttributeValues: {
+                  ":now": Date.now(),
+                  ":cancelled": "CANCELLED",
+                  ":expired": "EXPIRED",
+                },
               },
-            },
-          })),
+            }];
+          }),
         ],
       }),
     );

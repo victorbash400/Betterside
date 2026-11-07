@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { database, requireTable } from "./aws.ts";
-import { paypalRequest } from "./paypal.ts";
+import { PayPalRequestError, paypalRequest } from "./paypal.ts";
 import { loadProfile } from "./profile.ts";
 import { loadCatalogue } from "./catalogue.ts";
 import { goalMatchesProject } from "../lib/profile.ts";
@@ -39,12 +39,17 @@ export function refreshSubscription(record: StoredSubscription) {
   refreshing.set(record.id, request);
   return request;
 }
-async function readSubscription(record: StoredSubscription) {
-  const details = detailsSchema.parse(
-    await paypalRequest(
-      `/v1/billing/subscriptions/${encodeURIComponent(record.id)}`,
-    ),
+async function readSubscription(record: StoredSubscription, canCancel = true): Promise<StoredSubscription> {
+  const path = `/v1/billing/subscriptions/${encodeURIComponent(record.id)}`;
+  const details = await paypalRequest(path).then(
+    (response) => detailsSchema.parse(response),
+    (error: unknown) => {
+      if (record.discarded && record.status === "APPROVAL_PENDING" &&
+        error instanceof PayPalRequestError && error.status === 404) return null;
+      throw error;
+    },
   );
+  if (!details) return record;
   if (
     details.id !== record.id ||
     (details.plan_id !== record.planId &&
@@ -57,6 +62,11 @@ async function readSubscription(record: StoredSubscription) {
   );
   const terminal =
     details.status === "CANCELLED" || details.status === "EXPIRED";
+  if (record.discarded && !terminal && details.status !== "APPROVAL_PENDING") {
+    if (!canCancel) throw new Error("PayPal has not confirmed cancellation of the deleted goal.");
+    await paypalRequest(`${path}/cancel`, { reason: "Goal deleted before PayPal approval." });
+    return readSubscription(record, false);
+  }
   const next = {
     ...record,
     planId: details.plan_id,
@@ -75,6 +85,7 @@ async function readSubscription(record: StoredSubscription) {
     next.approvalUrl !== record.approvalUrl ||
     (terminal && Boolean(record.pendingChange));
   const stored = changed ? await storeSubscription(next) : record;
+  if (stored.discarded) return stored;
   const current = await goalSubscription(record.owner, record.goalId);
   if (current && current.id !== record.id) return stored;
   {
@@ -218,6 +229,7 @@ export async function createSubscription(
   if (!process.env.PAYPAL_WEBHOOK_ID)
     throw new Error("Configure the PayPal subscription webhook first.");
   const current = await goalSubscription(owner, goalId);
+  if (current?.discarded) throw new Error("This goal was deleted. Create a new goal.");
   if (current && subscriptionLocked(current.status))
     return refreshSubscription(current);
   const goal = (await loadProfile(owner)).profile.goals.find(

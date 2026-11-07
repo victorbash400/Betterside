@@ -1,6 +1,11 @@
 import "server-only";
 import { z } from "zod";
 const base = "https://api-m.sandbox.paypal.com";
+export class PayPalRequestError extends Error {
+  constructor(readonly status: number) {
+    super(`PayPal request failed (${status}).`);
+  }
+}
 async function paypalFetch(path: string, options: RequestInit) {
   try {
     return await fetch(`${base}${path}`, {
@@ -48,7 +53,7 @@ export async function paypalRequest(
   });
   if (response.status === 204 && response.ok) return {};
   if (!response.ok)
-    throw new Error(`PayPal request failed (${response.status}).`);
+    throw new PayPalRequestError(response.status);
   return paypalJson(response);
 }
 async function paypalJson(response: Response) {

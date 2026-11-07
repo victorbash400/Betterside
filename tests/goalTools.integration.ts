@@ -255,6 +255,38 @@ test("subscription setup, reapproval, lifecycle and mixed-price payments use rea
     assert.equal((await loadProfile(donor)).profile.goals.length, 0);
     await reconcileDonorSubscriptions(donor);
     assert.equal((await contributions(donor)).length, 2);
+
+    subscriptionId = `I-${randomUUID().slice(0, 12)}`;
+    subscriptionIds.push(subscriptionId);
+    providerPlan = "P-revised";
+    transactions.length = 0;
+    providerStatus = "APPROVAL_PENDING";
+    const beforePending = await loadProfile(donor);
+    await create.execute!({ ...input, revision: beforePending.revision }, {
+      ...options,
+      toolCallId: "qa-discard-pending",
+    });
+    const pendingProfile = await loadProfile(donor);
+    const removed = goalsResultSchema.parse(await manageGoalTool(context).execute!({
+      goalId,
+      revision: pendingProfile.revision,
+      action: "remove",
+    }, options));
+    assert.equal(removed.goals.length, 0);
+    const discarded = await goalSubscription(donor, goalId);
+    assert.equal(discarded?.discarded, true);
+    assert.equal(discarded?.approvalUrl, null);
+    assert.equal(discarded?.status, "APPROVAL_PENDING");
+
+    providerStatus = "ACTIVE";
+    await handleSubscriptionWebhook({
+      id: `late-approval-${subscriptionId}`,
+      event_type: "BILLING.SUBSCRIPTION.ACTIVATED",
+      resource: { id: subscriptionId },
+    });
+    assert.equal((await goalSubscription(donor, goalId))?.status, "CANCELLED");
+    assert.equal((await loadProfile(donor)).profile.goals.length, 0);
+
   } finally {
     globalThis.fetch = originalFetch;
     const ledger = await contributions(donor);

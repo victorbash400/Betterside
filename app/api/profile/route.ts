@@ -37,7 +37,7 @@ export async function PUT(request: Request) {
   } catch (failure) {
     return apiError(
       failure instanceof Error &&
-        failure.name === "ConditionalCheckFailedException"
+        ["ConditionalCheckFailedException", "TransactionCanceledException"].includes(failure.name)
         ? new Error("Profile changed in another tab. Reload to review.")
         : failure,
     );

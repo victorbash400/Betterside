@@ -8,6 +8,7 @@ import { z } from "zod";
 import { database, requireTable } from "./aws.ts";
 import { subscriptionSchema } from "../lib/paypalSubscription.ts";
 export const storedSubscriptionSchema = subscriptionSchema.extend({
+  discarded: z.literal(true).optional(),
   version: z.number().int().nonnegative().default(0),
   pendingPlanId: z.string().optional(),
   owner: z.string(),
@@ -113,6 +114,7 @@ export async function storeSubscription(value: StoredSubscription) {
 export async function assertSubscriptionEditable(
   owner: string,
   goalId: string,
+  deleting = false,
 ) {
   const result = await database.send(
     new GetCommand({
@@ -123,6 +125,10 @@ export async function assertSubscriptionEditable(
   );
   const item = result.Item;
   if (
+    deleting && item?.id && item.status === "APPROVAL_PENDING" &&
+    Number(item.creatingUntil ?? 0) <= Date.now()
+  ) return storedSubscriptionSchema.parse(item);
+  if (
     item &&
     (Number(item.creatingUntil ?? 0) > Date.now() ||
       (item.id && !["CANCELLED", "EXPIRED"].includes(item.status)))
@@ -130,4 +136,31 @@ export async function assertSubscriptionEditable(
     throw new Error(
       "Cancel the PayPal subscription before changing billing or deleting this goal.",
     );
+}
+
+// Both copies must keep the discarded marker for PayPal return and webhook handling.
+export function discardPendingSubscription(pending: StoredSubscription) {
+  return [
+    { pk: `DONOR#${pending.owner}`, sk: `SUBSCRIPTION#${pending.goalId}` },
+    { pk: `SUBSCRIPTION#${pending.id}`, sk: "META" },
+  ].map((Key) => ({
+    Update: {
+      TableName: requireTable(),
+      Key,
+      UpdateExpression: "SET discarded = :discarded, approvalUrl = :empty, #version = :next",
+      ConditionExpression:
+        "#id = :id AND #status = :pending AND (#version = :version OR (attribute_not_exists(#version) AND :version = :zero)) AND (attribute_not_exists(creatingUntil) OR creatingUntil <= :now)",
+      ExpressionAttributeNames: { "#id": "id", "#status": "status", "#version": "version" },
+      ExpressionAttributeValues: {
+        ":id": pending.id,
+        ":pending": "APPROVAL_PENDING",
+        ":version": pending.version,
+        ":zero": 0,
+        ":next": pending.version + 1,
+        ":now": Date.now(),
+        ":discarded": true,
+        ":empty": null,
+      },
+    },
+  }));
 }

@@ -15,15 +15,24 @@ export async function GET(request: Request) {
   try {
     const owner = await donorSession();
     if (!owner) throw new Error("Session unavailable. Return to BetterSide.");
+    const query = new URL(request.url).searchParams;
     const goalId = z
       .string()
       .min(1)
       .max(100)
-      .parse(new URL(request.url).searchParams.get("goalId"));
+      .parse(query.get("goalId"));
     const current = await goalSubscription(owner, goalId);
-    const record = current;
+    const record = current && !current.discarded ? subscriptionSchema.parse(current) : null;
+    if (query.get("approve") === "1") {
+      if (record?.status !== "APPROVAL_PENDING" || !record.approvalUrl)
+        return apiError(new Error("This PayPal approval is no longer available."), 404);
+      return new Response(null, {
+        status: 303,
+        headers: { Location: record.approvalUrl, "Cache-Control": "no-store" },
+      });
+    }
     return Response.json(
-      { subscription: record ? subscriptionSchema.parse(record) : null },
+      { subscription: record },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
@@ -103,5 +112,6 @@ async function refreshGoalSubscription(owner: string, goalId: string) {
   const current = await refreshSubscription(stored);
   if (current.status !== "APPROVAL_PENDING")
     await syncSubscriptionPayments(current);
+  if (current.discarded) throw new Error("This goal was deleted.");
   return current;
 }

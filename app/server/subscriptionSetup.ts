@@ -22,6 +22,7 @@ export async function setupSubscription(
     );
   const input = parsed.data;
   const current = await goalSubscription(owner, input.goalId);
+  if (current?.discarded) throw new Error("This goal was deleted. Create a new goal.");
   if (current && subscriptionLocked(current.status)) {
     if (
       current.projectId !== input.projectId ||
