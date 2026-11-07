@@ -1,5 +1,6 @@
 import type { MapItem } from "./types.ts";
 import type { Measurement } from "./measurements.ts";
+import { womenRightsTopic } from "./organizations.ts";
 export const concerns = [
   {
     id: "war",
@@ -55,6 +56,13 @@ export const concerns = [
     label: "Health needs",
     color: "#a36191",
     unit: "People needing health assistance",
+    metric: "people-in-need",
+  },
+  {
+    id: "womens-rights",
+    label: womenRightsTopic,
+    color: "#97658b",
+    unit: "People needing gender-based violence response",
     metric: "people-in-need",
   },
   {
@@ -187,6 +195,8 @@ export function matchesConcern(item: MapItem, id: ConcernId) {
       return item.kind === "Water";
     case "health":
       return item.kind === "Health" && !categories.includes("disease");
+    case "womens-rights":
+      return categories.includes("womens-rights");
     case "floods":
       return categories.includes("flood-response");
     case "fires":

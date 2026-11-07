@@ -11,6 +11,7 @@ const datasetsByConcern: Record<string, HapiDataset[]> = {
   famine: ["hapi-famine"],
   water: ["hapi-needs"],
   health: ["hapi-needs"],
+  "womens-rights": ["hapi-needs"],
   needs: ["hapi-needs"],
   shelter: ["hapi-needs"],
   displacement: ["hapi-idps"],

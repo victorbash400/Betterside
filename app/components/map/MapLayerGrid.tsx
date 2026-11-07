@@ -1,40 +1,24 @@
 import { useMemo } from "react";
 import type { ColDef } from "ag-grid-community";
-import MapLayerSelectionCell from "./MapLayerSelectionCell";
 import DataGrid from "../grid/DataGrid";
 
-export interface MapLayerRow {
-  id: string;
+interface MapLayerRow<Id extends string> {
+  id: Id;
   label: string;
   count?: number;
 }
-export default function MapLayerGrid({
+export default function MapLayerGrid<Id extends string>({
   rows,
   selected,
-  onToggle,
+  onChange,
 }: {
-  rows: MapLayerRow[];
-  selected: string[];
-  onToggle: (id: string) => void;
+  rows: MapLayerRow<Id>[];
+  selected: Id[];
+  onChange: (ids: Id[]) => void;
 }) {
   const hasCounts = rows.some((row) => row.count !== undefined);
-  const columns = useMemo<ColDef<MapLayerRow>[]>(
+  const columns = useMemo<ColDef<MapLayerRow<Id>>[]>(
     () => [
-      {
-        colId: "selection",
-        headerName: "",
-        width: 32,
-        minWidth: 32,
-        maxWidth: 32,
-        sortable: false,
-        filter: false,
-        resizable: false,
-        suppressMovable: true,
-        cellStyle: { padding: "0", justifyContent: "center" },
-        valueGetter: ({ data }) => Boolean(data && selected.includes(data.id)),
-        cellRenderer: MapLayerSelectionCell,
-        cellRendererParams: { onToggle },
-      },
       {
         field: "label",
         headerName: "Cause",
@@ -55,7 +39,7 @@ export default function MapLayerGrid({
           ]
         : []),
     ],
-    [hasCounts, selected, onToggle],
+    [hasCounts],
   );
   return (
     <DataGrid
@@ -65,7 +49,7 @@ export default function MapLayerGrid({
       columns={columns}
       selectedIds={selected}
       rowHeight={32}
-      onOpen={(row) => onToggle(row.id)}
+      onSelectionChange={(rows) => onChange(rows.map((row) => row.id))}
     />
   );
 }

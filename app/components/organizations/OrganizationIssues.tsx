@@ -59,13 +59,7 @@ export default function OrganizationIssues({
       <MapLayerGrid
         rows={topics.map((topic) => ({ id: topic, label: topic }))}
         selected={value}
-        onToggle={(topic) =>
-          onChange(
-            value.includes(topic)
-              ? value.filter((entry) => entry !== topic)
-              : [...value, topic],
-          )
-        }
+        onChange={onChange}
       />
       <button className={styles.settings} onClick={onSettings}>
         <SlidersHorizontal size={14} />

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { MapItem, IssueKind } from "../types.ts";
 import type { Measurement } from "../measurements.ts";
+import { sectorTopics, womenRightsTopic } from "../organizations.ts";
 import { countryIndex, feedDate, type Country } from "./shared.ts";
 export type HapiDataset =
   | "hapi-needs"
@@ -167,15 +168,17 @@ export function hapiIndicators(
       if (row.category !== "" || row.population_status !== "INN") continue;
       kind = sectorKinds[row.sector_code] ?? "Humanitarian needs";
       category =
-        kind === "Water"
-          ? "water"
-          : kind === "Hunger"
-            ? "food-security"
-            : kind === "Health"
-              ? "health"
-              : kind === "Displacement"
-                ? "displacement"
-                : "humanitarian-needs";
+        sectorTopics[row.sector_code]?.includes(womenRightsTopic)
+          ? "womens-rights"
+          : kind === "Water"
+            ? "water"
+            : kind === "Hunger"
+              ? "food-security"
+              : kind === "Health"
+                ? "health"
+                : kind === "Displacement"
+                  ? "displacement"
+                  : "humanitarian-needs";
       detail = row.sector_name ?? row.sector_code;
       dimensions = [row.sector_code, row.category, row.population_status];
       measurements.push({ metric: "people-in-need", value: row.population });

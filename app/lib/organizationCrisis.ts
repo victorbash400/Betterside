@@ -7,6 +7,7 @@ import {
 } from "./concerns.ts";
 import {
   organizationMapScope,
+  womenRightsTopic,
   type DirectoryOrganization,
 } from "./organizations.ts";
 import type { MapGeography } from "./mapGeography.ts";
@@ -16,6 +17,7 @@ import { organizationCoverageGeometry } from "./organizationCoverage.ts";
 import { pointInArea } from "./pointInArea.ts";
 
 export const organizationCrisisMeasures: Record<string, ConcernId[]> = {
+  [womenRightsTopic]: ["womens-rights"],
   Health: ["health", "disease"],
   Hunger: ["hunger", "famine"],
   Water: ["water"],

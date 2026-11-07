@@ -7,6 +7,7 @@ import { sourceUrlIdentity, feedDate } from "../app/lib/feeds/shared.ts";
 import { trackingSchema } from "../app/lib/tracking.ts";
 import { searchRecords } from "../app/lib/researchRecords.ts";
 import { formatDate } from "../app/lib/dates.ts";
+import { matchesConcern } from "../app/lib/concerns.ts";
 import type { MapItem } from "../app/lib/types.ts";
 const reviewed = "2026-10-28T00:00:00Z";
 const countries = [{ id: 1, iso3: "TST", name: "Test country", centroid: { type: "Point" as const, coordinates: [10, 20] as [number, number] }, is_deprecated: false, record_type: 1 }];
@@ -32,6 +33,15 @@ test("IPC combined phase is never added to phases or projections", () => {
   assert.equal(result.issues.length, 1);
   assert.ok(result.issues[0].summary.startsWith("100 people"));
   assert.equal(result.issues[0].severity, "Insufficient data");
+});
+test("the women's rights cause includes reported GBV needs and excludes general protection totals", () => {
+  const row = { ...base, category: "", population_status: "INN", population: 100 };
+  const { issues } = indicators("hapi-needs", [
+    { ...row, sector_code: "PRO-GBV", sector_name: "Gender Based Violence" },
+    { ...row, sector_code: "PRO", sector_name: "Protection" },
+  ]);
+  assert.deepEqual(issues.filter((issue) => matchesConcern(issue, "womens-rights")).map((issue) => issue.location),
+    ["Test country · Gender Based Violence"]);
 });
 test("conflict categories and displacement operations stay separate", () => {
   const conflict = { ...base, event_type: "political_violence", events: 4, fatalities: 1 };

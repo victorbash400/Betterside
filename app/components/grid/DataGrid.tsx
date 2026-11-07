@@ -28,10 +28,11 @@ const rowSelection = {
 
 const multipleSelection = {
   mode: "multiRow" as const,
-  checkboxes: false,
   headerCheckbox: false,
-  enableClickSelection: false,
+  enableClickSelection: true,
+  enableSelectionWithoutKeys: true,
 };
+const selectionColumnDef = { width: 36, minWidth: 36, maxWidth: 36 };
 function syncSelection<T>(api: GridApi<T> | undefined, ids: Set<string>) {
   api?.forEachNode((node) =>
     node.setSelected(Boolean(node.id && ids.has(node.id))),
@@ -48,6 +49,7 @@ export default function DataGrid<T extends { id: string }>({
   emptyMessage = "Adjust filters to view records.",
   selected,
   selectedIds,
+  onSelectionChange,
   onOpen,
   onContextMenu,
 }: {
@@ -60,7 +62,8 @@ export default function DataGrid<T extends { id: string }>({
   emptyMessage?: string;
   selected?: string;
   selectedIds?: string[];
-  onOpen: (row: T) => void;
+  onSelectionChange?: (rows: T[]) => void;
+  onOpen?: (row: T) => void;
   onContextMenu?: (row: T, event: MouseEvent) => void;
 }) {
   const [ready, setReady] = useState(false);
@@ -106,6 +109,15 @@ export default function DataGrid<T extends { id: string }>({
           defaultColDef={defaultColDef}
           getRowId={({ data }) => data.id}
           rowSelection={selectedIds ? multipleSelection : rowSelection}
+          selectionColumnDef={selectedIds ? selectionColumnDef : undefined}
+          onSelectionChanged={({ api, source }) => {
+            if (
+              source === "checkboxSelected" || source === "rowClicked" ||
+              source === "spaceKey" || source === "keyboardSelectAll"
+            ) {
+              onSelectionChange?.(api.getSelectedRows());
+            }
+          }}
           pagination
           paginationPageSize={100}
           scrollbarWidth={8}
@@ -136,7 +148,7 @@ export default function DataGrid<T extends { id: string }>({
               event.target.closest("button,a,input")
             )
               return;
-            if (data) onOpen(data);
+            if (data) onOpen?.(data);
           }}
           onCellKeyDown={({ data, event }) => {
             if (
@@ -146,6 +158,7 @@ export default function DataGrid<T extends { id: string }>({
               return;
             if (
               data &&
+              onOpen &&
               event instanceof KeyboardEvent &&
               (event.key === "Enter" || event.key === " ")
             ) {
