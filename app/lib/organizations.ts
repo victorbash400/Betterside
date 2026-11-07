@@ -1,6 +1,7 @@
 import { z } from "zod";
+export const womenRightsTopic = "Women's rights";
 export const organizationTopics = [
-  "Women's rights",
+  womenRightsTopic,
   "Health",
   "Hunger",
   "Water",
@@ -102,16 +103,19 @@ export const defaultOrganizationFilters: OrganizationFilters = {
   type: "",
   donation: "",
 };
+function normalizeOrganizationSearch(value: string) {
+  return value.trim().toLocaleLowerCase().replaceAll("'", "").replaceAll("’", "");
+}
 export function filterOrganizations(
   organizations: DirectoryOrganization[],
   filters: OrganizationFilters,
 ) {
-  const query = filters.query.trim().toLocaleLowerCase();
+  const query = normalizeOrganizationSearch(filters.query);
   return organizations.filter(
     (org) =>
       (!query ||
         [org.name, org.acronym, org.description ?? "", ...org.topics].some(
-          (value) => value.toLocaleLowerCase().includes(query),
+          (value) => normalizeOrganizationSearch(value).includes(query),
         )) &&
       (!filters.country ||
         org.presence.some((area) => area.country === filters.country)) &&

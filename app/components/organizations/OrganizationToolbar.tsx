@@ -25,7 +25,6 @@ export default function OrganizationToolbar({
   mapView,
   onMapView,
   showMap,
-  selected,
   overlay,
   onOverlay,
   datasets,
@@ -43,7 +42,6 @@ export default function OrganizationToolbar({
   mapView: MapViewSettings;
   onMapView: (value: MapViewSettings) => void;
   showMap: boolean;
-  selected?: DirectoryOrganization;
   overlay: OverlaySettings;
   onOverlay: (value: OverlaySettings) => void;
   datasets: DatasetSelection;
@@ -67,7 +65,7 @@ export default function OrganizationToolbar({
       />
       <OrganizationCauseControl
         value={filters.topics}
-        options={organizationCauseTopics(selected)}
+        options={organizationCauseTopics()}
         onChange={(topics) => onChange({ ...filters, topics })}
       />
       <ViewSettingsControl

@@ -95,6 +95,11 @@ test("organization filtering combines verified topic, country, type, donation av
     0,
   );
 });
+test("organization search finds women's rights with straight, curly, or omitted apostrophes", () => {
+  for (const query of ["women's rights", "women’s rights", "womens rights"]) {
+    assert.deepEqual(filterOrganizations([base], { ...defaultOrganizationFilters, query }), [base]);
+  }
+});
 test("IATI identity is retained and headquarters is never used as operating presence or donation authority", () => {
   const [org] = iatiOrganizations({
     count: 1,

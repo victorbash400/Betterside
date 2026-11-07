@@ -35,6 +35,7 @@ import type { InterestAction } from "../../lib/interestActions";
 import type { MapItem } from "../../lib/types";
 import { concerns, type OverlaySettings } from "../../lib/concerns";
 import { defaultDiscoveryFilters } from "../../lib/discoveryFilters";
+import { defaultOrganizationFilters } from "../../lib/organizations";
 import { useOrganizationCrisisMap } from "../../state/useOrganizationCrisisMap";
 import styles from "./Workspace.module.css";
 const InterestContents = dynamic(
@@ -94,6 +95,19 @@ export default function Workspace() {
   function selectOrganization(id?: string) {
     organizations.select(id);
     state.setSelectedId(undefined);
+  }
+  function browseOrganizationTopic(topic: string) {
+    organizations.select(undefined);
+    updateOrganizations({
+      ...defaultOrganizationFilters,
+      country: state.discoveryFilters.country,
+      topics: [topic],
+    });
+    setChatContext(undefined);
+    state.setFilters({ ...state.filters, query: "" });
+    state.setSelectedInterestId(undefined);
+    state.setView("Organizations");
+    state.setCollectionMode("list");
   }
   const [organizationCountry, setOrganizationCountry] = useState<{
     code: string;
@@ -347,7 +361,6 @@ export default function Workspace() {
           >
             {state.view === "Organizations" && (
               <OrganizationToolbar
-                selected={organizations.organization}
                 overlay={crisis.overlay}
                 onOverlay={changeOrganizationOverlay}
                 datasets={state.datasets}
@@ -539,6 +552,7 @@ export default function Workspace() {
                     items={state.availableRecords}
                     mapView={state.collectionMode === "map"}
                     onChange={state.setOverlay}
+                    onBrowseOrganizationTopic={browseOrganizationTopic}
                   />
                 )}
 

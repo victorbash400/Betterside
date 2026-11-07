@@ -1,7 +1,7 @@
-import { X } from "lucide-react";
+import { Building2, SlidersHorizontal, X } from "lucide-react";
 import IconButton from "../controls/IconButton";
 import { useMemo, useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import { womenRightsTopic } from "../../lib/organizations";
 import {
   concerns,
   matchesConcern,
@@ -21,6 +21,7 @@ export default function MapTools({
   items,
   mapView,
   onChange,
+  onBrowseOrganizationTopic,
 }: {
   open: boolean;
   onClose: () => void;
@@ -29,6 +30,7 @@ export default function MapTools({
   items: MapItem[];
   mapView: boolean;
   onChange: (value: OverlaySettings) => void;
+  onBrowseOrganizationTopic: (topic: string) => void;
 }) {
   const [settings, setSettings] = useState(false);
   const counts = useMemo(
@@ -94,6 +96,14 @@ export default function MapTools({
             })
           }
         />
+        <button
+          className={styles.settings}
+          onClick={() => onBrowseOrganizationTopic(womenRightsTopic)}
+          title="Browse women's rights organizations"
+        >
+          <Building2 size={15} aria-hidden="true" />
+          {womenRightsTopic}
+        </button>
         <button
           className={styles.settings}
           onClick={() => setSettings(true)}
