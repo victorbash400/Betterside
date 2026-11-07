@@ -4,6 +4,7 @@ node_modules/
 !.env.example
 *.md
 *.MD
+!/README.md
 look and feel/
 .qa/
 *.tsbuildinfo
@@ -11,3 +12,9 @@ look and feel/
 
 .vercel/
 .vercel
+
+/devpost-assets/
+/voicoversctipt.md
+/demo-script.txt
+/public/images/welcome/
+/public/BetterSide Community Welcome Screen.png
