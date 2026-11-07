@@ -13,44 +13,78 @@
 
 BetterSide is a humanitarian research and giving workspace for people deciding where to help. Explore reported needs on a globe, inspect the underlying observations in AG Grid, and look up organizations by country and sector. When you choose an eligible project, BetterSide connects your monthly contribution goal to PayPal Sandbox and brings the subscription status back into the workspace.
 
+<table width="100%">
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Explore reported needs</h3>
+      <p>Browse the globe by country and cause. Open a record to see the measure, assessment period, and original source.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>Compare observations</h3>
+      <p>Ask chat for a historical series, view it in AG Charts, and inspect or export the underlying rows in AG Grid.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Find organizations</h3>
+      <p>Search by country or sector to see where organizations report working. Save a place, cause, or organization to revisit.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>Manage recurring support</h3>
+      <p>Set up a monthly goal through PayPal Sandbox. Check the billing schedule in Goals and review recorded payments in AG Studio.</p>
+    </td>
+  </tr>
+</table>
+
 ## System overview
 
 Next.js routes normalize records from HDX HAPI and hazard and emergency feeds. MapLibre draws the map. AWS Bedrock powers a chat assistant that uses typed tools to query the catalogue, load trends, and prepare contribution goals. Cognito handles sign-in. DynamoDB stores goals, subscription state, contribution records, and shared public feed data.
 
-```mermaid
-flowchart TD
-    Feeds["Humanitarian and hazard feeds"] --> Adapters["Next.js data adapters"]
-    Adapters --> Globe["Globe and organization directory"]
-    Adapters --> Chat["Bedrock chat tools"]
-    Adapters --> Grid["AG Grid and AG Charts"]
-    Chat --> Grid
-    Chat --> Goals["Goals and eligible projects"]
-    Goals --> PayPal["PayPal Sandbox"]
-    PayPal --> Ledger["DynamoDB subscription state and payment ledger"]
-    Ledger --> Studio["Contributions and AG Studio"]
-```
+![BetterSide architecture from source data to the globe, AG Grid, PayPal, and contribution reporting](docs/images/architecture-betterside.png)
 
 ## Explore and compare humanitarian data
 
+### Globe and organization directory
+
 Choose a country and cause on the globe, open a record, and check its measure, reporting period, and source. Search the organization directory by place or sector and pin items for later. HDX HAPI supplies indicators such as IPC food insecurity, IOM internal displacement, and OCHA appeal funding. USGS, GDACS, NASA EONET, and IFRC GO supply hazard and emergency records.
 
-In the demo, open the Hunger record for Palestine and ask chat how food insecurity in Gaza has changed. AG Charts plots the returned IPC series. Switch to **Compare data** and expand the series in AG Grid to see the count, assessment dates, and source for each observation. The grid can export the data to Excel. The full **Records** table also lets you sort and filter the catalogue by fields such as cause, value, and reference date.
+The globe shows event coordinates for individual incidents and area summaries for records reported at country or district level. The Organizations directory shows reported operating areas and sectors. A saved pin can reopen a country and cause together, an organization, or an individual record.
+
+![Humanitarian needs map with the cause filter and a source record open](docs/images/humanitarian-needs-map.jpg)
+
+### Records, trends, and chat
+
+The **Records** table uses AG Grid to sort and filter the catalogue by fields such as cause, value, and reference date. Chat can use the selected record to answer a follow-up about its measure or retrieve the associated historical series. The assistant calls tools with structured inputs, and the application renders the returned records and measurements beside the answer.
+
+![AG Grid records table with measures, reference dates, and geography](docs/images/ag-grid-humanitarian-records.jpg)
+
+AG Charts plots the dated observations. In **Compare data**, AG Grid lets you group series, expand them to inspect the underlying observations, and export them to Excel. BetterSide keeps the source, population, geography, and unit attached to each series. For example, an IOM internal displacement series and a UNHCR refugee series stay separate because they measure different populations.
+
+![Chat showing an AG Charts time series alongside the source record](docs/images/chat-food-insecurity-trends.jpg)
+
+![AG Grid and AG Charts architecture for source records and AG Studio contribution reports](docs/images/architecture-ag-grid.png)
+
+### Source updates and coverage
+
+Each observation keeps its assessment period separate from the publisher's update date. Trends use the period the measurement describes. The history request uses the selected country, cause, or record to retrieve relevant observations. Shared caching lets requests reuse provider responses, and the interface surfaces source failures where they affect the results.
 
 ## Set up a monthly contribution
 
 Choose an eligible project and confirm the monthly amount in Goals or chat. BetterSide uses the PayPal Subscriptions API to create the billing plan and associate the subscription with the goal. You review and authorize recurring billing on PayPal. BetterSide verifies the returned subscription against the stored plan and goal, then displays its status and next billing date. The goal has controls to pause, resume, or cancel.
 
-```mermaid
-flowchart TD
-    Goal["Project and monthly amount"] --> Plan["Create PayPal plan and link subscription to goal"]
-    Plan --> Approval["Authorize on PayPal"]
-    Approval --> Verify["Verify subscription, plan, and goal"]
-    Verify --> Status["Goals shows status and next billing date"]
-    Events["PayPal webhooks and transaction refresh"] --> Ledger["Record payments by PayPal transaction ID"]
-    Ledger --> Report["Contribution history and AG Studio report"]
-```
+![PayPal subscription approval, verification, and payment reconciliation](docs/images/architecture-paypal.png)
+
+![PayPal subscription goal showing the monthly amount and next payment date](docs/images/paypal-subscription-goal.jpg)
 
 Signed PayPal webhooks and explicit refresh reconcile completed transactions into DynamoDB. The payment ledger uses PayPal transaction IDs to prevent double counting. Contributions displays payment history, and the AG Studio report in chat adds totals, a chart grouped by project or month, and a filterable receipt grid.
+
+### Subscription status and payment history
+
+An active subscription establishes the billing schedule. A completed transaction creates a ledger entry tied to the project. Goals reads the subscription state, while Contributions and AG Studio read the ledger. This allows the workspace to show the next billing date before the first completed payment appears in history.
+
+![AG Studio contribution report with totals, a payment chart, and a receipt grid](docs/images/ag-studio-contribution-report.jpg)
+
+The assistant can prepare a goal and show the PayPal approval link. The buyer authorizes the subscription on PayPal. For one-time contributions, the PayPal JavaScript SDK opens checkout and the Orders API creates and captures the order.
 
 ## Local development
 
